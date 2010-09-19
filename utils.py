@@ -200,6 +200,7 @@ def run(command, **kwargs):
     data = ref.communicate()
     return Objectify({
         '_bool': ref.returncode == 0,
+        'command': command,
         'code': ref.returncode,
         'stdout': data[0],
         'stderr': data[1],
