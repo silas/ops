@@ -10,7 +10,7 @@ python-utils is a collection of Python utilities.
 #### pushd & popd
 
     pushd('/tmp')
-    popd
+    popd()
 
 #### mkdir
 
