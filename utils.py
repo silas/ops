@@ -70,7 +70,7 @@ def popd(no_class=False):
     curframe = inspect.currentframe()
     calframe = inspect.getouterframes(curframe, 2)
     locals = calframe[1][0].f_locals
-    # Use self if class and no_clas is not true
+    # Use self if caller is a method and no_class is false
     print locals['self']
     if not no_class and 'self' in locals:
         locals = locals['self'].__dict__
@@ -104,7 +104,7 @@ def pushd(path, no_class=False):
     curframe = inspect.currentframe()
     calframe = inspect.getouterframes(curframe, 2)
     locals = calframe[1][0].f_locals
-    # Use self if class and no_clas is not true
+    # Use self if caller is a method and no_class is false
     if not no_class and 'self' in locals:
         locals = locals['self'].__dict__
     # Get or create directory stack variable
@@ -130,9 +130,9 @@ def pushd(path, no_class=False):
     })
 
 def run(command, close_fds=True, shell=True, env=None, set_env=None):
-    """Run a shell command and wait for response. The result object will
-    resolve to True if result.code == 0 and text results can be retrieved
-    from result.stdout and result.stderr.
+    """Run a shell command and wait for the response. The result object will
+    resolve to True if result.code == 0 and output/error results can be
+    retrieved from result.stdout and result.stderr variables.
 
     run('ls /random-directory')
     """
