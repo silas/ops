@@ -15,7 +15,7 @@ python-utils is a collection of Python utilities.
 ### run
 
     r = run("du -sh /tmp | awk '{ print $1 }'")
-    print 'Result (%s): %s' % (r.code, r.stderr.strip())
+    print 'Result (%s): %s' % (r.code, r.stdout.strip())
     >>> Result(0): 14M
     bool(r)
     >>> True
