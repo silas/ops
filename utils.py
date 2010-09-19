@@ -73,7 +73,6 @@ def popd(no_class=False):
     calframe = inspect.getouterframes(curframe, 2)
     locals = calframe[1][0].f_locals
     # Use self if caller is a method and no_class is false
-    print locals['self']
     if not no_class and 'self' in locals:
         locals = locals['self'].__dict__
     # Get or create directory stack variable
