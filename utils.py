@@ -60,6 +60,23 @@ def exit(code=0, text=''):
             print text
         sys.exit(0)
 
+def mkdir(path, recursive=True):
+    """Create a directory at the specified path. By default this function
+    recursively creates the structure.
+
+    mkdir('/tmp/build')
+    """
+    if os.path.exists(path):
+        return True
+    try:
+        if recursive:
+            os.makedirs(path)
+        else:
+            os.mkdir(path)
+    except OSError:
+        return False
+    return True
+
 def popd(no_class=False):
     """Remove last path from the stack and make it the current working
     directory. By default popd will look for the stack variable in self if
@@ -79,6 +96,7 @@ def popd(no_class=False):
     path = ''
     success = False
     if DIRECTORY_STACK_NAME in locals:
+        stack = locals[DIRECTORY_STACK_NAME]
         # Do popd
         if len(stack) > 0:
             path = stack.pop()
@@ -129,6 +147,27 @@ def pushd(path, no_class=False):
         '_bool': success,
         'path': path,
     })
+
+def rm(path, recursive=False):
+    """Delete a specified file or directory. This function does not recursively
+    delete by default.
+
+    rm('/tmp/build', recursive=True)
+    """
+    try:
+        if recursive:
+            if os.path.isfile(path):
+                os.remove(path)
+            else:
+                shutil.rmtree(path)
+        else:
+            if os.path.isfile(path):
+                os.remove(path)
+            else:
+                os.rmdir(path)
+    except OSError:
+        return False
+    return True
 
 def run(command, **kwargs):
     """Run a shell command and wait for the response. The result object will

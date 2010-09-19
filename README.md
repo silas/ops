@@ -12,6 +12,14 @@ python-utils is a collection of Python utilities.
     pushd('/tmp')
     popd
 
+#### mkdir
+
+    mkdir('/tmp/build/hello-world')
+
+#### rm
+
+    rm('/tmp/build', recursive=True)
+
 #### run
 
     r = run("du -sh ${path} | awk '{ print $1 }'", path='/tmp')
