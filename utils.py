@@ -6,6 +6,8 @@
 import copy
 import inspect
 import os
+import pipes
+import string
 import subprocess
 import sys
 
@@ -129,23 +131,32 @@ def pushd(path, no_class=False):
         'path': path,
     })
 
-def run(command, close_fds=True, shell=True, env=None, set_env=None):
+def run(command, **kwargs):
     """Run a shell command and wait for the response. The result object will
     resolve to True if result.code == 0 and output/error results can be
     retrieved from result.stdout and result.stderr variables.
 
-    run('ls /random-directory')
+    run('ls ${path}', path='/tmp')
     """
-    if set_env is not None:
-        if env is None:
-            env = copy.deepcopy(os.environ)
-        env.update(set_env)
+    if ('env' in kwargs and not kwargs.get('env_empty') and
+        isinstance(kwargs['env'], dict)):
+        env = copy.deepcopy(os.environ)
+        env.update(kwargs['env'])
+    elif kwargs.get('env_empty'):
+        env = {}
+    else:
+        env = None
+    if kwargs:
+        args = {}
+        for name, value in kwargs.items():
+            args[name] = pipes.quote(value)
+        command = string.Template(command).safe_substitute(args)
     ref = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        shell=shell,
-        close_fds=close_fds,
+        shell=True,
+        close_fds=True,
         env=env,
     )
     data = ref.communicate()
