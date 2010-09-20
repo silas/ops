@@ -3,6 +3,10 @@ python-utils
 
 python-utils is a collection of Python utilities.
 
+#### cp
+
+    cp('/tmp/one', '/tmp/two')
+
 #### exit
 
     exit(code=1, text='Invalid directory path')

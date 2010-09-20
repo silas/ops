@@ -7,6 +7,7 @@ import copy
 import inspect
 import os
 import pipes
+import shutil
 import string
 import subprocess
 import sys
@@ -42,6 +43,28 @@ class Objectify(dict):
             if not name.startswith('_'):
                 values[name] = value
         return values
+
+def cp(src_path, dst_path, follow_symlinks=False):
+    """Copy source to destination.
+
+    cp('/tmp/one', '/tmp/two')
+    """
+    try:
+        if follow_symlinks and os.path.islink(src_path):
+            src_path = os.path.realpath(src_path)
+        if follow_symlinks and os.path.islink(dst_path):
+            dst_path = os.path.realpath(dst_path)
+        if os.path.isfile(src_path):
+            if os.path.isdir(dst_path):
+                dst_path = os.path.join(dst_path, os.path.basename(src_path))
+            shutil.copy2(src_path, dst_path)
+            return True
+        elif os.path.isdir(src_path):
+            shutil.copytree(src_path, dst_path, symlinks=follow_symlinks)
+            return True
+    except OSError:
+        pass
+    return False
 
 def exit(code=0, text=''):
     """Exit and print text (if defined) to stderr if code > 0 or stdout
