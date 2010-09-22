@@ -4,9 +4,10 @@
 # This file is subject to the New BSD License (see the LICENSE file).
 
 import copy
-import inspect
+import fnmatch
 import glob
 import grp
+import inspect
 import os
 import pipes
 import pwd
@@ -47,29 +48,40 @@ class Objectify(dict):
                 values[name] = value
         return values
 
-def chown(path, user, group=None):
+def _chown(path, **kwargs):
+    user = kwargs.get('user')
+    group = kwargs.get('group')
+    uid = kwargs.get('uid', -1)
+    gid = kwargs.get('gid', -1)
+    successful = True
+    if uid == -1 and user is not None:
+        try:
+            uid = pwd.getpwnam(user)[2]
+        except KeyError:
+            successful = False
+    if gid == -1 and group is not None:
+        try:
+            gid = grp.getgrnam(group)[2]
+        except KeyError:
+            successful = False
+    try:
+        os.chown(path, uid, gid)
+    except OSError:
+        successful = False
+    return successful
+
+def chown(path, **kwargs):
     """Change file owner and group.
 
     chown('/tmp/one', user='root', group='apache')
     """
     successful = True
-    uid = -1
-    gid = -1
-    try:
-        data = pwd.getpwnam(user)
-        uid = data[2]
-        gid = data[3]
-        if group is not None:
-            try:
-                gid = grp.getgrnam(group)[2]
-            except KeyError:
-                successful = False
-        try:
-            os.chown(path, uid, gid)
-        except OSError:
-            successful = False
-    except KeyError:
-        successful = False
+    recursive = kwargs.get('recursive')
+    if recursive:
+        for p in find(path):
+            successful = chown(p, **kwargs) and successful
+    else:
+        successful = chown(path, **kwargs)
     return successful
 
 def cp(src_path, dst_path, follow_symlinks=False):
@@ -77,6 +89,7 @@ def cp(src_path, dst_path, follow_symlinks=False):
 
     cp('/tmp/one', '/tmp/two')
     """
+    successful = False
     try:
         if follow_symlinks and os.path.islink(src_path):
             src_path = os.path.realpath(src_path)
@@ -86,13 +99,13 @@ def cp(src_path, dst_path, follow_symlinks=False):
             if os.path.isdir(dst_path):
                 dst_path = os.path.join(dst_path, os.path.basename(src_path))
             shutil.copy2(src_path, dst_path)
-            return True
+            successful = True
         elif os.path.isdir(src_path):
             shutil.copytree(src_path, dst_path, symlinks=follow_symlinks)
-            return True
+            successful = True
     except OSError:
-        pass
-    return False
+        successful = False
+    return successful
 
 def exit(code=0, text=''):
     """Exit and print text (if defined) to stderr if code > 0 or stdout
@@ -110,6 +123,25 @@ def exit(code=0, text=''):
         if text:
             print text
         sys.exit(0)
+
+def _find(value, name=None):
+    if name is not None and not fnmatch.fnmatch(value, name):
+        return False
+    return True
+
+def find(path, directory=True, file=True, **kwargs):
+    """Find directories and files in the specified path.
+
+    for path in find('/tmp', name='*.py', directory=False):
+        print path
+    """
+    for root_path, dir_list, file_list in os.walk(path):
+        if directory and _find(root_path, **kwargs):
+            yield root_path
+        if file:
+            for f in file_list:
+                if _find(f, **kwargs):
+                    yield os.path.join(root_path, f)
 
 def mkdir(path, recursive=True):
     """Create a directory at the specified path. By default this function
@@ -227,14 +259,13 @@ def run(command, **kwargs):
 
     run('ls ${path}', path='/tmp')
     """
-    if ('env' in kwargs and not kwargs.get('env_empty') and
-        isinstance(kwargs['env'], dict)):
-        env = copy.deepcopy(os.environ)
+    env = None
+    if 'env' in kwargs:
+        if kwargs.get('env_empty'):
+            env = {}
+        else:
+            env = copy.deepcopy(os.environ)
         env.update(kwargs['env'])
-    elif kwargs.get('env_empty'):
-        env = {}
-    else:
-        env = None
     if kwargs:
         args = {}
         for name, value in kwargs.items():
