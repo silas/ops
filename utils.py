@@ -5,8 +5,11 @@
 
 import copy
 import inspect
+import glob
+import grp
 import os
 import pipes
+import pwd
 import shutil
 import string
 import subprocess
@@ -43,6 +46,31 @@ class Objectify(dict):
             if not name.startswith('_'):
                 values[name] = value
         return values
+
+def chown(path, user, group=None):
+    """Change file owner and group.
+
+    chown('/tmp/one', user='root', group='apache')
+    """
+    successful = True
+    uid = -1
+    gid = -1
+    try:
+        data = pwd.getpwnam(user)
+        uid = data[2]
+        gid = data[3]
+        if group is not None:
+            try:
+                gid = grp.getgrnam(group)[2]
+            except KeyError:
+                successful = False
+        try:
+            os.chown(path, uid, gid)
+        except OSError:
+            successful = False
+    except KeyError:
+        successful = False
+    return successful
 
 def cp(src_path, dst_path, follow_symlinks=False):
     """Copy source to destination.
@@ -117,7 +145,7 @@ def popd(no_class=False):
         locals = locals['self'].__dict__
     # Get or create directory stack variable
     path = ''
-    success = False
+    successful = False
     if DIRECTORY_STACK_NAME in locals:
         stack = locals[DIRECTORY_STACK_NAME]
         # Do popd
@@ -125,12 +153,12 @@ def popd(no_class=False):
             path = stack.pop()
             try:
                 os.chdir(path)
-                success = True
+                successful = True
             except OSError:
                 pass
     # Return results with path
     return Objectify({
-        '_bool': success,
+        '_bool': successful,
         'path': path,
     })
 
@@ -155,11 +183,11 @@ def pushd(path, no_class=False):
     else:
         stack = locals[DIRECTORY_STACK_NAME]
     # Do pushd
-    success = False
+    successful = False
     try:
         stack.append(os.getcwd())
         os.chdir(path)
-        success = True
+        successful = True
     except OSError:
         stack.pop()
     # Delete variable if empty
@@ -167,7 +195,7 @@ def pushd(path, no_class=False):
         del locals[DIRECTORY_STACK_NAME]
     # Return results with path
     return Objectify({
-        '_bool': success,
+        '_bool': successful,
         'path': path,
     })
 
