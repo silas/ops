@@ -1,7 +1,14 @@
 python-utils
 ============
 
-python-utils is a collection of Python utilities.
+python-utils is a collection of convenience functions intended to augment the
+builtin Python `os` and `shutil` modules.
+
+### Requirements
+
+ * Python >= 2.6
+
+### Examples
 
 #### cp
 
