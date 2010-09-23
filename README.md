@@ -51,6 +51,11 @@ builtin Python `os` and `shutil` modules.
     bool(r)
     >>> False
 
+#### workspace
+
+    with workspace('test') as w:
+        print w.join('dir1', 'file1')
+
 ### License
 
 This work is licensed under the New BSD License (see the LICENSE file).

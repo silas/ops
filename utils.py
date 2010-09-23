@@ -16,6 +16,7 @@ import shutil
 import string
 import subprocess
 import sys
+import tempfile
 
 DIRECTORY_STACK_NAME = '__utils_directory_stack'
 
@@ -301,3 +302,31 @@ def run(command, **kwargs):
         'stdout': data[0],
         'stderr': data[1],
     })
+
+class workspace(object):
+    """Create a secure and temporary workspace that will be automatically
+    cleaned up. `workspace` takes the same parameters as `tempfile.mkdtemp`.
+
+    with workspace('test') as w:
+        print w.join('dir1', 'file1')
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs
+        self._path = None
+
+    def __enter__(self):
+        self._path = tempfile.mkdtemp(*self.args, **self.kwargs)
+        return self
+
+    def __exit__(self, type, value, traceback):
+        if self.path and os.path.exists(self.path):
+            rm(self.path, recursive=True)
+
+    @property
+    def path(self):
+        return self._path
+
+    def join(self, *args):
+        return os.path.join(self.path, *args)
