@@ -8,6 +8,7 @@ import fnmatch
 import glob
 import grp
 import inspect
+import logging
 import os
 import pipes
 import pwd
@@ -58,15 +59,18 @@ def _chown(path, **kwargs):
         try:
             uid = pwd.getpwnam(user)[2]
         except KeyError:
+            logging.error('chown: uid lookup failed: %s' % user)
             successful = False
     if gid == -1 and group is not None:
         try:
             gid = grp.getgrnam(group)[2]
         except KeyError:
+            logging.error('chown: gid lookup failed: %s' % group)
             successful = False
     try:
         os.chown(path, uid, gid)
-    except OSError:
+    except OSError, error:
+        logging.error('chown: execute failed: %s (%s)' % (path, error))
         successful = False
     return successful
 
@@ -95,16 +99,18 @@ def cp(src_path, dst_path, follow_symlinks=False):
             src_path = os.path.realpath(src_path)
         if follow_symlinks and os.path.islink(dst_path):
             dst_path = os.path.realpath(dst_path)
-        if os.path.isfile(src_path):
+        if os.path.isdir(src_path):
+            shutil.copytree(src_path, dst_path, symlinks=follow_symlinks)
+            successful = True
+        elif os.path.exists(src_path):
             if os.path.isdir(dst_path):
                 dst_path = os.path.join(dst_path, os.path.basename(src_path))
             shutil.copy2(src_path, dst_path)
             successful = True
-        elif os.path.isdir(src_path):
-            shutil.copytree(src_path, dst_path, symlinks=follow_symlinks)
-            successful = True
-    except OSError:
-        successful = False
+        else:
+            logging.error('cp: source not found: %s' % src_path)
+    except OSError, error:
+        logging.error('cp: execute failed: %s => %s (%s)' % (src_path, dst_path, error))
     return successful
 
 def exit(code=0, text=''):
@@ -156,7 +162,8 @@ def mkdir(path, recursive=True):
             os.makedirs(path)
         else:
             os.mkdir(path)
-    except OSError:
+    except OSError, error:
+        logging.error('mkdir: execute failed: %s (%s)' % (path, error))
         return False
     return True
 
@@ -187,7 +194,11 @@ def popd(no_class=False):
                 os.chdir(path)
                 successful = True
             except OSError:
-                pass
+                logging.error('popd: unable to chdir: %s' % path)
+        else:
+            logging.error('popd: stack empty')
+    else:
+        logging.error('popd: stack does not exist')
     # Return results with path
     return Objectify({
         '_bool': successful,
@@ -221,6 +232,7 @@ def pushd(path, no_class=False):
         os.chdir(path)
         successful = True
     except OSError:
+        logging.error('pushd: unable to chdir: %s' % path)
         stack.pop()
     # Delete variable if empty
     if not locals[DIRECTORY_STACK_NAME]:
@@ -248,7 +260,8 @@ def rm(path, recursive=False):
                 os.remove(path)
             else:
                 os.rmdir(path)
-    except OSError:
+    except OSError, error:
+        logging.error('rm: execute failed: %s (%s)' % (path, error))
         return False
     return True
 
@@ -271,6 +284,7 @@ def run(command, **kwargs):
         for name, value in kwargs.items():
             args[name] = pipes.quote(value)
         command = string.Template(command).safe_substitute(args)
+    logging.debug('run: %s' % command)
     ref = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
