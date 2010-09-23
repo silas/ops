@@ -83,9 +83,9 @@ def chown(path, **kwargs):
     recursive = kwargs.get('recursive')
     if recursive:
         for p in find(path):
-            successful = chown(p, **kwargs) and successful
+            successful = _chown(p, **kwargs) and successful
     else:
-        successful = chown(path, **kwargs)
+        successful = _chown(path, **kwargs)
     return successful
 
 def cp(src_path, dst_path, follow_symlinks=False):
