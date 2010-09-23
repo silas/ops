@@ -14,6 +14,9 @@ class Workspace(object):
     def path(self):
         return self._path
 
+    def join(self, *args):
+        return os.path.join(self.path, *args)
+
     def create(self):
         self.destroy()
         os.makedirs(self.path)
