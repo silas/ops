@@ -5,7 +5,7 @@ python-utils is a collection of Python utilities.
 
 #### cp
 
-    cp('/tmp/one', '/tmp/two')
+    cp('/etc/password', '/tmp')
 
 #### exit
 
