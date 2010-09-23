@@ -11,6 +11,12 @@ python-utils is a collection of Python utilities.
 
     exit(code=1, text='Invalid directory path')
 
+#### find
+
+    for path in find('/tmp', name='*.pyc', directory=False):
+        print 'Deleting %s...' % path
+        rm(path)
+
 #### pushd & popd
 
     pushd('/tmp')
