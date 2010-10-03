@@ -4,6 +4,7 @@
 # This file is subject to the New BSD License (see the LICENSE file).
 
 import copy
+import datetime
 import fnmatch
 import glob
 import grp
@@ -149,6 +150,64 @@ def find(path, directory=True, file=True, **kwargs):
             for f in file_list:
                 if _find(f, **kwargs):
                     yield os.path.join(root_path, f)
+
+class group(object):
+    """Helper class for getting information about a group.
+
+    g = group(id=0)
+    print g.name
+    """
+
+    def __init__(self, id=None, name=None):
+        self._id = id
+        self._name = name
+        if id is None and name is None:
+            self._id = os.getegid()
+
+    @property
+    def data(self):
+        if not hasattr(self, '_data'):
+            if self._name:
+                try:
+                    self._data = grp.getgrnam(self._name)
+                except KeyError:
+                    logging.error('unable to lookup by name: %s' % self._name)
+                    self._data = [None] * 7
+            else:
+                try:
+                    self._data = grp.getgrgid(self._id)
+                except KeyError:
+                    logging.error('unable to lookup by gid: %s' % self._id)
+                    self._data = [None] * 7
+        return self._data
+
+    @property
+    def gr_name(self):
+        return self.data[0]
+
+    @property
+    def name(self):
+        return self.gr_name
+
+    @property
+    def gr_passwd(self):
+        return self.data[1]
+
+    @property
+    def gr_gid(self):
+        return self.data[2]
+
+    @property
+    def id(self):
+        return self.gr_gid
+
+    @property
+    def gr_mem(self):
+        return self.data[3]
+
+    @property
+    def members(self):
+        return [user(name=name) for name in self.gr_mem]
 
 def mkdir(path, recursive=True):
     """Create a directory at the specified path. By default this function
@@ -302,6 +361,175 @@ def run(command, **kwargs):
         'stdout': data[0],
         'stderr': data[1],
     })
+
+class stat(object):
+
+    def __init__(self, path):
+        self.path = path
+
+    @property
+    def data(self):
+        if not hasattr(self, '_data'):
+            self._data = os.stat(self.path)
+        return self._data
+
+    @property
+    def st_mode(self):
+        return self.data[0]
+
+    @property
+    def st_ino(self):
+        return self.data[1]
+
+    @property
+    def inode(self):
+        return self.st_ino
+
+    @property
+    def st_dev(self):
+        return self.data[2]
+
+    @property
+    def device(self):
+        return self.st_dev
+
+    @property
+    def st_nlink(self):
+        return self.data[3]
+
+    @property
+    def nlink(self):
+        return self.st_nlinks
+
+    @property
+    def st_uid(self):
+        return self.data[4]
+
+    @property
+    def user(self):
+        return user(id=self.st_uid)
+
+    @property
+    def st_gid(self):
+        return self.data[5]
+
+    @property
+    def gid(self):
+        return self.st_gid
+
+    @property
+    def st_size(self):
+        return self.data[6]
+
+    @property
+    def size(self):
+        return self.st_size
+
+    @property
+    def st_atime(self):
+        return self.data[7]
+
+    @property
+    def atime(self):
+        return datetime.datetime.fromtimestamp(self.st_atime)
+
+    @property
+    def st_mtime(self):
+        return self.data[8]
+
+    @property
+    def mtime(self):
+        return datetime.datetime.fromtimestamp(self.st_mtime)
+
+    @property
+    def st_ctime(self):
+        return self.data[9]
+
+    @property
+    def ctime(self):
+        return datetime.datetime.fromtimestamp(self.st_ctime)
+
+class user(object):
+    """Helper class for getting information about a user.
+
+    u = user(id=0)
+    print u.name
+    """
+
+    def __init__(self, id=None, name=None):
+        self._id = id
+        self._name = name
+        if id is None and name is None:
+            self._id = os.geteuid()
+
+    @property
+    def data(self):
+        if not hasattr(self, '_data'):
+            if self._name:
+                try:
+                    self._data = pwd.getpwnam(self._name)
+                except KeyError:
+                    logging.error('unable to lookup by name: %s' % self._name)
+                    self._data = [None] * 7
+            else:
+                try:
+                    self._data = pwd.getpwuid(self._id)
+                except KeyError:
+                    logging.error('unable to lookup by uid: %s' % self._id)
+                    self._data = [None] * 7
+        return self._data
+
+    @property
+    def pw_name(self):
+        return self.data[0]
+
+    @property
+    def name(self):
+        return self.pw_name
+
+    @property
+    def pw_password(self):
+        return self.data[1]
+
+    @property
+    def pw_uid(self):
+        return self.data[2]
+
+    @property
+    def id(self):
+        return self.pw_uid
+
+    @property
+    def pw_gid(self):
+        return self.data[3]
+
+    @property
+    def group(self):
+        return group(id=self.pw_gid)
+
+    @property
+    def pw_gecos(self):
+        return self.data[4]
+
+    @property
+    def gecos(self):
+        return self.pw_gecos
+
+    @property
+    def pw_dir(self):
+        return self.data[5]
+
+    @property
+    def home(self):
+        return self.pw_dir
+
+    @property
+    def pw_shell(self):
+        return self.data[6]
+
+    @property
+    def shell(self):
+        return self.pw_shell
 
 class workspace(object):
     """Create a secure and temporary workspace that will be automatically
