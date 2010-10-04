@@ -1,8 +1,8 @@
+import helper
+
 import os
 import unittest
 import opsutils
-
-import helper
 
 class CpTestCase(unittest.TestCase):
 

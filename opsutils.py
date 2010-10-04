@@ -9,7 +9,7 @@ import fnmatch
 import glob
 import grp
 import inspect
-import logging
+import logging as logginglib
 import os
 import pipes
 import pwd
@@ -18,6 +18,8 @@ import string
 import subprocess
 import sys
 import tempfile
+
+logging = logginglib.getLogger('opsutils')
 
 DIRECTORY_STACK_NAME = '__utils_directory_stack'
 

@@ -1,10 +1,10 @@
+import helper
+
 import datetime
 import copy
 import os
 import unittest
 import opsutils
-
-import helper
 
 class FindRuleTestCase(unittest.TestCase):
 

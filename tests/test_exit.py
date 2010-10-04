@@ -1,3 +1,5 @@
+import helper
+
 import StringIO
 import sys
 import unittest

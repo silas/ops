@@ -1,9 +1,9 @@
+import helper
+
 import grp
 import os
 import unittest
 import opsutils
-
-import helper
 
 class ChownTestCase(unittest.TestCase):
 
