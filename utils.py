@@ -188,8 +188,8 @@ class _FindTimeRule(_FindRule):
                         dt.month == self.time.month and
                         dt.day == self.time.day)
             return self.render(dt == self.time)
-        if isinstance(self.time, datetime.date):
-            time = datetime.datetime(year=time.year, month=time.month, day=time.day)
+        if isinstance(self.time, datetime.date) and not isinstance(self.time, datetime.datetime):
+            time = datetime.datetime(year=self.time.year, month=self.time.month, day=self.time.day)
         else:
             time = self.time
         if self.op == 'lt':
