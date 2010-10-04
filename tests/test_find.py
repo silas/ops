@@ -125,5 +125,35 @@ class FindTimeRuleTestCase(unittest.TestCase):
         self.assertTrue(self.rule('second', 15))
         self.assertFalse(self.rule('second', 1))
 
+class FindTestCase(unittest.TestCase):
+
+    def test_add_rule_name(self):
+        find = utils.find('.')
+        find._add_rule({'name': '*.pyc'})
+        self.assertEqual(len(find.rules), 1)
+        self.assertTrue(isinstance(find.rules[0], utils._FindNameRule))
+
+    def test_add_rule_directory(self):
+        find = utils.find('.')
+        find._add_rule({'directory': True})
+        self.assertEqual(len(find.rules), 1)
+        self.assertTrue(isinstance(find.rules[0], utils._FindDirectoryRule))
+
+    def test_add_rule_file(self):
+        find = utils.find('.')
+        find._add_rule({'file': True})
+        self.assertEqual(len(find.rules), 1)
+        self.assertTrue(isinstance(find.rules[0], utils._FindFileRule))
+
+    def test_add_rule_time(self):
+        find = utils.find('.')
+        find._add_rule({'atime__year': 2010})
+        find._add_rule({'ctime__month': 5})
+        find._add_rule({'mtime__day': 1})
+        self.assertEqual(len(find.rules), 3)
+        self.assertTrue(isinstance(find.rules[0], utils._FindTimeRule))
+        self.assertTrue(isinstance(find.rules[1], utils._FindTimeRule))
+        self.assertTrue(isinstance(find.rules[2], utils._FindTimeRule))
+
 if __name__ == '__main__':
     unittest.main()

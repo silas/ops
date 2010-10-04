@@ -229,13 +229,13 @@ class find(object):
         for root_path, dir_list, file_list in os.walk(self.path):
             s = stat(root_path)
             s._directory, s._file = True, False
-            if self._run(os.path.basename(root_path), s):
+            if self._match(os.path.basename(root_path), s):
                 yield root_path
             for f in file_list:
                 path = os.path.join(root_path, f)
                 s = stat(path)
                 s._directory, s._file = False, True
-                if self._run(f, s):
+                if self._match(f, s):
                     yield path
 
     def _add_rule(self, data, exclude=False):
@@ -252,7 +252,7 @@ class find(object):
             else:
                 logging.error('unknown find rule %s=%s' % (name, value))
 
-    def _run(self, name, stat):
+    def _match(self, name, stat):
         for rule in self.rules:
             if not rule(name, stat):
                 return False
