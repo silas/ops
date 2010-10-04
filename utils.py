@@ -21,7 +21,7 @@ import tempfile
 
 DIRECTORY_STACK_NAME = '__utils_directory_stack'
 
-class Objectify(dict):
+class objectify(dict):
 
     def __getattr__(self, name):
         try:
@@ -136,6 +136,9 @@ class _FindRule(object):
 
     def __init__(self, exclude=False):
         self.exclude = exclude
+
+    def __call__(self, name, stat):
+        raise NotImplementedError()
 
     def render(self, value=True):
         if self.exclude:
@@ -372,7 +375,7 @@ def popd(no_class=False):
     else:
         logging.error('popd: stack does not exist')
     # Return results with path
-    return Objectify({
+    return objectify({
         '_bool': successful,
         'path': path,
     })
@@ -410,7 +413,7 @@ def pushd(path, no_class=False):
     if not locals[DIRECTORY_STACK_NAME]:
         del locals[DIRECTORY_STACK_NAME]
     # Return results with path
-    return Objectify({
+    return objectify({
         '_bool': successful,
         'path': path,
     })
@@ -466,7 +469,7 @@ def run(command, **kwargs):
         env=env,
     )
     data = ref.communicate()
-    return Objectify({
+    return objectify({
         '_bool': ref.returncode == 0,
         'code': ref.returncode,
         'command': command,
