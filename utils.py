@@ -132,65 +132,136 @@ def exit(code=0, text=''):
             print text
         sys.exit(0)
 
-def _find_relative(stat, time):
-    if isinstance(time, datetime.datetime) and time == stat:
-        return True
-    elif isinstance(time, datetime.date) and time == stat.date():
-        return True
-    elif isinstance(time, datetime.timedelta):
-        if time > 0 and stat >= datetime.datetime.now() + time:
-            return True
-        elif time < 0 and stat <= datetime.datetime.now() + (-time):
-            return True
-    return False
+class _FindRule(object):
 
-def _find_between(stat, low, high):
-    if isinstance(low, datetime.date):
-        low = datetime.datetime(year=low.year, month=low.month, day=low.day)
-    if isinstance(high, datetime.date):
-        high = datetime.datetime(year=high.year, month=high.month, day=high.day)
-    if low is not None and high is not None:
-        return stat >= low and stat <= high
-    elif low is not None:
-        return stat >= low
-    elif high is not None:
-        return stat <= high
-    return True
+    def __init__(self, exclude=False):
+        self.exclude = exclude
 
-def _find(value, stat, **kwargs):
-    if 'name' in kwargs and not fnmatch.fnmatch(value, kwargs['name']):
-        return False
-    for n in ('atime', 'ctime', 'mtime'):
-        s = getattr(stat, n)
-        # check relative time
-        if n in kwargs and not _find_relative(s, kwargs[n]):
-            return False
-        # check between low/high
-        if (('%s_low' % n in kwargs or '%s_high' % n in kwargs) and
-            not _find_between(s, kwargs.get('%s_low' % n),
-                kwargs.get('%s_high' % n))):
-            return False
-    return True
+    def render(self, value=True):
+        if self.exclude:
+            return not value
+        return value
 
-def find(path, directory=True, file=True, **kwargs):
+class _FindDirectoryRule(_FindRule):
+
+    def __init__(self, value, **kwargs):
+        super(_FindDirectoryRule, self).__init__(**kwargs)
+        self.value = value
+
+    def __call__(self, name, stat):
+        return self.render(stat.directory == self.value)
+
+class _FindFileRule(_FindRule):
+
+    def __init__(self, value, **kwargs):
+        super(_FindFileRule, self).__init__(**kwargs)
+        self.value = value
+
+    def __call__(self, name, stat):
+        return self.render(stat.file == self.value)
+
+class _FindNameRule(_FindRule):
+
+    def __init__(self, pattern, **kwargs):
+        super(_FindNameRule, self).__init__(**kwargs)
+        self.pattern = pattern
+
+    def __call__(self, name, stat):
+        return self.render(fnmatch.fnmatch(name, self.pattern))
+
+class _FindTimeRule(_FindRule):
+
+    def __init__(self, type, op, time, **kwargs):
+        super(_FindTimeRule, self).__init__(**kwargs)
+        self.type = type
+        self.op = op
+        self.time = time
+
+    def __call__(self, name, stat):
+        dt = getattr(stat, self.type)
+        if not self.op or self.op == 'exact':
+            if isinstance(self.time, datetime.date):
+                return self.render(dt.year == self.time.year and
+                        dt.month == self.time.month and
+                        dt.day == self.time.day)
+            return self.render(dt == self.time)
+        if isinstance(self.time, datetime.date):
+            time = datetime.datetime(year=time.year, month=time.month, day=time.day)
+        else:
+            time = self.time
+        if self.op == 'lt':
+            return self.render(dt < time)
+        elif self.op == 'lte':
+            return self.render(dt <= time)
+        elif self.op == 'gt':
+            return self.render(dt > time)
+        elif self.op == 'gte':
+            return self.render(dt >= time)
+        elif self.op == 'year':
+            return self.render(dt.year == self.time)
+        elif self.op == 'month':
+            return self.render(dt.month == self.time)
+        elif self.op == 'day':
+            return self.render(dt.day == self.time)
+        elif self.op == 'hour':
+            return self.render(dt.hour == self.time)
+        elif self.op == 'minute':
+            return self.render(dt.minute == self.time)
+        elif self.op == 'second':
+            return self.render(dt.second == self.time)
+        return self.render()
+
+class find(object):
     """Find directories and files in the specified path.
 
-    for path in find('/tmp', name='*.py', directory=False):
+    for path in find('/tmp').filter(name='*.py'):
         print path
     """
-    path = os.path.realpath(path)
-    for root_path, dir_list, file_list in os.walk(path):
-        if directory:
-            d_name = os.path.basename(root_path)
-            d_stat = stat(root_path)
-            if _find(d_name, d_stat, **kwargs):
+
+    def __init__(self, path):
+        self.path = os.path.realpath(path)
+        self.rules = []
+
+    def __iter__(self):
+        for root_path, dir_list, file_list in os.walk(self.path):
+            s = stat(root_path)
+            s._directory, s._file = True, False
+            if self._run(os.path.basename(root_path), s):
                 yield root_path
-        if file:
             for f in file_list:
-                f_path = os.path.join(root_path, f)
-                f_stat = stat(f_path)
-                if _find(f, f_stat, **kwargs):
-                    yield os.path.join(root_path, f)
+                path = os.path.join(root_path, f)
+                s = stat(path)
+                s._directory, s._file = False, True
+                if self._run(f, s):
+                    yield path
+
+    def _add_rule(self, data, exclude=False):
+        for name, value in data.items():
+            n, p, op = name.partition('__')
+            if n == 'name':
+                self.rules.append(_FindNameRule(value, exclude=exclude))
+            elif n == 'directory':
+                self.rules.append(_FindDirectoryRule(value, exclude=exclude))
+            elif n == 'file':
+                self.rules.append(_FindFileRule(value, exclude=exclude))
+            elif n in ('atime', 'ctime', 'mtime'):
+                self.rules.append(FindTimeRule(n, op, value, exclude=exclude))
+            else:
+                logging.error('unknown find rule %s=%s' % (name, value))
+
+    def _run(self, name, stat):
+        for rule in self.rules:
+            if not rule(name, stat):
+                return False
+        return True
+
+    def filter(self, **kwargs):
+        self._add_rule(kwargs)
+        return self
+
+    def exclude(self, **kwargs):
+        self._add_rule(kwargs, exclude=True)
+        return self
 
 class group(object):
     """Helper class for getting information about a group.
@@ -489,6 +560,18 @@ class stat(object):
     @property
     def ctime(self):
         return datetime.datetime.fromtimestamp(self.st_ctime)
+
+    @property
+    def file(self):
+        if not hasattr(self, '_file'):
+            self._file = os.path.isfile(self.path)
+        return self._file
+
+    @property
+    def directory(self):
+        if not hasattr(self, '_directory'):
+            self._directory = os.path.isdir(self.path)
+        return self._directory
 
 class user(object):
     """Helper class for getting information about a user.
