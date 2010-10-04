@@ -276,24 +276,27 @@ class group(object):
     def __init__(self, id=None, name=None):
         self._id = id
         self._name = name
+        self._bool = None
         if id is None and name is None:
             self._id = os.getegid()
+
+    def __nonzero__(self):
+        if self._bool is None:
+            self.data
+        return self._bool
 
     @property
     def data(self):
         if not hasattr(self, '_data'):
-            if self._name:
-                try:
+            try:
+                if self._name:
                     self._data = grp.getgrnam(self._name)
-                except KeyError:
-                    logging.error('unable to lookup by name: %s' % self._name)
-                    self._data = [None] * 7
-            else:
-                try:
+                else:
                     self._data = grp.getgrgid(self._id)
-                except KeyError:
-                    logging.error('unable to lookup by gid: %s' % self._id)
-                    self._data = [None] * 7
+                self._bool = True
+            except KeyError:
+                self._bool = False
+                self._data = [None] * 7
         return self._data
 
     @property
@@ -586,24 +589,27 @@ class user(object):
     def __init__(self, id=None, name=None):
         self._id = id
         self._name = name
+        self._bool = None
         if id is None and name is None:
             self._id = os.geteuid()
+
+    def __nonzero__(self):
+        if self._bool is None:
+            self.data
+        return self._bool
 
     @property
     def data(self):
         if not hasattr(self, '_data'):
-            if self._name:
-                try:
+            try:
+                if self._name:
                     self._data = pwd.getpwnam(self._name)
-                except KeyError:
-                    logging.error('unable to lookup by name: %s' % self._name)
-                    self._data = [None] * 7
-            else:
-                try:
+                else:
                     self._data = pwd.getpwuid(self._id)
-                except KeyError:
-                    logging.error('unable to lookup by uid: %s' % self._id)
-                    self._data = [None] * 7
+                self._bool = True
+            except KeyError:
+                self._data = [None] * 7
+                self._bool = False
         return self._data
 
     @property
