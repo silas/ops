@@ -155,5 +155,22 @@ class FindTestCase(unittest.TestCase):
         self.assertTrue(isinstance(find.rules[1], opsutils._FindTimeRule))
         self.assertTrue(isinstance(find.rules[2], opsutils._FindTimeRule))
 
+    def test_filter(self):
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        count = 0
+        for path in opsutils.find(dir_path).filter(name='test_find.py'):
+            count += 1
+        self.assertEqual(count, 1)
+
+    def test_exclude(self):
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        total_count = 0
+        exclude_count = 0
+        for path in opsutils.find(dir_path):
+            total_count += 1
+        for path in opsutils.find(dir_path).exclude(name='test_find.py'):
+            exclude_count += 1
+        self.assertEqual(exclude_count+1, total_count)
+
 if __name__ == '__main__':
     unittest.main()
