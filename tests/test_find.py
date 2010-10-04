@@ -2,14 +2,14 @@ import datetime
 import copy
 import os
 import unittest
-import utils
+import opsutils
 
 import helper
 
 class FindRuleTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.rule = utils._FindRule()
+        self.rule = opsutils._FindRule()
 
     def test_call(self):
         try:
@@ -20,44 +20,44 @@ class FindRuleTestCase(unittest.TestCase):
     def test_render(self):
         self.assertTrue(self.rule.render())
         self.assertFalse(self.rule.render(False))
-        rule = utils._FindRule(exclude=True)
+        rule = opsutils._FindRule(exclude=True)
         self.assertFalse(rule.render())
         self.assertTrue(rule.render(False))
 
 class FindDirectoryRuleTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.rule = utils._FindDirectoryRule(True)
+        self.rule = opsutils._FindDirectoryRule(True)
         self.file_path = os.path.realpath(__file__)
 
     def test_call(self):
         name = os.path.basename(self.file_path)
-        self.assertFalse(self.rule(name, utils.stat(self.file_path)))
+        self.assertFalse(self.rule(name, opsutils.stat(self.file_path)))
 
     def test_directory(self):
         path = os.path.dirname(self.file_path)
         name = os.path.basename(path)
-        self.assertTrue(self.rule(name, utils.stat(path)))
+        self.assertTrue(self.rule(name, opsutils.stat(path)))
 
 class FindFileRuleTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.rule = utils._FindFileRule(True)
+        self.rule = opsutils._FindFileRule(True)
         self.file_path = os.path.realpath(__file__)
 
     def test_file(self):
         name = os.path.basename(self.file_path)
-        self.assertTrue(self.rule(name, utils.stat(self.file_path)))
+        self.assertTrue(self.rule(name, opsutils.stat(self.file_path)))
 
     def test_directory(self):
         path = os.path.dirname(self.file_path)
         name = os.path.basename(path)
-        self.assertFalse(self.rule(name, utils.stat(path)))
+        self.assertFalse(self.rule(name, opsutils.stat(path)))
 
 class FindNameRuleTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.rule = utils._FindNameRule('*hello[12].py?')
+        self.rule = opsutils._FindNameRule('*hello[12].py?')
 
     def test_match(self):
         self.assertTrue(self.rule('hello1.pyc', None))
@@ -72,10 +72,10 @@ class FindTimeRuleTestCase(unittest.TestCase):
         self.dt_eq = datetime.datetime(year=2010, month=11, day=12, hour=13, minute=14, second=15)
         self.dt_lt = datetime.datetime(year=2001, month=1, day=2, hour=3, minute=4, second=5)
         self.dt_gt = datetime.datetime(year=2021, month=2, day=3, hour=4, minute=5, second=6)
-        self.stat = utils.objectify({'ctime': copy.deepcopy(self.dt_eq)})
+        self.stat = opsutils.objectify({'ctime': copy.deepcopy(self.dt_eq)})
 
     def rule(self, o, v, type='ctime'):
-        return utils._FindTimeRule(type, o, v)(None, self.stat)
+        return opsutils._FindTimeRule(type, o, v)(None, self.stat)
 
     def test_exact(self):
         self.assertTrue(self.rule('', self.dt_eq))
@@ -128,32 +128,32 @@ class FindTimeRuleTestCase(unittest.TestCase):
 class FindTestCase(unittest.TestCase):
 
     def test_add_rule_name(self):
-        find = utils.find('.')
+        find = opsutils.find('.')
         find._add_rule({'name': '*.pyc'})
         self.assertEqual(len(find.rules), 1)
-        self.assertTrue(isinstance(find.rules[0], utils._FindNameRule))
+        self.assertTrue(isinstance(find.rules[0], opsutils._FindNameRule))
 
     def test_add_rule_directory(self):
-        find = utils.find('.')
+        find = opsutils.find('.')
         find._add_rule({'directory': True})
         self.assertEqual(len(find.rules), 1)
-        self.assertTrue(isinstance(find.rules[0], utils._FindDirectoryRule))
+        self.assertTrue(isinstance(find.rules[0], opsutils._FindDirectoryRule))
 
     def test_add_rule_file(self):
-        find = utils.find('.')
+        find = opsutils.find('.')
         find._add_rule({'file': True})
         self.assertEqual(len(find.rules), 1)
-        self.assertTrue(isinstance(find.rules[0], utils._FindFileRule))
+        self.assertTrue(isinstance(find.rules[0], opsutils._FindFileRule))
 
     def test_add_rule_time(self):
-        find = utils.find('.')
+        find = opsutils.find('.')
         find._add_rule({'atime__year': 2010})
         find._add_rule({'ctime__month': 5})
         find._add_rule({'mtime__day': 1})
         self.assertEqual(len(find.rules), 3)
-        self.assertTrue(isinstance(find.rules[0], utils._FindTimeRule))
-        self.assertTrue(isinstance(find.rules[1], utils._FindTimeRule))
-        self.assertTrue(isinstance(find.rules[2], utils._FindTimeRule))
+        self.assertTrue(isinstance(find.rules[0], opsutils._FindTimeRule))
+        self.assertTrue(isinstance(find.rules[1], opsutils._FindTimeRule))
+        self.assertTrue(isinstance(find.rules[2], opsutils._FindTimeRule))
 
 if __name__ == '__main__':
     unittest.main()

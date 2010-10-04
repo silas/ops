@@ -1,7 +1,7 @@
 import grp
 import os
 import unittest
-import utils
+import opsutils
 
 import helper
 
@@ -18,22 +18,22 @@ class ChownTestCase(unittest.TestCase):
         self.workspace.destroy()
 
     def test_uid(self):
-        utils._chown(self.workspace.path, uid=self.uid)
+        opsutils._chown(self.workspace.path, uid=self.uid)
 
     def test_gid(self):
-        utils._chown(self.workspace.path, gid=self.gid)
+        opsutils._chown(self.workspace.path, gid=self.gid)
 
     def test_user(self):
-        utils._chown(self.workspace.path, user=self.user)
+        opsutils._chown(self.workspace.path, user=self.user)
 
     def test_group(self):
-        utils._chown(self.workspace.path, group=self.group)
+        opsutils._chown(self.workspace.path, group=self.group)
 
     def test_chown(self):
-        utils.chown(self.workspace.path, user=self.user, group=self.group)
+        opsutils.chown(self.workspace.path, user=self.user, group=self.group)
 
     def test_recursive(self):
-        utils.chown(self.workspace.path, user=self.user, group=self.group, recursive=True)
+        opsutils.chown(self.workspace.path, user=self.user, group=self.group, recursive=True)
 
 if __name__ == '__main__':
     unittest.main()

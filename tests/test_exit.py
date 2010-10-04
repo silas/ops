@@ -1,7 +1,7 @@
 import StringIO
 import sys
 import unittest
-import utils
+import opsutils
 
 class ExitTestCase(unittest.TestCase):
 
@@ -16,16 +16,16 @@ class ExitTestCase(unittest.TestCase):
         sys.stderr = self.real_stderr
 
     def test_code(self):
-        self.assertRaises(SystemExit, utils.exit, code=0)
-        self.assertRaises(SystemExit, utils.exit, code=1)
+        self.assertRaises(SystemExit, opsutils.exit, code=0)
+        self.assertRaises(SystemExit, opsutils.exit, code=1)
         try:
-            utils.exit(code=1)
+            opsutils.exit(code=1)
         except SystemExit, exit:
             self.assertEqual(exit.code, 1)
 
     def test_stdout(self):
         try:
-            utils.exit(text='Successfuly')
+            opsutils.exit(text='Successfuly')
         except SystemExit:
             pass
         result = sys.stdout.getvalue().rstrip()
@@ -33,7 +33,7 @@ class ExitTestCase(unittest.TestCase):
 
     def test_stderr(self):
         try:
-            utils.exit(code=1, text='Failure')
+            opsutils.exit(code=1, text='Failure')
         except SystemExit:
             pass
         result = sys.stderr.getvalue().rstrip()

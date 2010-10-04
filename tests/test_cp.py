@@ -1,6 +1,6 @@
 import os
 import unittest
-import utils
+import opsutils
 
 import helper
 
@@ -63,20 +63,20 @@ class CpTestCase(unittest.TestCase):
 
     def test_file_to_file(self):
         self.setup_file()
-        utils.cp(self.path1, self.path2)
+        opsutils.cp(self.path1, self.path2)
         self.check_same_file(self.path1, self.path2)
 
     def test_file_to_directory(self):
         self.setup_file()
         dir_path = os.path.join(self.workspace.path, 'dst')
         os.makedirs(dir_path)
-        utils.cp(self.path1, dir_path)
+        opsutils.cp(self.path1, dir_path)
         path2 = os.path.join(dir_path, self.name1)
         self.check_same_file(self.path1, path2)
 
     def test_directory(self):
         self.setup_directory()
-        utils.cp(self.path1, self.path2)
+        opsutils.cp(self.path1, self.path2)
         self.check_same_file(self.src_file_path1, self.dst_file_path1)
         self.check_same_file(self.src_file_path2, self.dst_file_path2)
         self.check_stat(self.path1, self.path2)
