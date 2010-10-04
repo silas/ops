@@ -214,7 +214,7 @@ class _FindTimeRule(_FindRule):
 class find(object):
     """Find directories and files in the specified path.
 
-    for path in find('/tmp').filter(name='*.py'):
+    for path in find('/tmp').filter(name='*.py', file=True).exclude(mtime__day=13):
         print path
     """
 
@@ -245,7 +245,7 @@ class find(object):
             elif n == 'file':
                 self.rules.append(_FindFileRule(value, exclude=exclude))
             elif n in ('atime', 'ctime', 'mtime'):
-                self.rules.append(FindTimeRule(n, op, value, exclude=exclude))
+                self.rules.append(_FindTimeRule(n, op, value, exclude=exclude))
             else:
                 logging.error('unknown find rule %s=%s' % (name, value))
 
