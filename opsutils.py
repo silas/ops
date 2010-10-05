@@ -387,6 +387,25 @@ def popd(no_class=False):
         'path': path,
     })
 
+def dirs(no_class=False):
+    """Return the directory stack from pushd/popd.
+
+    dirs()
+    """
+    # Get locals from caller
+    curframe = inspect.currentframe()
+    calframe = inspect.getouterframes(curframe, 2)
+    locals = calframe[1][0].f_locals
+    # Use self if caller is a method and no_class is false
+    if not no_class and 'self' in locals:
+        locals = locals['self'].__dict__
+    # Get or create directory stack variable
+    if DIRECTORY_STACK_NAME not in locals:
+        stack = locals[DIRECTORY_STACK_NAME] = []
+    else:
+        stack = locals[DIRECTORY_STACK_NAME]
+    return stack
+
 def pushd(path, no_class=False):
     """Add the current working directory to the stack and switch to the path
     specified. By default pushd will attach the the stack variable to self if
