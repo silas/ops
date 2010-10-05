@@ -1,3 +1,5 @@
-.*.swp
 *.pyc
+*.swp
+.coverage
+_build
 _tmp
