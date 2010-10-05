@@ -2,6 +2,7 @@ import helper
 
 import os
 import unittest
+import uuid
 import opsutils
 
 class CpTestCase(unittest.TestCase):
@@ -52,8 +53,8 @@ class CpTestCase(unittest.TestCase):
         self.assertEqual(stat1[8], stat2[8]) # st_ctime
 
     def check_same_file(self, path1, path2):
-        content1 = 'one'
-        content2 = 'two'
+        content1 = uuid.uuid4().get_hex()
+        content2 = uuid.uuid4().get_hex()
         with open(path1, 'r') as f:
             content1 = f.read()
         with open(path2, 'r') as f:
