@@ -92,7 +92,7 @@ def chown(path, **kwargs):
         successful = _chown(path, **kwargs)
     return successful
 
-def cp(src_path, dst_path, follow_symlinks=False):
+def cp(src_path, dst_path, follow_symlinks=False, recursive=True):
     """Copy source to destination.
 
     cp('/tmp/one', '/tmp/two')
@@ -104,6 +104,8 @@ def cp(src_path, dst_path, follow_symlinks=False):
         if follow_symlinks and os.path.islink(dst_path):
             dst_path = os.path.realpath(dst_path)
         if os.path.isdir(src_path):
+            if not recursive:
+                return successful
             shutil.copytree(src_path, dst_path, symlinks=follow_symlinks)
             successful = True
         elif os.path.exists(src_path):
