@@ -23,37 +23,42 @@ class DirsPushPopTestCase(unittest.TestCase):
 
     def test_class(self):
         self.check_path(self.path0)
+
         opsutils.pushd(self.path1)
         self.check_path(self.path1)
+
         opsutils.pushd(self.path2)
         self.check_path(self.path2)
+
         opsutils.pushd(self.path3)
         self.check_path(self.path3)
+
         opsutils.popd()
         self.check_path(self.path2)
+
         opsutils.popd()
         self.check_path(self.path1)
+
         opsutils.popd()
         self.check_path(self.path0)
+
+    @staticmethod
+    def assert_function_static():
+        assert len(opsutils.dirs()) == 0
+        opsutils.pushd(os.path.join(os.getcwd(), '..'))
+        assert len(opsutils.dirs()) == 1
 
     def test_function(self):
         self.check_path(self.path0)
-        opsutils.pushd(self.path1)
-        self.check_path(self.path1)
+
+        opsutils.pushd(self.path3)
+        self.check_path(self.path3)
 
         self.assertEqual(len(opsutils.dirs()), 1)
-
-        def func():
-            self.assertEqual(len(opsutils.dirs()), 0)
-            opsutils.pushd(self.path3)
-        func()
-
+        self.assert_function_static()
         self.assertEqual(len(opsutils.dirs()), 1)
-
-        opsutils.pushd(self.path2)
         self.check_path(self.path2)
-        opsutils.popd()
-        self.check_path(self.path1)
+
         opsutils.popd()
         self.check_path(self.path0)
 
