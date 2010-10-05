@@ -68,7 +68,7 @@ class CpTestCase(unittest.TestCase):
 
     def test_file_to_directory(self):
         self.setup_file()
-        dir_path = os.path.join(self.workspace.path, 'dst')
+        dir_path = self.workspace.join('dst')
         os.makedirs(dir_path)
         opsutils.cp(self.path1, dir_path)
         path2 = os.path.join(dir_path, self.name1)
@@ -80,6 +80,14 @@ class CpTestCase(unittest.TestCase):
         self.check_same_file(self.src_file_path1, self.dst_file_path1)
         self.check_same_file(self.src_file_path2, self.dst_file_path2)
         self.check_stat(self.path1, self.path2)
+
+    def test_recursive(self):
+        self.setup_directory()
+        path = self.workspace.join('dst')
+        opsutils.cp(self.path1, path, recursive=False)
+        self.assertFalse(os.path.exists(path))
+        opsutils.cp(self.path1, path, recursive=True)
+        self.assertTrue(os.path.isdir(path))
 
 if __name__ == '__main__':
     unittest.main()
