@@ -13,7 +13,7 @@ builtin Python `os` and `shutil` modules.
     from opsutils import *
 
     for path in find('/tmp').filter(name='*.py', file=True).exclude(mtime__day=13):
-        print path
+        chown(path, user='root', group='root')
 
 ### License
 
