@@ -484,6 +484,8 @@ def run(command, **kwargs):
     if kwargs:
         args = {}
         for name, value in kwargs.items():
+            if not isinstance(value, basestring):
+                value = unicode(value)
             args[name] = pipes.quote(value)
         command = string.Template(command).safe_substitute(args)
     logging.debug('run: %s' % command)
@@ -491,9 +493,10 @@ def run(command, **kwargs):
         command,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        shell=True,
-        close_fds=True,
+        shell=kwargs.get('shell', True),
+        close_fds=kwargs.get('close_fds', True),
         env=env,
+        cwd=kwargs.get('cwd', tempfile.gettempdir()),
     )
     data = ref.communicate()
     return objectify({
