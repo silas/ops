@@ -42,6 +42,21 @@ class DirsPushPopTestCase(unittest.TestCase):
         opsutils.popd()
         self.check_path(self.path0)
 
+    def test_no_class(self):
+        self.check_path(self.path0)
+
+        opsutils.pushd(self.path1)
+        self.check_path(self.path1)
+
+        opsutils.pushd(self.path2, no_class=True)
+        self.check_path(self.path2)
+
+        opsutils.popd()
+        self.check_path(self.path0)
+
+        opsutils.popd(no_class=True)
+        self.check_path(self.path1)
+
     @staticmethod
     def assert_function_static():
         assert len(opsutils.dirs()) == 0
