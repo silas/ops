@@ -544,7 +544,7 @@ class stat(object):
 
     @property
     def nlink(self):
-        return self.st_nlinks
+        return self.st_nlink
 
     @property
     def st_uid(self):
@@ -559,8 +559,8 @@ class stat(object):
         return self.data[5]
 
     @property
-    def gid(self):
-        return self.st_gid
+    def group(self):
+        return group(id=self.st_gid)
 
     @property
     def st_size(self):
