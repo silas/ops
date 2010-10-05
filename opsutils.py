@@ -23,36 +23,6 @@ logging = logginglib.getLogger('opsutils')
 
 DIRECTORY_STACK_NAME = '__utils_directory_stack'
 
-class objectify(dict):
-
-    def __getattr__(self, name):
-        try:
-            return self[name]
-        except KeyError:
-            raise AttributeError(name)
-
-    def __nonzero__(self):
-        try:
-            return self['_bool']
-        except KeyError:
-            return len(self) > 0
-
-    def __repr__(self):
-        return repr(self.dict())
-
-    def __str__(self):
-        return str(self.dict())
-
-    def __unicode__(self):
-        return unicode(self.dict())
-
-    def dict(self):
-        values = {}
-        for name, value in self.items():
-            if not name.startswith('_'):
-                values[name] = value
-        return values
-
 def _chown(path, **kwargs):
     user = kwargs.get('user')
     group = kwargs.get('group')
@@ -118,6 +88,26 @@ def cp(src_path, dst_path, follow_symlinks=False, recursive=True):
     except OSError, error:
         logging.error('cp: execute failed: %s => %s (%s)' % (src_path, dst_path, error))
     return successful
+
+def dirs(no_class=False):
+    """Return the directory stack from pushd/popd.
+
+    dirs()
+    """
+    # Get locals from caller
+    curframe = inspect.currentframe()
+    calframe = inspect.getouterframes(curframe, 2)
+    locals = calframe[1][0].f_locals
+    # Use self if caller is a method and no_class is false
+    if not no_class and 'self' in locals:
+        locals = locals['self'].__dict__
+    # Get or create directory stack variable
+    if DIRECTORY_STACK_NAME not in locals:
+        stack = locals[DIRECTORY_STACK_NAME] = []
+    else:
+        stack = locals[DIRECTORY_STACK_NAME]
+    return stack
+
 
 def exit(code=0, text=''):
     """Exit and print text (if defined) to stderr if code > 0 or stdout
@@ -349,6 +339,36 @@ def mkdir(path, recursive=True):
         return False
     return True
 
+class objectify(dict):
+
+    def __getattr__(self, name):
+        try:
+            return self[name]
+        except KeyError:
+            raise AttributeError(name)
+
+    def __nonzero__(self):
+        try:
+            return self['_bool']
+        except KeyError:
+            return len(self) > 0
+
+    def __repr__(self):
+        return repr(self.dict())
+
+    def __str__(self):
+        return str(self.dict())
+
+    def __unicode__(self):
+        return unicode(self.dict())
+
+    def dict(self):
+        values = {}
+        for name, value in self.items():
+            if not name.startswith('_'):
+                values[name] = value
+        return values
+
 def popd(no_class=False):
     """Remove last path from the stack and make it the current working
     directory. By default popd will look for the stack variable in self if
@@ -386,25 +406,6 @@ def popd(no_class=False):
         '_bool': successful,
         'path': path,
     })
-
-def dirs(no_class=False):
-    """Return the directory stack from pushd/popd.
-
-    dirs()
-    """
-    # Get locals from caller
-    curframe = inspect.currentframe()
-    calframe = inspect.getouterframes(curframe, 2)
-    locals = calframe[1][0].f_locals
-    # Use self if caller is a method and no_class is false
-    if not no_class and 'self' in locals:
-        locals = locals['self'].__dict__
-    # Get or create directory stack variable
-    if DIRECTORY_STACK_NAME not in locals:
-        stack = locals[DIRECTORY_STACK_NAME] = []
-    else:
-        stack = locals[DIRECTORY_STACK_NAME]
-    return stack
 
 def pushd(path, no_class=False):
     """Add the current working directory to the stack and switch to the path
@@ -716,13 +717,14 @@ class workspace(object):
         return os.path.join(self.path, *args)
 
 __all__ = [
-    'objectify',
     'chown',
     'cp',
+    'dirs',
     'exit',
     'find',
     'group',
     'mkdir',
+    'objectify',
     'popd',
     'pushd',
     'rm',
