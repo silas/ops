@@ -693,3 +693,20 @@ class workspace(object):
 
     def join(self, *args):
         return os.path.join(self.path, *args)
+
+__all__ = [
+    'objectify',
+    'chown',
+    'cp',
+    'exit',
+    'find',
+    'group',
+    'mkdir',
+    'popd',
+    'pushd',
+    'rm',
+    'run',
+    'stat',
+    'user',
+    'workspace',
+]
