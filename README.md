@@ -1,10 +1,8 @@
 opsutils
 ========
 
-`opsutils` is a collection of convenience functions intended to augment the
-builtin Python `os` and `shutil` modules.
-
-[Get latest version](http://github.com/opsdojo/opsutils/raw/master/opsutils.py)
+[opsutils][opsutils] is a collection of convenience functions intended to
+augment the builtin Python [os][os] and [shutil][shutil] modules.
 
 ### Requirements
 
@@ -20,3 +18,7 @@ builtin Python `os` and `shutil` modules.
 ### License
 
 This work is licensed under the New BSD License (see the LICENSE file).
+
+[opsutils]: http://github.com/opsdojo/opsutils/raw/master/opsutils.py
+[os]: http://docs.python.org/library/os.html
+[shutil]: http://docs.python.org/library/shutil.html
