@@ -37,9 +37,12 @@ def _chmod(path, value=None):
     return False
 
 def chmod(path, mode=None, user=None, group=None, other=None, recursive=False):
-    """Change file permissions.
+    """Changes file mode bits.
 
-    chmod('/tmp/one', 0755)
+    Examples:
+      >>> chmod('/tmp/one', 0755)
+
+    NOTE: The precending 0 is required when using a numerical mode.
     """
     successful = True
     mode = _ops_mode(mode)
@@ -85,7 +88,8 @@ def _chown(path, **kwargs):
 def chown(path, **kwargs):
     """Change file owner and group.
 
-    chown('/tmp/one', user='root', group='apache')
+    Examples:
+      >>> chown('/tmp/one', user='root', group='apache')
     """
     successful = True
     recursive = kwargs.get('recursive')
@@ -100,7 +104,8 @@ _ops_chown = chown
 def cp(src_path, dst_path, follow_links=False, recursive=True):
     """Copy source to destination.
 
-    cp('/tmp/one', '/tmp/two')
+    Examples:
+      >>> cp('/tmp/one', '/tmp/two')
     """
     successful = False
     try:
@@ -126,9 +131,11 @@ def cp(src_path, dst_path, follow_links=False, recursive=True):
 _ops_cp = cp
 
 def dirs(no_class=False):
-    """Return the directory stack from pushd/popd.
+    """Returns a reference to the directory stack used by pushd and popd.
 
-    dirs()
+    Examples:
+      >>> pushd('/tmp')
+      >>> dirs()
     """
     # Get locals from caller
     curframe = inspect.currentframe()
@@ -149,7 +156,8 @@ def exit(code=0, text=''):
     """Exit and print text (if defined) to stderr if code > 0 or stdout
     otherwise.
 
-    exit(code=1, text='Invalid directory path')
+    Examples:
+      >>> exit(code=1, text='Invalid directory path')
     """
     if not isinstance(text, basestring):
         text = unicode(text)
@@ -249,8 +257,9 @@ class _FindTimeRule(_FindRule):
 class find(object):
     """Find directories and files in the specified path.
 
-    for path in find('/tmp').filter(name='*.py', file=True).exclude(mtime__day=13):
-        print path
+    Examples:
+      >>> for path in find('/tmp').filter(name='*.py', file=True).exclude(mtime__day=13):
+      ...     print path
     """
 
     def __init__(self, path, no_peek=False, top_down=False):
@@ -314,10 +323,13 @@ class find(object):
 _ops_find = find
 
 class group(object):
-    """Helper class for getting information about a group.
+    """Get information about a group.
 
-    g = group(id=0)
-    print g.name
+    Examples:
+      >>> print group(id=0).name
+      root
+      >>> print group(name='root').id
+      0
     """
 
     def __init__(self, id=None, name=None):
@@ -377,9 +389,10 @@ _ops_group = group
 
 def mkdir(path, recursive=True):
     """Create a directory at the specified path. By default this function
-    recursively creates the structure.
+    recursively creates the path.
 
-    mkdir('/tmp/build')
+    Examples:
+      >>> mkdir('/tmp/one/two')
     """
     if os.path.exists(path):
         return True
@@ -411,7 +424,13 @@ class _ModeBits(object):
 class mode(object):
     """An object for representing file mode bits.
 
-    mode(0755).user.read
+    Example:
+      >>> print mode(0755).user.read
+      True
+      >>> print mode(0755).group.execute
+      True
+      >>> print mode(0755).other.write
+      False
     """
 
     _TYPES = (('user', 'USR'), ('group', 'GRP'), ('other', 'OTH'))
@@ -480,6 +499,12 @@ class mode(object):
 _ops_mode = mode
 
 class objectify(dict):
+    """Access dict-like objects via getattr.
+
+    Examples:
+      >>> objectify({'name': 'test'}).name
+      test
+    """
 
     def __getattr__(self, name):
         try:
@@ -522,7 +547,9 @@ def _path_stat_set(self, value=None):
 class path(unicode):
     """An object for representing paths.
 
-    path('/tmp').stat.owner.name
+    Examples:
+      >>> path('/tmp').stat.owner.name
+      root
     """
 
     def __new__(cls, value=None, stat=None, root=None, name=None):
@@ -547,7 +574,9 @@ def popd(no_class=False):
     in a method and the local scope if in a function. The class behaviour can
     be disabled by passing no_class=True.
 
-    popd()
+    Examples:
+      >>> pushd('/tmp')
+      >>> popd()
     """
     # Get locals from caller
     curframe = inspect.currentframe()
@@ -586,7 +615,9 @@ def pushd(path, no_class=False):
     in a method and the local scope if in a function. The class behaviour can
     be disabled by passing no_class=True.
 
-    pushd('/tmp')
+    Examples:
+      >>> pushd('/tmp')
+      >>> popd()
     """
     # Get locals from caller
     curframe = inspect.currentframe()
@@ -623,7 +654,8 @@ def rm(path, recursive=False):
     """Delete a specified file or directory. This function does not recursively
     delete by default.
 
-    rm('/tmp/build', recursive=True)
+    Examples:
+      >>> rm('/tmp/build', recursive=True)
     """
     try:
         if recursive:
@@ -647,7 +679,9 @@ def run(command, **kwargs):
     resolve to True if result.code == 0 and output/error results can be
     retrieved from result.stdout and result.stderr variables.
 
-    run('ls ${path}', path='/tmp')
+    Examples:
+      >>> run('ls ${path}', path='/tmp').code
+      0
     """
     env = None
     if 'env' in kwargs:
@@ -684,6 +718,12 @@ def run(command, **kwargs):
 _ops_rm = rm
 
 class stat(object):
+    """Access stat attributes of files and directories.
+
+    Examples:
+      >>> stat('/tmp').user.name
+      root
+    """
 
     def __init__(self, path):
         self.path = path
@@ -790,8 +830,9 @@ _ops_stat = stat
 class user(object):
     """Helper class for getting information about a user.
 
-    u = user(id=0)
-    print u.name
+    Examples:
+      >>> user(id=0).name
+      root
     """
 
     def __init__(self, id=None, name=None):
@@ -877,17 +918,18 @@ class workspace(object):
     """Create a secure and temporary workspace that will be automatically
     cleaned up. `workspace` takes the same parameters as `tempfile.mkdtemp`.
 
-    with workspace('test') as w:
-        print w.join('dir1', 'file1')
+    Examples:
+      >>> with workspace('test') as w:
+      ...     print w.join('dir1', 'file1')
     """
 
-    def __init__(self, *args, **kwargs):
-        self.args = args
-        self.kwargs = kwargs
+    def __init__(self, suffix='', prefix='tmp', dir=None):
+        self.suffix = suffix
+        self.prefix = prefix
         self._path = None
 
     def __enter__(self):
-        self._path = tempfile.mkdtemp(*self.args, **self.kwargs)
+        self._path = tempfile.mkdtemp(suffix=self.suffix, prefix=self.prefix)
         return self
 
     def __exit__(self, type, value, traceback):

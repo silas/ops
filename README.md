@@ -2,7 +2,7 @@ opsutils
 ========
 
 [opsutils][opsutils] is a collection of convenience functions intended to
-augment the builtin Python [os][os] and [shutil][shutil] modules.
+augment the built-in Python [os][os] and [shutil][shutil] modules.
 
 ### Requirements
 
