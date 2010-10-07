@@ -445,7 +445,7 @@ class mode(object):
         for type_name, type_abbr in self._TYPES:
             type_value = getattr(self, type_name)
             for bits_name, bits_abbr in self._BITS:
-                value = mode & getattr(statlib, 'S_I%s%s' % (bits_abbr, type_abbr))
+                value = bool(mode & getattr(statlib, 'S_I%s%s' % (bits_abbr, type_abbr)))
                 setattr(type_value, bits_name, value)
 
     @property
