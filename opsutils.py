@@ -404,28 +404,9 @@ class _ModeBits(object):
             self._set_numeric(value)
 
     def _set_numeric(self, value):
-        self.read = False
-        self.write = False
-        self.execute = False
-        if value == 1:
-            self.execute = True
-        elif value == 2:
-            self.write = True
-        elif value == 3:
-            self.execute = True
-            self.write = True
-        elif value == 4:
-            self.read = True
-        elif value == 5:
-            self.execute = True
-            self.read = True
-        elif value == 6:
-            self.read = True
-            self.write = True
-        elif value == 7:
-            self.execute = True
-            self.read = True
-            self.write = True
+        self.execute = value & 1
+        self.read = value & 4
+        self.write = value & 2
 
 class mode(object):
     """An object for representing file mode bits.
