@@ -188,12 +188,21 @@ class FindTestCase(unittest.TestCase):
 
     def test_top_down(self):
         self.setup_directory()
+
         list1 = list(opsutils.find(self.workspace.path))
         list2 = list(opsutils.find(self.workspace.path, top_down=True))
+        list3 = list(opsutils.find(self.workspace.path, no_peek=True, top_down=True))
+
         self.assertEqual(len(list1), 22)
         self.assertEqual(len(list2), len(list1))
+        self.assertEqual(len(list3), len(list2))
+
         self.assertNotEqual(list2[0], list1[0])
         self.assertNotEqual(list2[-1], list1[-1])
+
+        for i, v in enumerate(list2):
+            self.assertEqual(list3[i], v)
+
         list1.sort()
         list2.sort()
         for i, v in enumerate(list1):
