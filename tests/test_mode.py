@@ -64,44 +64,50 @@ class ModeTestCase(unittest.TestCase):
 
     def test_default(self):
         m = opsutils.mode()
+
         self.assertEqual(m.user.read, None)
         self.assertEqual(m.group.write, None)
         self.assertEqual(m.other.execute, None)
 
-    def test_set(self):
-        m = opsutils.mode(0664)
+    def test_get(self):
+        m = opsutils.mode(0740)
 
-        self.assertTrue(m.group.write)
-        m.group.write = False
-        self.assertFalse(m.group.write)
-
-    def test_init_numeric(self):
-        m = opsutils.mode(0750)
-
-        self.assertTrue(m.user.execute)
         self.assertTrue(m.user.read)
         self.assertTrue(m.user.write)
+        self.assertTrue(m.user.execute)
 
-        self.assertTrue(m.group.execute)
         self.assertTrue(m.group.read)
         self.assertFalse(m.group.write)
+        self.assertFalse(m.group.execute)
 
-        self.assertFalse(m.other.execute)
         self.assertFalse(m.other.read)
         self.assertFalse(m.other.write)
+        self.assertFalse(m.other.execute)
 
-    def test_set_numeric(self):
+    def test_set(self):
+        m = opsutils.mode(0640)
+
+        m.group.write = True
+        m.other.read = True
+        self.assertEqual(m.numeric, 0664)
+
+    def test_set_type(self):
         m = opsutils.mode()
 
-        m.group = 0
-        self.assertFalse(m.group.read)
-        self.assertFalse(m.group.write)
-        self.assertFalse(m.group.execute)
+        m.user = 7
+        self.assertTrue(m.user.read)
+        self.assertTrue(m.user.write)
+        self.assertTrue(m.user.execute)
 
-        m.group = 4
+        m.group = 5
         self.assertTrue(m.group.read)
         self.assertFalse(m.group.write)
-        self.assertFalse(m.group.execute)
+        self.assertTrue(m.group.execute)
+
+        m.other = 2
+        self.assertFalse(m.other.read)
+        self.assertTrue(m.other.write)
+        self.assertFalse(m.other.execute)
 
 if __name__ == '__main__':
     unittest.main()

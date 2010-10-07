@@ -374,7 +374,7 @@ class _ModeBits(object):
             self.write = True
 
 class mode(object):
-    """An object for representing file modes.
+    """An object for representing file mode bits.
 
     mode(0755).user.read
     """
@@ -385,21 +385,31 @@ class mode(object):
         self.user = user
         self.group = group
         self.other = other
-        for name in ('_user', '_group', '_other'):
-            if not hasattr(self, name):
-                setattr(self, name, _ModeBits())
         if isinstance(value, int):
-            self._set_numeric(value)
+            self.numeric = value
 
-    def _mode_bits(self, value):
-        if isinstance(value, _ModeBits):
-            return value
-        elif isinstance(value, int):
-            return _ModeBits(value=value)
-        else:
+    def _set_bits(self, name, value):
+        if isinstance(value, int):
+            setattr(self, name, _ModeBits(value=value))
+        elif isinstance(value, _ModeBits):
+            setattr(self, name, value)
+        elif value is not None:
             logging.warning('mode: unknown bit: %s' % value)
+        if not hasattr(self, name):
+            setattr(self, name, _ModeBits())
 
-    def _set_numeric(self, mode):
+    @property
+    def numeric(self):
+        mode = 0
+        for type_name, type_abbr in (('user', 'USR'), ('group', 'GRP'), ('other', 'OTH')):
+            type_value = getattr(self, type_name)
+            for bits_name, bits_abbr in (('read', 'R'), ('write', 'W'), ('execute', 'X')):
+                if getattr(type_value, bits_name):
+                    mode |= getattr(statlib, 'S_I%s%s' % (bits_abbr, type_abbr))
+        return mode
+
+    @numeric.setter
+    def numeric(self, mode):
         for type_name, type_abbr in (('user', 'USR'), ('group', 'GRP'), ('other', 'OTH')):
             type_value = getattr(self, type_name)
             for bits_name, bits_abbr in (('read', 'R'), ('write', 'W'), ('execute', 'X')):
@@ -412,10 +422,7 @@ class mode(object):
 
     @user.setter
     def user(self, value=None):
-        if value is not None:
-            value = self._mode_bits(value)
-            if value is not None:
-                self._user = value
+        self._set_bits('_user', value)
 
     @property
     def group(self):
@@ -423,10 +430,7 @@ class mode(object):
 
     @group.setter
     def group(self, value=None):
-        if value is not None:
-            value = self._mode_bits(value)
-            if value is not None:
-                self._group = value
+        self._set_bits('_group', value)
 
     @property
     def other(self):
@@ -434,10 +438,7 @@ class mode(object):
 
     @other.setter
     def other(self, value=None):
-        if value is not None:
-            value = self._mode_bits(value)
-            if value is not None:
-                self._other = value
+        self._set_bits('_other', value)
 
 class objectify(dict):
 
