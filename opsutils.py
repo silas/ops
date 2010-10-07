@@ -250,12 +250,17 @@ class find(object):
     """
 
     def __init__(self, path, no_peek=False, top_down=False):
-        self.path = os.path.realpath(path)
+        try:
+            self.path = os.path.realpath(path)
+        except OSError:
+            self.path = None
         self.rules = []
         self.no_peek = no_peek
         self.top_down = top_down
 
     def __iter__(self):
+        if self.path is None:
+            return
         if self.no_peek and not self.top_down:
             s = stat(self.path)
             s._directory, s._file = True, False
