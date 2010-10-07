@@ -256,7 +256,7 @@ class find(object):
         self.top_down = top_down
 
     def __iter__(self):
-        if self.no_peek and not self.top_now:
+        if self.no_peek and not self.top_down:
             s = stat(self.path)
             s._directory, s._file = True, False
             if self._match(self.path, s):
