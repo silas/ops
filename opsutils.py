@@ -43,14 +43,17 @@ def chmod(path, value=None, user=None, group=None, other=None, recursive=False):
     """
     successful = True
     value = mode(value)
-    value.user = user
-    value.group = group
-    value.other = other
+    if user is not None:
+        value.user = user
+    if group is not None:
+        value.group = group
+    if other is not None:
+        value.other = other
     if recursive:
         for p in find(path):
             successful = _chmod(p, value) and successful
     else:
-        successful = _chown(path, value)
+        successful = _chmod(path, value)
     return successful
 
 def _chown(path, **kwargs):
@@ -857,6 +860,7 @@ class workspace(object):
         return os.path.join(self.path, *args)
 
 __all__ = [
+    'chmod',
     'chown',
     'cp',
     'dirs',
