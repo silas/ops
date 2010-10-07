@@ -50,7 +50,7 @@ def chmod(path, value=None, user=None, group=None, other=None, recursive=False):
     if other is not None:
         value.other = other
     if recursive:
-        for p in find(path):
+        for p in find(path, dirs_first=True):
             successful = _chmod(p, value) and successful
     else:
         successful = _chmod(path, value)
@@ -89,7 +89,7 @@ def chown(path, **kwargs):
     successful = True
     recursive = kwargs.get('recursive')
     if recursive:
-        for p in find(path):
+        for p in find(path, dirs_first=True):
             successful = _chown(p, **kwargs) and successful
     else:
         successful = _chown(path, **kwargs)
@@ -249,16 +249,30 @@ class find(object):
         print path
     """
 
-    def __init__(self, path):
+    def __init__(self, path, dirs_first=False):
         self.path = os.path.realpath(path)
         self.rules = []
+        self.dirs_first = dirs_first
 
     def __iter__(self):
-        for root_path, dir_list, file_list in os.walk(self.path):
-            s = stat(root_path)
+        if self.dirs_first:
+            s = stat(self.path)
             s._directory, s._file = True, False
-            if self._match(root_path, s):
-                yield root_path
+            if self._match(self.path, s):
+                yield self.path
+        for root_path, dir_list, file_list in os.walk(self.path):
+            if self.dirs_first:
+                for d in dir_list:
+                    path = os.path.join(root_path, d)
+                    s = stat(path)
+                    s._directory, s._file = True, False
+                    if self._match(path, s):
+                        yield path
+            else:
+                s = stat(root_path)
+                s._directory, s._file = True, False
+                if self._match(root_path, s):
+                    yield root_path
             for f in file_list:
                 path = os.path.join(root_path, f)
                 s = stat(path)
@@ -851,6 +865,7 @@ class workspace(object):
 
     def __exit__(self, type, value, traceback):
         if self.path and os.path.exists(self.path):
+            chmod(self.path, 0700, recursive=True)
             rm(self.path, recursive=True)
 
     @property
