@@ -933,6 +933,7 @@ __all__ = [
     'mode',
     'mkdir',
     'objectify',
+    'path',
     'popd',
     'pushd',
     'rm',
