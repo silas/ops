@@ -3,6 +3,7 @@ import helper
 import datetime
 import copy
 import os
+import time
 import unittest
 import opsutils
 
@@ -13,7 +14,7 @@ class FindRuleTestCase(unittest.TestCase):
 
     def test_call(self):
         try:
-            self.rule(None, None)
+            self.rule(opsutils.path('/tmp'))
         except NotImplementedError:
             pass
 
@@ -28,31 +29,27 @@ class FindDirectoryRuleTestCase(unittest.TestCase):
 
     def setUp(self):
         self.rule = opsutils._FindDirectoryRule(True)
-        self.file_path = os.path.realpath(__file__)
+        self.file_path = opsutils.path(__file__)
 
     def test_call(self):
-        name = os.path.basename(self.file_path)
-        self.assertFalse(self.rule(name, opsutils.stat(self.file_path)))
+        self.assertFalse(self.rule(self.file_path))
 
     def test_directory(self):
-        path = os.path.dirname(self.file_path)
-        name = os.path.basename(path)
-        self.assertTrue(self.rule(name, opsutils.stat(path)))
+        path = opsutils.path(os.path.dirname(self.file_path))
+        self.assertTrue(self.rule(path))
 
 class FindFileRuleTestCase(unittest.TestCase):
 
     def setUp(self):
         self.rule = opsutils._FindFileRule(True)
-        self.file_path = os.path.realpath(__file__)
+        self.file_path = opsutils.path(__file__)
 
     def test_file(self):
-        name = os.path.basename(self.file_path)
-        self.assertTrue(self.rule(name, opsutils.stat(self.file_path)))
+        self.assertTrue(self.rule(self.file_path))
 
     def test_directory(self):
-        path = os.path.dirname(self.file_path)
-        name = os.path.basename(path)
-        self.assertFalse(self.rule(name, opsutils.stat(path)))
+        path = opsutils.path(os.path.dirname(self.file_path))
+        self.assertFalse(self.rule(path))
 
 class FindNameRuleTestCase(unittest.TestCase):
 
@@ -60,11 +57,11 @@ class FindNameRuleTestCase(unittest.TestCase):
         self.rule = opsutils._FindNameRule('*hello[12].py?')
 
     def test_match(self):
-        self.assertTrue(self.rule('hello1.pyc', None))
-        self.assertTrue(self.rule('test-hello2.pyo', None))
+        self.assertTrue(self.rule(opsutils.path('hello1.pyc')))
+        self.assertTrue(self.rule(opsutils.path('test-hello2.pyo')))
 
     def test_no_match(self):
-        self.assertFalse(self.rule('world.py', None))
+        self.assertFalse(self.rule(opsutils.path('world.py')))
 
 class FindTimeRuleTestCase(unittest.TestCase):
 
@@ -72,10 +69,24 @@ class FindTimeRuleTestCase(unittest.TestCase):
         self.dt_eq = datetime.datetime(year=2010, month=11, day=12, hour=13, minute=14, second=15)
         self.dt_lt = datetime.datetime(year=2001, month=1, day=2, hour=3, minute=4, second=5)
         self.dt_gt = datetime.datetime(year=2021, month=2, day=3, hour=4, minute=5, second=6)
-        self.stat = opsutils.objectify({'ctime': copy.deepcopy(self.dt_eq)})
+        p = time.mktime(self.dt_eq.timetuple())
+        s = opsutils.stat('/tmp')
+        s._data = [
+            0,  # st_mode
+            0,  # st_ino
+            0,  # st_dev
+            1,  # st_nlink
+            0,  # st_uid
+            0,  # st_gid
+            0,  # st_size
+            p,  # st_atime
+            p,  # st_mtime
+            p,  # st_ctime
+        ]
+        self.path = opsutils.path('/tmp', stat=s)
 
     def rule(self, o, v, type='ctime'):
-        return opsutils._FindTimeRule(type, o, v)(None, self.stat)
+        return opsutils._FindTimeRule(type, o, v)(self.path)
 
     def test_exact(self):
         self.assertTrue(self.rule('', self.dt_eq))

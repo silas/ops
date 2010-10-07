@@ -36,25 +36,26 @@ def _chmod(path, value=None):
         logging.error('invalid mode value: %s' % value)
     return False
 
-def chmod(path, value=None, user=None, group=None, other=None, recursive=False):
+def chmod(path, mode=None, user=None, group=None, other=None, recursive=False):
     """Change file permissions.
 
     chmod('/tmp/one', 0755)
     """
     successful = True
-    value = mode(value)
+    mode = _ops_mode(mode)
     if user is not None:
-        value.user = user
+        mode.user = user
     if group is not None:
-        value.group = group
+        mode.group = group
     if other is not None:
-        value.other = other
+        mode.other = other
     if recursive:
         for p in find(path, no_peek=True):
-            successful = _chmod(p, value) and successful
+            successful = _chmod(p, mode) and successful
     else:
-        successful = _chmod(path, value)
+        successful = _chmod(path, mode)
     return successful
+_ops_chmod = chmod
 
 def _chown(path, **kwargs):
     user = kwargs.get('user')
@@ -89,11 +90,12 @@ def chown(path, **kwargs):
     successful = True
     recursive = kwargs.get('recursive')
     if recursive:
-        for p in find(path, no_peek=True):
+        for p in _ops_find(path, no_peek=True):
             successful = _chown(p, **kwargs) and successful
     else:
         successful = _chown(path, **kwargs)
     return successful
+_ops_chown = chown
 
 def cp(src_path, dst_path, follow_links=False, recursive=True):
     """Copy source to destination.
@@ -121,6 +123,7 @@ def cp(src_path, dst_path, follow_links=False, recursive=True):
     except OSError, error:
         logging.error('cp: execute failed: %s => %s (%s)' % (src_path, dst_path, error))
     return successful
+_ops_cp = cp
 
 def dirs(no_class=False):
     """Return the directory stack from pushd/popd.
@@ -140,7 +143,7 @@ def dirs(no_class=False):
     else:
         stack = locals[DIRECTORY_STACK_NAME]
     return stack
-
+_ops_dirs = dirs
 
 def exit(code=0, text=''):
     """Exit and print text (if defined) to stderr if code > 0 or stdout
@@ -158,13 +161,14 @@ def exit(code=0, text=''):
         if text:
             print text
         sys.exit(0)
+_ops_exit = exit
 
 class _FindRule(object):
 
     def __init__(self, exclude=False):
         self.exclude = exclude
 
-    def __call__(self, path, stat):
+    def __call__(self, path):
         raise NotImplementedError()
 
     def render(self, value=True):
@@ -178,8 +182,8 @@ class _FindDirectoryRule(_FindRule):
         super(_FindDirectoryRule, self).__init__(**kwargs)
         self.value = value
 
-    def __call__(self, path, stat):
-        return self.render(stat.directory == self.value)
+    def __call__(self, path):
+        return self.render(path.stat.directory == self.value)
 
 class _FindFileRule(_FindRule):
 
@@ -187,8 +191,8 @@ class _FindFileRule(_FindRule):
         super(_FindFileRule, self).__init__(**kwargs)
         self.value = value
 
-    def __call__(self, path, stat):
-        return self.render(stat.file == self.value)
+    def __call__(self, path):
+        return self.render(path.stat.file == self.value)
 
 class _FindNameRule(_FindRule):
 
@@ -196,7 +200,7 @@ class _FindNameRule(_FindRule):
         super(_FindNameRule, self).__init__(**kwargs)
         self.pattern = pattern
 
-    def __call__(self, path, stat):
+    def __call__(self, path):
         name = os.path.basename(path)
         return self.render(fnmatch.fnmatch(name, self.pattern))
 
@@ -208,8 +212,8 @@ class _FindTimeRule(_FindRule):
         self.op = op
         self.time = time
 
-    def __call__(self, path, stat):
-        dt = getattr(stat, self.type)
+    def __call__(self, path):
+        dt = getattr(path.stat, self.type)
         if not self.op or self.op == 'exact':
             if isinstance(self.time, datetime.date):
                 return self.render(dt.year == self.time.year and
@@ -262,29 +266,23 @@ class find(object):
         if self.path is None:
             return
         if self.no_peek and not self.top_down:
-            s = stat(self.path)
-            s._directory, s._file = True, False
-            if self._match(self.path, s):
-                yield self.path
+            p = path(self.path)
+            if self._match(p):
+                yield p
         for root_path, dir_list, file_list in os.walk(self.path, topdown=self.top_down):
             if self.no_peek and not self.top_down:
                 for d in dir_list:
-                    path = os.path.join(root_path, d)
-                    s = stat(path)
-                    s._directory, s._file = True, False
-                    if self._match(path, s):
-                        yield path
+                    p = path(root=self.path, name=d)
+                    if self._match(p):
+                        yield p
             else:
-                s = stat(root_path)
-                s._directory, s._file = True, False
-                if self._match(root_path, s):
-                    yield root_path
+                p = path(root_path)
+                if self._match(p):
+                    yield p
             for f in file_list:
-                path = os.path.join(root_path, f)
-                s = stat(path)
-                s._directory, s._file = False, True
-                if self._match(os.path.join(root_path, f), s):
-                    yield path
+                p = path(root=root_path, name=f)
+                if self._match(p):
+                    yield p
 
     def _add_rule(self, data, exclude=False):
         for name, value in data.items():
@@ -300,9 +298,9 @@ class find(object):
             else:
                 logging.error('unknown find rule %s=%s' % (name, value))
 
-    def _match(self, path, stat):
+    def _match(self, path):
         for rule in self.rules:
-            if not rule(path, stat):
+            if not rule(path):
                 return False
         return True
 
@@ -313,6 +311,7 @@ class find(object):
     def exclude(self, **kwargs):
         self._add_rule(kwargs, exclude=True)
         return self
+_ops_find = find
 
 class group(object):
     """Helper class for getting information about a group.
@@ -373,7 +372,8 @@ class group(object):
 
     @property
     def members(self):
-        return [user(name=name) for name in self.gr_mem]
+        return [_ops_user(name=name) for name in self.gr_mem]
+_ops_group = group
 
 def mkdir(path, recursive=True):
     """Create a directory at the specified path. By default this function
@@ -392,6 +392,7 @@ def mkdir(path, recursive=True):
         logging.error('mkdir: execute failed: %s (%s)' % (path, error))
         return False
     return True
+_ops_mkdir = mkdir
 
 class _ModeBits(object):
 
@@ -495,6 +496,7 @@ class mode(object):
     @other.setter
     def other(self, value=None):
         self._set_bits('_other', value)
+_ops_mode = mode
 
 class objectify(dict):
 
@@ -525,6 +527,38 @@ class objectify(dict):
             if not name.startswith('_'):
                 values[name] = value
         return values
+_ops_objectify = objectify
+
+def _path_stat_get(self):
+    if not hasattr(self, '_stat'):
+        self._stat = _ops_stat(self)
+    return self._stat
+
+def _path_stat_set(self, value=None):
+    if isinstance(value, _ops_stat):
+        self._stat = stat
+
+class path(unicode):
+    """An object for representing paths.
+
+    path('/tmp').stat.owner.name
+    """
+
+    def __new__(cls, value=None, stat=None, root=None, name=None):
+        if isinstance(value, path):
+            return value
+        cls.stat = property(_path_stat_get, _path_stat_set)
+        if root is not None and name is not None:
+            value = os.path.join(root, name)
+        try:
+            value = os.path.realpath(value)
+        except OSError:
+            value = ''
+        obj = unicode.__new__(cls, value)
+        if isinstance(stat, _ops_stat):
+            obj._stat = stat
+        return obj
+_ops_path = path
 
 def popd(no_class=False):
     """Remove last path from the stack and make it the current working
@@ -563,6 +597,7 @@ def popd(no_class=False):
         '_bool': successful,
         'path': path,
     })
+_ops_popd = popd
 
 def pushd(path, no_class=False):
     """Add the current working directory to the stack and switch to the path
@@ -601,6 +636,7 @@ def pushd(path, no_class=False):
         '_bool': successful,
         'path': path,
     })
+_ops_pushd = pushd
 
 def rm(path, recursive=False):
     """Delete a specified file or directory. This function does not recursively
@@ -623,6 +659,7 @@ def rm(path, recursive=False):
         logging.error('rm: execute failed: %s (%s)' % (path, error))
         return False
     return True
+_ops_rm = rm
 
 def run(command, **kwargs):
     """Run a shell command and wait for the response. The result object will
@@ -663,6 +700,7 @@ def run(command, **kwargs):
         'stdout': data[0],
         'stderr': data[1],
     })
+_ops_rm = rm
 
 class stat(object):
 
@@ -677,83 +715,83 @@ class stat(object):
 
     @property
     def st_mode(self):
-        return self.data.st_mode
+        return self.data[0]
 
     @property
     def mode(self):
-        return mode(self.data.st_mode)
+        return _ops_mode(self.data[0])
 
     @property
     def st_ino(self):
-        return self.data.st_ino
+        return self.data[1]
 
     @property
     def inode(self):
-        return self.data.st_ino
+        return self.data[1]
 
     @property
     def st_dev(self):
-        return self.data.st_dev
+        return self.data[2]
 
     @property
     def device(self):
-        return self.data.st_dev
+        return self.data[2]
 
     @property
     def st_nlink(self):
-        return self.data.st_nlink
+        return self.data[3]
 
     @property
     def nlink(self):
-        return self.data.st_nlink
+        return self.data[3]
 
     @property
     def st_uid(self):
-        return self.data.st_uid
+        return self.data[4]
 
     @property
     def user(self):
-        return user(id=self.data.st_uid)
+        return _ops_user(id=self.data[4])
 
     @property
     def st_gid(self):
-        return self.data.st_gid
+        return self.data[5]
 
     @property
     def group(self):
-        return group(id=self.data.st_gid)
+        return _ops_group(id=self.data[5])
 
     @property
     def st_size(self):
-        return self.data.st_size
+        return self.data[6]
 
     @property
     def size(self):
-        return self.st_size
+        return self.data[6]
 
     @property
     def st_atime(self):
-        return self.data.st_size
+        return self.data[7]
 
     @property
     def atime(self):
-        return datetime.datetime.fromtimestamp(self.data.st_atime)
+        return datetime.datetime.fromtimestamp(self.data[7])
 
     @property
     def st_mtime(self):
-        return self.data.st_mtime
+        return self.data[8]
 
     @property
     def mtime(self):
-        return datetime.datetime.fromtimestamp(self.data.st_mtime)
+        return datetime.datetime.fromtimestamp(self.data[8])
 
     @property
     def st_ctime(self):
-        return self.data.st_ctime
+        return self.data[9]
 
     @property
     def ctime(self):
-        return datetime.datetime.fromtimestamp(self.data.st_ctime)
+        return datetime.datetime.fromtimestamp(self.data[9])
 
     @property
     def file(self):
@@ -766,6 +804,7 @@ class stat(object):
         if not hasattr(self, '_directory'):
             self._directory = os.path.isdir(self.path)
         return self._directory
+_ops_stat = stat
 
 class user(object):
     """Helper class for getting information about a user.
@@ -826,7 +865,7 @@ class user(object):
 
     @property
     def group(self):
-        return group(id=self.pw_gid)
+        return _ops_group(id=self.pw_gid)
 
     @property
     def pw_gecos(self):
@@ -851,6 +890,7 @@ class user(object):
     @property
     def shell(self):
         return self.pw_shell
+_ops_user = user
 
 class workspace(object):
     """Create a secure and temporary workspace that will be automatically
@@ -871,8 +911,8 @@ class workspace(object):
 
     def __exit__(self, type, value, traceback):
         if self.path and os.path.exists(self.path):
-            chmod(self.path, 0700, recursive=True)
-            rm(self.path, recursive=True)
+            _ops_chmod(self.path, 0700, recursive=True)
+            _ops_rm(self.path, recursive=True)
 
     @property
     def path(self):
@@ -880,6 +920,7 @@ class workspace(object):
 
     def join(self, *args):
         return os.path.join(self.path, *args)
+_ops_workspace = workspace
 
 __all__ = [
     'chmod',
