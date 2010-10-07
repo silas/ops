@@ -164,7 +164,7 @@ class _FindRule(object):
     def __init__(self, exclude=False):
         self.exclude = exclude
 
-    def __call__(self, name, stat):
+    def __call__(self, path, stat):
         raise NotImplementedError()
 
     def render(self, value=True):
@@ -178,7 +178,7 @@ class _FindDirectoryRule(_FindRule):
         super(_FindDirectoryRule, self).__init__(**kwargs)
         self.value = value
 
-    def __call__(self, name, stat):
+    def __call__(self, path, stat):
         return self.render(stat.directory == self.value)
 
 class _FindFileRule(_FindRule):
@@ -187,7 +187,7 @@ class _FindFileRule(_FindRule):
         super(_FindFileRule, self).__init__(**kwargs)
         self.value = value
 
-    def __call__(self, name, stat):
+    def __call__(self, path, stat):
         return self.render(stat.file == self.value)
 
 class _FindNameRule(_FindRule):
@@ -196,7 +196,8 @@ class _FindNameRule(_FindRule):
         super(_FindNameRule, self).__init__(**kwargs)
         self.pattern = pattern
 
-    def __call__(self, name, stat):
+    def __call__(self, path, stat):
+        name = os.path.basename(path)
         return self.render(fnmatch.fnmatch(name, self.pattern))
 
 class _FindTimeRule(_FindRule):
@@ -207,7 +208,7 @@ class _FindTimeRule(_FindRule):
         self.op = op
         self.time = time
 
-    def __call__(self, name, stat):
+    def __call__(self, path, stat):
         dt = getattr(stat, self.type)
         if not self.op or self.op == 'exact':
             if isinstance(self.time, datetime.date):
@@ -256,13 +257,13 @@ class find(object):
         for root_path, dir_list, file_list in os.walk(self.path):
             s = stat(root_path)
             s._directory, s._file = True, False
-            if self._match(os.path.basename(root_path), s):
+            if self._match(root_path, s):
                 yield root_path
             for f in file_list:
                 path = os.path.join(root_path, f)
                 s = stat(path)
                 s._directory, s._file = False, True
-                if self._match(f, s):
+                if self._match(os.path.join(root_path, f), s):
                     yield path
 
     def _add_rule(self, data, exclude=False):
@@ -279,9 +280,9 @@ class find(object):
             else:
                 logging.error('unknown find rule %s=%s' % (name, value))
 
-    def _match(self, name, stat):
+    def _match(self, path, stat):
         for rule in self.rules:
-            if not rule(name, stat):
+            if not rule(path, stat):
                 return False
         return True
 
