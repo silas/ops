@@ -1,80 +1,372 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>opsutils &mdash; opsutils v0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="opsutils v0.1.0 documentation" href="#" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="#">opsutils v0.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
 
-	<title>opsdojo/opsutils @ GitHub</title>
-	
-	<style type="text/css">
-		body {
-  		margin-top: 1.0em;
-  		background-color: #ba9933;
-		  font-family: "Helvetica,Arial,FreeSans";
-  		color: #000000;
-    }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-		h1 { font-size: 3.8em; color: #4566cc; margin-bottom: 3px; }
-		h1 .small { font-size: 0.4em; }
-		h1 a { text-decoration: none }
-		h2 { font-size: 1.5em; color: #4566cc; }
-    h3 { text-align: center; color: #4566cc; }
-    a { color: #4566cc; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-		pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
-	</style>
-	
-</head>
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="opsutils">
+<h1>opsutils<a class="headerlink" href="#opsutils" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="http://github.com/opsdojo/opsutils">opsutils</a> is a collection of convenience functions intended to augment the
+built-in Python os and shutil modules.</p>
+<div class="section" id="api">
+<h2>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="opsutils.chmod">
+<tt class="descclassname">opsutils.</tt><tt class="descname">chmod</tt><big>(</big><em>path</em>, <em>mode=None</em>, <em>user=None</em>, <em>group=None</em>, <em>other=None</em>, <em>recursive=False</em><big>)</big><a class="headerlink" href="#opsutils.chmod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Changes file mode bits.</p>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">chmod</span><span class="p">(</span><span class="s">&#39;/tmp/one&#39;</span><span class="p">,</span> <span class="mo">0755</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>NOTE: The precending 0 is required when using a numerical mode.</p>
+</dd></dl>
 
-<body>
-  <a href="http://github.com/opsdojo/opsutils"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+<dl class="function">
+<dt id="opsutils.chown">
+<tt class="descclassname">opsutils.</tt><tt class="descname">chown</tt><big>(</big><em>path</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#opsutils.chown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change file owner and group.</p>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">chown</span><span class="p">(</span><span class="s">&#39;/tmp/one&#39;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="s">&#39;root&#39;</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s">&#39;apache&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
 
-  <div id="container">
+<dl class="function">
+<dt id="opsutils.cp">
+<tt class="descclassname">opsutils.</tt><tt class="descname">cp</tt><big>(</big><em>src_path</em>, <em>dst_path</em>, <em>follow_links=False</em>, <em>recursive=True</em><big>)</big><a class="headerlink" href="#opsutils.cp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy source to destination.</p>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cp</span><span class="p">(</span><span class="s">&#39;/tmp/one&#39;</span><span class="p">,</span> <span class="s">&#39;/tmp/two&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
 
-    <div class="download">
-      <a href="http://github.com/opsdojo/opsutils/zipball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
-      <a href="http://github.com/opsdojo/opsutils/tarball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
+<dl class="function">
+<dt id="opsutils.dirs">
+<tt class="descclassname">opsutils.</tt><tt class="descname">dirs</tt><big>(</big><em>no_class=False</em><big>)</big><a class="headerlink" href="#opsutils.dirs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a reference to the directory stack used by pushd and popd.</p>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pushd</span><span class="p">(</span><span class="s">&#39;/tmp&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dirs</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="opsutils.exit">
+<tt class="descclassname">opsutils.</tt><tt class="descname">exit</tt><big>(</big><em>code=0</em>, <em>text=''</em><big>)</big><a class="headerlink" href="#opsutils.exit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exit and print text (if defined) to stderr if code &gt; 0 or stdout
+otherwise.</p>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">exit</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s">&#39;Invalid directory path&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="opsutils.find">
+<tt class="descclassname">opsutils.</tt><tt class="descname">find</tt><big>(</big><em>path</em>, <em>no_peek=False</em>, <em>top_down=False</em><big>)</big><a class="headerlink" href="#opsutils.find" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find directories and files in the specified path.</p>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">find</span><span class="p">(</span><span class="s">&#39;/tmp&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;*.py&#39;</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">mtime__day</span><span class="o">=</span><span class="mi">13</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="n">path</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="opsutils.group">
+<tt class="descclassname">opsutils.</tt><tt class="descname">group</tt><big>(</big><em>id=None</em>, <em>name=None</em><big>)</big><a class="headerlink" href="#opsutils.group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get information about a group.</p>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">group</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+<span class="go">root</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">group</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;root&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="opsutils.mkdir">
+<tt class="descclassname">opsutils.</tt><tt class="descname">mkdir</tt><big>(</big><em>path</em>, <em>recursive=True</em><big>)</big><a class="headerlink" href="#opsutils.mkdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a directory at the specified path. By default this function
+recursively creates the path.</p>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">mkdir</span><span class="p">(</span><span class="s">&#39;/tmp/one/two&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="opsutils.mode">
+<tt class="descclassname">opsutils.</tt><tt class="descname">mode</tt><big>(</big><em>value=None</em>, <em>user=None</em>, <em>group=None</em>, <em>other=None</em><big>)</big><a class="headerlink" href="#opsutils.mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>An object for representing file mode bits.</p>
+<dl class="docutils">
+<dt>Example:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">mode</span><span class="p">(</span><span class="mo">0755</span><span class="p">)</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">read</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">mode</span><span class="p">(</span><span class="mo">0755</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">execute</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">mode</span><span class="p">(</span><span class="mo">0755</span><span class="p">)</span><span class="o">.</span><span class="n">other</span><span class="o">.</span><span class="n">write</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="opsutils.objectify">
+<tt class="descclassname">opsutils.</tt><tt class="descname">objectify</tt><big>(</big><big>)</big><a class="headerlink" href="#opsutils.objectify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Access dict-like objects via getattr.</p>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">objectify</span><span class="p">({</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;test&#39;</span><span class="p">})</span><span class="o">.</span><span class="n">name</span>
+<span class="go">test</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="opsutils.path">
+<tt class="descclassname">opsutils.</tt><tt class="descname">path</tt><big>(</big><em>cls</em>, <em>value=None</em>, <em>stat=None</em>, <em>root=None</em>, <em>name=None</em><big>)</big><a class="headerlink" href="#opsutils.path" title="Permalink to this definition">¶</a></dt>
+<dd><p>An object for representing paths.</p>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span><span class="p">(</span><span class="s">&#39;/tmp&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">stat</span><span class="o">.</span><span class="n">owner</span><span class="o">.</span><span class="n">name</span>
+<span class="go">root</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="opsutils.popd">
+<tt class="descclassname">opsutils.</tt><tt class="descname">popd</tt><big>(</big><em>no_class=False</em><big>)</big><a class="headerlink" href="#opsutils.popd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove last path from the stack and make it the current working
+directory. By default popd will look for the stack variable in self if
+in a method and the local scope if in a function. The class behaviour can
+be disabled by passing no_class=True.</p>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pushd</span><span class="p">(</span><span class="s">&#39;/tmp&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">popd</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="opsutils.pushd">
+<tt class="descclassname">opsutils.</tt><tt class="descname">pushd</tt><big>(</big><em>path</em>, <em>no_class=False</em><big>)</big><a class="headerlink" href="#opsutils.pushd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the current working directory to the stack and switch to the path
+specified. By default pushd will attach the the stack variable to self if
+in a method and the local scope if in a function. The class behaviour can
+be disabled by passing no_class=True.</p>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pushd</span><span class="p">(</span><span class="s">&#39;/tmp&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">popd</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="opsutils.rm">
+<tt class="descclassname">opsutils.</tt><tt class="descname">rm</tt><big>(</big><em>path</em>, <em>recursive=False</em><big>)</big><a class="headerlink" href="#opsutils.rm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a specified file or directory. This function does not recursively
+delete by default.</p>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">rm</span><span class="p">(</span><span class="s">&#39;/tmp/build&#39;</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="opsutils.run">
+<tt class="descclassname">opsutils.</tt><tt class="descname">run</tt><big>(</big><em>command</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#opsutils.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a shell command and wait for the response. The result object will
+resolve to True if result.code == 0 and output/error results can be
+retrieved from result.stdout and result.stderr variables.</p>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">run</span><span class="p">(</span><span class="s">&#39;ls ${path}&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s">&#39;/tmp&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">code</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="opsutils.stat">
+<tt class="descclassname">opsutils.</tt><tt class="descname">stat</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#opsutils.stat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Access stat attributes of files and directories.</p>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stat</span><span class="p">(</span><span class="s">&#39;/tmp&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">name</span>
+<span class="go">root</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="opsutils.user">
+<tt class="descclassname">opsutils.</tt><tt class="descname">user</tt><big>(</big><em>id=None</em>, <em>name=None</em><big>)</big><a class="headerlink" href="#opsutils.user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper class for getting information about a user.</p>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">user</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+<span class="go">root</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="opsutils.workspace">
+<tt class="descclassname">opsutils.</tt><tt class="descname">workspace</tt><big>(</big><em>suffix=''</em>, <em>prefix='tmp'</em>, <em>dir=None</em><big>)</big><a class="headerlink" href="#opsutils.workspace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a secure and temporary workspace that will be automatically
+cleaned up. <cite>workspace</cite> takes the same parameters as <cite>tempfile.mkdtemp</cite>.</p>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">workspace</span><span class="p">(</span><span class="s">&#39;test&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">w</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="n">w</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;dir1&#39;</span><span class="p">,</span> <span class="s">&#39;file1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference external" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference external" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="#">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">opsutils</a><ul>
+<li><a class="reference external" href="#api">API</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/index.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
     </div>
-
-    <h1><a href="http://github.com/opsdojo/opsutils">opsutils</a>
-      <span class="small">by <a href="http://github.com/opsdojo">opsdojo</a></span></h1>
-
-    <div class="description">
-      Collection of Python utilities for doing system tasks
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="#">opsutils v0.1.0 documentation</a> &raquo;</li> 
+      </ul>
     </div>
-
-    <h2>Authors</h2>
-<p>Silas Sewell (silas@sewell.ch)<br/><br/>      </p>
-<h2>Contact</h2>
-<p>Ops Dojo (silas@opsdojo.com)<br/>      </p>
-
-
-    <h2>Download</h2>
-    <p>
-      You can download this project in either
-      <a href="http://github.com/opsdojo/opsutils/zipball/master">zip</a> or
-      <a href="http://github.com/opsdojo/opsutils/tarball/master">tar</a> formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/opsdojo/opsutils</pre>
-    </p>
-
     <div class="footer">
-      get the source code on GitHub : <a href="http://github.com/opsdojo/opsutils">opsdojo/opsutils</a>
+      &copy; Copyright 2010, Silas Sewell.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
     </div>
-
-  </div>
-
-  
-</body>
+  </body>
 </html>
