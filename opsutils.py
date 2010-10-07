@@ -50,7 +50,7 @@ def chmod(path, value=None, user=None, group=None, other=None, recursive=False):
     if other is not None:
         value.other = other
     if recursive:
-        for p in find(path, dirs_first=True):
+        for p in find(path, no_peek=True):
             successful = _chmod(p, value) and successful
     else:
         successful = _chmod(path, value)
@@ -89,27 +89,27 @@ def chown(path, **kwargs):
     successful = True
     recursive = kwargs.get('recursive')
     if recursive:
-        for p in find(path, dirs_first=True):
+        for p in find(path, no_peek=True):
             successful = _chown(p, **kwargs) and successful
     else:
         successful = _chown(path, **kwargs)
     return successful
 
-def cp(src_path, dst_path, follow_symlinks=False, recursive=True):
+def cp(src_path, dst_path, follow_links=False, recursive=True):
     """Copy source to destination.
 
     cp('/tmp/one', '/tmp/two')
     """
     successful = False
     try:
-        if follow_symlinks and os.path.islink(src_path):
+        if follow_links and os.path.islink(src_path):
             src_path = os.path.realpath(src_path)
-        if follow_symlinks and os.path.islink(dst_path):
+        if follow_links and os.path.islink(dst_path):
             dst_path = os.path.realpath(dst_path)
         if os.path.isdir(src_path):
             if not recursive:
                 return successful
-            shutil.copytree(src_path, dst_path, symlinks=follow_symlinks)
+            shutil.copytree(src_path, dst_path, symlinks=follow_links)
             successful = True
         elif os.path.exists(src_path):
             if os.path.isdir(dst_path):
@@ -249,19 +249,20 @@ class find(object):
         print path
     """
 
-    def __init__(self, path, dirs_first=False):
+    def __init__(self, path, no_peek=False, top_down=False):
         self.path = os.path.realpath(path)
         self.rules = []
-        self.dirs_first = dirs_first
+        self.no_peek = no_peek
+        self.top_down = top_down
 
     def __iter__(self):
-        if self.dirs_first:
+        if self.no_peek and not self.top_now:
             s = stat(self.path)
             s._directory, s._file = True, False
             if self._match(self.path, s):
                 yield self.path
         for root_path, dir_list, file_list in os.walk(self.path):
-            if self.dirs_first:
+            if self.no_peek and not self.top_down:
                 for d in dir_list:
                     path = os.path.join(root_path, d)
                     s = stat(path)
