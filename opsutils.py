@@ -261,7 +261,7 @@ class find(object):
             s._directory, s._file = True, False
             if self._match(self.path, s):
                 yield self.path
-        for root_path, dir_list, file_list in os.walk(self.path):
+        for root_path, dir_list, file_list in os.walk(self.path, topdown=self.top_down):
             if self.no_peek and not self.top_down:
                 for d in dir_list:
                     path = os.path.join(root_path, d)

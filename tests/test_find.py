@@ -127,6 +127,20 @@ class FindTimeRuleTestCase(unittest.TestCase):
 
 class FindTestCase(unittest.TestCase):
 
+    def setUp(self):
+        self.workspace = helper.Workspace()
+
+    def tearDown(self):
+        self.workspace.destroy()
+
+    def setup_directory(self):
+        for n1 in xrange(0, 3):
+            for n2 in xrange(0, 3):
+                p = self.workspace.join('dir%s' % n1, 'dir%s' % n2)
+                os.makedirs(p)
+                with open(os.path.join(p, 'file'), 'w') as f:
+                    f.write('hello world')
+
     def test_add_rule_name(self):
         find = opsutils.find('.')
         find._add_rule({'name': '*.pyc'})
@@ -171,6 +185,19 @@ class FindTestCase(unittest.TestCase):
         for path in opsutils.find(dir_path).exclude(name='test_find.py'):
             exclude_count += 1
         self.assertEqual(exclude_count+1, total_count)
+
+    def test_top_down(self):
+        self.setup_directory()
+        list1 = list(opsutils.find(self.workspace.path))
+        list2 = list(opsutils.find(self.workspace.path, top_down=True))
+        self.assertEqual(len(list1), 22)
+        self.assertEqual(len(list2), len(list1))
+        self.assertNotEqual(list2[0], list1[0])
+        self.assertNotEqual(list2[-1], list1[-1])
+        list1.sort()
+        list2.sort()
+        for i, v in enumerate(list1):
+            self.assertEqual(list2[i], v)
 
 if __name__ == '__main__':
     unittest.main()
