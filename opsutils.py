@@ -16,6 +16,7 @@ import pwd
 import shutil
 import string
 import subprocess
+import stat as statlib
 import sys
 import tempfile
 
@@ -339,6 +340,105 @@ def mkdir(path, recursive=True):
         return False
     return True
 
+class _ModeBits(object):
+
+    def __init__(self, value=None, read=None, write=None, execute=None):
+        self.read = read
+        self.write = write
+        self.execute = execute
+        if isinstance(value, int) and value >= 0 and value <= 7:
+            self._set_numeric(value)
+
+    def _set_numeric(self, value):
+        self.read = False
+        self.write = False
+        self.execute = False
+        if value == 1:
+            self.execute = True
+        elif value == 2:
+            self.write = True
+        elif value == 3:
+            self.execute = True
+            self.write = True
+        elif value == 4:
+            self.read = True
+        elif value == 5:
+            self.execute = True
+            self.read = True
+        elif value == 6:
+            self.read = True
+            self.write = True
+        elif value == 7:
+            self.execute = True
+            self.read = True
+            self.write = True
+
+class mode(object):
+    """An object for representing file modes.
+
+    mode(0755).user.read
+    """
+
+    bits = _ModeBits
+
+    def __init__(self, value=None, user=None, group=None, other=None):
+        self.user = user
+        self.group = group
+        self.other = other
+        for name in ('_user', '_group', '_other'):
+            if not hasattr(self, name):
+                setattr(self, name, _ModeBits())
+        if isinstance(value, int):
+            self._set_numeric(value)
+
+    def _mode_bits(self, value):
+        if isinstance(value, _ModeBits):
+            return value
+        elif isinstance(value, int):
+            return _ModeBits(value=value)
+        else:
+            logging.warning('mode: unknown bit: %s' % value)
+
+    def _set_numeric(self, mode):
+        for type_name, type_abbr in (('user', 'USR'), ('group', 'GRP'), ('other', 'OTH')):
+            type_value = getattr(self, type_name)
+            for bits_name, bits_abbr in (('read', 'R'), ('write', 'W'), ('execute', 'X')):
+                value = mode & getattr(statlib, 'S_I%s%s' % (bits_abbr, type_abbr))
+                setattr(type_value, bits_name, value)
+
+    @property
+    def user(self):
+        return self._user
+
+    @user.setter
+    def user(self, value=None):
+        if value is not None:
+            value = self._mode_bits(value)
+            if value is not None:
+                self._user = value
+
+    @property
+    def group(self):
+        return self._group
+
+    @group.setter
+    def group(self, value=None):
+        if value is not None:
+            value = self._mode_bits(value)
+            if value is not None:
+                self._group = value
+
+    @property
+    def other(self):
+        return self._other
+
+    @other.setter
+    def other(self, value=None):
+        if value is not None:
+            value = self._mode_bits(value)
+            if value is not None:
+                self._other = value
+
 class objectify(dict):
 
     def __getattr__(self, name):
@@ -520,51 +620,55 @@ class stat(object):
 
     @property
     def st_mode(self):
-        return self.data[0]
+        return self.data.st_mode
+
+    @property
+    def mode(self):
+        return mode(self.data.st_mode)
 
     @property
     def st_ino(self):
-        return self.data[1]
+        return self.data.st_ino
 
     @property
     def inode(self):
-        return self.st_ino
+        return self.data.st_ino
 
     @property
     def st_dev(self):
-        return self.data[2]
+        return self.data.st_dev
 
     @property
     def device(self):
-        return self.st_dev
+        return self.data.st_dev
 
     @property
     def st_nlink(self):
-        return self.data[3]
+        return self.data.st_nlink
 
     @property
     def nlink(self):
-        return self.st_nlink
+        return self.data.st_nlink
 
     @property
     def st_uid(self):
-        return self.data[4]
+        return self.data.st_uid
 
     @property
     def user(self):
-        return user(id=self.st_uid)
+        return user(id=self.data.st_uid)
 
     @property
     def st_gid(self):
-        return self.data[5]
+        return self.data.st_gid
 
     @property
     def group(self):
-        return group(id=self.st_gid)
+        return group(id=self.data.st_gid)
 
     @property
     def st_size(self):
-        return self.data[6]
+        return self.data.st_size
 
     @property
     def size(self):
@@ -572,27 +676,27 @@ class stat(object):
 
     @property
     def st_atime(self):
-        return self.data[7]
+        return self.data.st_size
 
     @property
     def atime(self):
-        return datetime.datetime.fromtimestamp(self.st_atime)
+        return datetime.datetime.fromtimestamp(self.data.st_atime)
 
     @property
     def st_mtime(self):
-        return self.data[8]
+        return self.data.st_mtime
 
     @property
     def mtime(self):
-        return datetime.datetime.fromtimestamp(self.st_mtime)
+        return datetime.datetime.fromtimestamp(self.data.st_mtime)
 
     @property
     def st_ctime(self):
-        return self.data[9]
+        return self.data.st_ctime
 
     @property
     def ctime(self):
-        return datetime.datetime.fromtimestamp(self.st_ctime)
+        return datetime.datetime.fromtimestamp(self.data.st_ctime)
 
     @property
     def file(self):
@@ -726,6 +830,7 @@ __all__ = [
     'exit',
     'find',
     'group',
+    'mode',
     'mkdir',
     'objectify',
     'popd',

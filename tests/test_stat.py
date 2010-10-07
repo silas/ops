@@ -45,16 +45,16 @@ class StatTestCase(unittest.TestCase):
         self.assertTrue(stat.group.id, self.gid)
         self.assertTrue(stat.group.name, self.group)
 
-        self.assertTrue(isinstance(stat.st_size, int))
+        self.assertFalse(stat.st_size is None)
         self.assertEqual(stat.st_size, stat.size)
 
-        self.assertTrue(isinstance(stat.st_atime, int))
+        self.assertFalse(stat.st_atime is None)
         self.assertTrue(isinstance(stat.atime, datetime.datetime))
 
-        self.assertTrue(isinstance(stat.st_mtime, int))
+        self.assertFalse(stat.st_mtime is None)
         self.assertTrue(isinstance(stat.mtime, datetime.datetime))
 
-        self.assertTrue(isinstance(stat.st_ctime, int))
+        self.assertFalse(stat.st_ctime is None)
         self.assertTrue(isinstance(stat.ctime, datetime.datetime))
 
         self.assertFalse(stat.file)
