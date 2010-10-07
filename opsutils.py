@@ -24,6 +24,35 @@ logging = logginglib.getLogger('opsutils')
 
 DIRECTORY_STACK_NAME = '__utils_directory_stack'
 
+def _chmod(path, value=None):
+    if isinstance(value, int):
+        value = mode(value)
+    try:
+        os.chmod(path, value.numeric)
+        return True
+    except OSError, error:
+        logging.error('chmod: %s' % error)
+    except TypeError:
+        logging.error('invalid mode value: %s' % value)
+    return False
+
+def chmod(path, value=None, user=None, group=None, other=None, recursive=False):
+    """Change file permissions.
+
+    chmod('/tmp/one', 0755)
+    """
+    successful = True
+    value = mode(value)
+    value.user = user
+    value.group = group
+    value.other = other
+    if recursive:
+        for p in find(path):
+            successful = _chmod(p, value) and successful
+    else:
+        successful = _chown(path, value)
+    return successful
+
 def _chown(path, **kwargs):
     user = kwargs.get('user')
     group = kwargs.get('group')
@@ -379,6 +408,9 @@ class mode(object):
     mode(0755).user.read
     """
 
+    _TYPES = (('user', 'USR'), ('group', 'GRP'), ('other', 'OTH'))
+    _BITS = (('read', 'R'), ('write', 'W'), ('execute', 'X'))
+
     bits = _ModeBits
 
     def __init__(self, value=None, user=None, group=None, other=None):
@@ -401,18 +433,18 @@ class mode(object):
     @property
     def numeric(self):
         mode = 0
-        for type_name, type_abbr in (('user', 'USR'), ('group', 'GRP'), ('other', 'OTH')):
+        for type_name, type_abbr in self._TYPES:
             type_value = getattr(self, type_name)
-            for bits_name, bits_abbr in (('read', 'R'), ('write', 'W'), ('execute', 'X')):
+            for bits_name, bits_abbr in self._BITS:
                 if getattr(type_value, bits_name):
                     mode |= getattr(statlib, 'S_I%s%s' % (bits_abbr, type_abbr))
         return mode
 
     @numeric.setter
     def numeric(self, mode):
-        for type_name, type_abbr in (('user', 'USR'), ('group', 'GRP'), ('other', 'OTH')):
+        for type_name, type_abbr in self._TYPES:
             type_value = getattr(self, type_name)
-            for bits_name, bits_abbr in (('read', 'R'), ('write', 'W'), ('execute', 'X')):
+            for bits_name, bits_abbr in self._BITS:
                 value = mode & getattr(statlib, 'S_I%s%s' % (bits_abbr, type_abbr))
                 setattr(type_value, bits_name, value)
 
