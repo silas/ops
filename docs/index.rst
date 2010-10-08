@@ -7,7 +7,7 @@ opsutils
 ========
 
 `opsutils`_ is a collection of convenience functions intended to augment the
-built-in Python os and shutil modules.
+built-in Python `os`_ and `shutil`_ modules.
 
 API
 ---
@@ -38,3 +38,5 @@ Indices and tables
 * :ref:`search`
 
 .. _opsutils: http://github.com/opsdojo/opsutils
+.. _os: http://docs.python.org/library/os.html
+.. _shutil: http://docs.python.org/library/shutil.html
