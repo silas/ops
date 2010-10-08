@@ -39,7 +39,6 @@ def _chmod(path, value=None):
 def chmod(path, mode=None, user=None, group=None, other=None, recursive=False):
     """Changes file mode bits.
 
-    Examples:
       >>> if chmod('/tmp/one', 0755):
       ...     print 'OK'
       OK
@@ -73,7 +72,6 @@ def _chown(path, uid=-1, gid=-1):
 def chown(path, user=None, group=None, recursive=False):
     """Change file owner and group.
 
-    Examples:
       >>> if chown('/tmp/one', user='root', group='wheel'):
       ...     print 'OK'
       OK
@@ -121,7 +119,6 @@ _ops_chown = chown
 def cp(src_path, dst_path, follow_links=False, recursive=True):
     """Copy source to destination.
 
-    Examples:
       >>> if cp('/tmp/one', '/tmp/two'):
       ...     print 'OK'
       OK
@@ -152,7 +149,6 @@ _ops_cp = cp
 def dirs(no_class=False):
     """Returns a reference to the directory stack used by pushd and popd.
 
-    Examples:
       >>> os.chdir('/tmp')
       >>> if not pushd('/'):
       ...     print 'Unable to pushd'
@@ -182,7 +178,6 @@ def exit(code=0, text=''):
     """Exit and print text (if defined) to stderr if code > 0 or stdout
     otherwise.
 
-    Examples:
       >>> exit(code=1, text='Invalid directory path')
     """
     if not isinstance(text, basestring):
@@ -283,7 +278,6 @@ class _FindTimeRule(_FindRule):
 class find(object):
     """Find directories and files in the specified path.
 
-    Examples:
       >>> for path in find('/tmp').filter(name='*.py', file=True).exclude(mtime__year=2010):
       ...     print '%s is owned by %s' % (path, path.stat.user.name)
       /tmp/test1.py is owned by silas
@@ -353,7 +347,6 @@ _ops_find = find
 class group(object):
     """Get information about a group.
 
-    Examples:
       >>> print group(id=0).name
       root
       >>> print group(name='root').id
@@ -419,7 +412,6 @@ def mkdir(path, recursive=True):
     """Create a directory at the specified path. By default this function
     recursively creates the path.
 
-    Examples:
       >>> if mkdir('/tmp/one/two'):
       ...     print 'OK'
       OK
@@ -454,7 +446,6 @@ class _ModeBits(object):
 class mode(object):
     """An object for representing file mode bits.
 
-    Example:
       >>> m = mode(0755)
       >>> m.user.read
       True
@@ -532,7 +523,6 @@ _ops_mode = mode
 class objectify(dict):
     """Use property access syntax to retrieve values from a dict-like object.
 
-    Examples:
       >>> o = objectify({'name': 'hello', 'value': 'world'})
       >>> o.name
       test
@@ -581,7 +571,6 @@ def _path_stat_set(self, value=None):
 class path(unicode):
     """An object for representing paths.
 
-    Examples:
       >>> p = path('/tmp')
       >>> isinstance(p, unicode)
       True
@@ -613,7 +602,6 @@ def popd(no_class=False):
     in a method and the local scope if in a function. The class behaviour can
     be disabled by passing no_class=True.
 
-    Examples:
       >>> os.getcwd()
       /
       >>> if not pushd('/tmp'):
@@ -699,7 +687,6 @@ def rm(path, recursive=False):
     """Delete a specified file or directory. This function does not recursively
     delete by default.
 
-    Examples:
       >>> if rm('/tmp/build', recursive=True):
       ...     print 'OK'
       OK
@@ -726,7 +713,6 @@ def run(command, **kwargs):
     resolve to True if result.code == 0 and output/error results can be
     retrieved from result.stdout and result.stderr variables.
 
-    Examples:
       >>> result = run('echo ${content}', content='Some $%^$## "" + \' content')
       >>> result.code
       0
@@ -775,7 +761,6 @@ _ops_rm = rm
 class stat(object):
     """Display stat info for files and directories.
 
-    Examples:
       >>> s = stat('/tmp')
       >>> s.user.name
       root
@@ -892,7 +877,6 @@ _ops_stat = stat
 class user(object):
     """Get information about a user.
 
-    Examples:
       >>> u = user(id=0)
       >>> u.name
       root
@@ -987,7 +971,6 @@ class workspace(object):
     """Create a secure and temporary workspace that will be automatically
     cleaned up.
 
-    Examples:
       >>> path = None
       >>> with workspace() as w:
       ...     path = w.path
