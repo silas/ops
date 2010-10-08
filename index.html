@@ -47,15 +47,11 @@ built-in Python <a class="reference external" href="http://docs.python.org/libra
 <dt id="opsutils.chmod">
 <tt class="descclassname">opsutils.</tt><tt class="descname">chmod</tt><big>(</big><em>path</em>, <em>mode=None</em>, <em>user=None</em>, <em>group=None</em>, <em>other=None</em>, <em>recursive=False</em><big>)</big><a class="headerlink" href="#opsutils.chmod" title="Permalink to this definition">¶</a></dt>
 <dd><p>Changes file mode bits.</p>
-<dl class="docutils">
-<dt>Examples:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">chmod</span><span class="p">(</span><span class="s">&#39;/tmp/one&#39;</span><span class="p">,</span> <span class="mo">0755</span><span class="p">):</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">chmod</span><span class="p">(</span><span class="s">&#39;/tmp/one&#39;</span><span class="p">,</span> <span class="mo">0755</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;OK&#39;</span>
 <span class="go">OK</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 <p>NOTE: The precending <tt class="docutils literal"><span class="pre">0</span></tt> is required when using a numerical mode.</p>
 </dd></dl>
 
@@ -63,39 +59,29 @@ built-in Python <a class="reference external" href="http://docs.python.org/libra
 <dt id="opsutils.chown">
 <tt class="descclassname">opsutils.</tt><tt class="descname">chown</tt><big>(</big><em>path</em>, <em>user=None</em>, <em>group=None</em>, <em>recursive=False</em><big>)</big><a class="headerlink" href="#opsutils.chown" title="Permalink to this definition">¶</a></dt>
 <dd><p>Change file owner and group.</p>
-<dl class="docutils">
-<dt>Examples:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">chown</span><span class="p">(</span><span class="s">&#39;/tmp/one&#39;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="s">&#39;root&#39;</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s">&#39;wheel&#39;</span><span class="p">):</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">chown</span><span class="p">(</span><span class="s">&#39;/tmp/one&#39;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="s">&#39;root&#39;</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s">&#39;wheel&#39;</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;OK&#39;</span>
 <span class="go">OK</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="opsutils.cp">
 <tt class="descclassname">opsutils.</tt><tt class="descname">cp</tt><big>(</big><em>src_path</em>, <em>dst_path</em>, <em>follow_links=False</em>, <em>recursive=True</em><big>)</big><a class="headerlink" href="#opsutils.cp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Copy source to destination.</p>
-<dl class="docutils">
-<dt>Examples:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">cp</span><span class="p">(</span><span class="s">&#39;/tmp/one&#39;</span><span class="p">,</span> <span class="s">&#39;/tmp/two&#39;</span><span class="p">):</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">cp</span><span class="p">(</span><span class="s">&#39;/tmp/one&#39;</span><span class="p">,</span> <span class="s">&#39;/tmp/two&#39;</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;OK&#39;</span>
 <span class="go">OK</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="opsutils.dirs">
 <tt class="descclassname">opsutils.</tt><tt class="descname">dirs</tt><big>(</big><em>no_class=False</em><big>)</big><a class="headerlink" href="#opsutils.dirs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a reference to the directory stack used by pushd and popd.</p>
-<dl class="docutils">
-<dt>Examples:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s">&#39;/tmp&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s">&#39;/tmp&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="ow">not</span> <span class="n">pushd</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;Unable to pushd&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dirs</span><span class="p">()</span>
@@ -106,8 +92,6 @@ built-in Python <a class="reference external" href="http://docs.python.org/libra
 <span class="go">[]</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="function">
@@ -115,45 +99,33 @@ built-in Python <a class="reference external" href="http://docs.python.org/libra
 <tt class="descclassname">opsutils.</tt><tt class="descname">exit</tt><big>(</big><em>code=0</em>, <em>text=''</em><big>)</big><a class="headerlink" href="#opsutils.exit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exit and print text (if defined) to stderr if code &gt; 0 or stdout
 otherwise.</p>
-<dl class="docutils">
-<dt>Examples:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">exit</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s">&#39;Invalid directory path&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">exit</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s">&#39;Invalid directory path&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="opsutils.find">
 <tt class="descclassname">opsutils.</tt><tt class="descname">find</tt><big>(</big><em>path</em>, <em>no_peek=False</em>, <em>top_down=False</em><big>)</big><a class="headerlink" href="#opsutils.find" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find directories and files in the specified path.</p>
-<dl class="docutils">
-<dt>Examples:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">find</span><span class="p">(</span><span class="s">&#39;/tmp&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;*.py&#39;</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">mtime__year</span><span class="o">=</span><span class="mi">2010</span><span class="p">):</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">find</span><span class="p">(</span><span class="s">&#39;/tmp&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;*.py&#39;</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">mtime__year</span><span class="o">=</span><span class="mi">2010</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s"> is owned by </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">stat</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 <span class="go">/tmp/test1.py is owned by silas</span>
 <span class="go">/tmp/test2.py is owned by root</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="opsutils.group">
-<tt class="descclassname">opsutils.</tt><tt class="descname">group</tt><big>(</big><em>id=None</em>, <em>name=None</em><big>)</big><a class="headerlink" href="#opsutils.group" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">opsutils.</tt><tt class="descname">group</tt><big>(</big><em>name=None</em>, <em>id=None</em><big>)</big><a class="headerlink" href="#opsutils.group" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get information about a group.</p>
-<dl class="docutils">
-<dt>Examples:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">group</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">group</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
 <span class="go">root</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">group</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;root&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
 <span class="go">0</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="function">
@@ -161,24 +133,18 @@ otherwise.</p>
 <tt class="descclassname">opsutils.</tt><tt class="descname">mkdir</tt><big>(</big><em>path</em>, <em>recursive=True</em><big>)</big><a class="headerlink" href="#opsutils.mkdir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a directory at the specified path. By default this function
 recursively creates the path.</p>
-<dl class="docutils">
-<dt>Examples:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">mkdir</span><span class="p">(</span><span class="s">&#39;/tmp/one/two&#39;</span><span class="p">):</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">mkdir</span><span class="p">(</span><span class="s">&#39;/tmp/one/two&#39;</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;OK&#39;</span>
 <span class="go">OK</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="opsutils.mode">
 <tt class="descclassname">opsutils.</tt><tt class="descname">mode</tt><big>(</big><em>value=None</em>, <em>user=None</em>, <em>group=None</em>, <em>other=None</em><big>)</big><a class="headerlink" href="#opsutils.mode" title="Permalink to this definition">¶</a></dt>
 <dd><p>An object for representing file mode bits.</p>
-<dl class="docutils">
-<dt>Example:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">mode</span><span class="p">(</span><span class="mo">0755</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">mode</span><span class="p">(</span><span class="mo">0755</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">read</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">execute</span>
@@ -187,34 +153,26 @@ recursively creates the path.</p>
 <span class="go">False</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="opsutils.objectify">
 <tt class="descclassname">opsutils.</tt><tt class="descname">objectify</tt><big>(</big><big>)</big><a class="headerlink" href="#opsutils.objectify" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use property access syntax to retrieve values from a dict-like object.</p>
-<dl class="docutils">
-<dt>Examples:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">o</span> <span class="o">=</span> <span class="n">objectify</span><span class="p">({</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;hello&#39;</span><span class="p">,</span> <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="s">&#39;world&#39;</span><span class="p">})</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">o</span> <span class="o">=</span> <span class="n">objectify</span><span class="p">({</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;hello&#39;</span><span class="p">,</span> <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="s">&#39;world&#39;</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">o</span><span class="o">.</span><span class="n">name</span>
 <span class="go">test</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">o</span><span class="o">.</span><span class="n">value</span>
 <span class="go">world</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="opsutils.path">
 <tt class="descclassname">opsutils.</tt><tt class="descname">path</tt><big>(</big><em>cls</em>, <em>value=None</em>, <em>stat=None</em>, <em>root=None</em>, <em>name=None</em><big>)</big><a class="headerlink" href="#opsutils.path" title="Permalink to this definition">¶</a></dt>
 <dd><p>An object for representing paths.</p>
-<dl class="docutils">
-<dt>Examples:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="s">&#39;/tmp&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="s">&#39;/tmp&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">)</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span>
@@ -223,8 +181,6 @@ recursively creates the path.</p>
 <span class="go">root</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="function">
@@ -234,9 +190,7 @@ recursively creates the path.</p>
 directory. By default popd will look for the stack variable in self if
 in a method and the local scope if in a function. The class behaviour can
 be disabled by passing no_class=True.</p>
-<dl class="docutils">
-<dt>Examples:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
 <span class="go">/</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="ow">not</span> <span class="n">pushd</span><span class="p">(</span><span class="s">&#39;/tmp&#39;</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;Unable to pushd&#39;</span>
@@ -248,8 +202,6 @@ be disabled by passing no_class=True.</p>
 <span class="go">/</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="function">
@@ -267,15 +219,11 @@ be disabled by passing no_class=True.</p>
 <tt class="descclassname">opsutils.</tt><tt class="descname">rm</tt><big>(</big><em>path</em>, <em>recursive=False</em><big>)</big><a class="headerlink" href="#opsutils.rm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a specified file or directory. This function does not recursively
 delete by default.</p>
-<dl class="docutils">
-<dt>Examples:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">rm</span><span class="p">(</span><span class="s">&#39;/tmp/build&#39;</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">rm</span><span class="p">(</span><span class="s">&#39;/tmp/build&#39;</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;OK&#39;</span>
 <span class="go">OK</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="function">
@@ -284,9 +232,7 @@ delete by default.</p>
 <dd><p>Run a shell command and wait for the response. The result object will
 resolve to True if result.code == 0 and output/error results can be
 retrieved from result.stdout and result.stderr variables.</p>
-<dl class="docutils">
-<dt>Examples:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="s">&#39;echo ${content}&#39;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="s">&#39;Some $%^$## &quot;&quot; + &#39;</span> <span class="n">content</span><span class="s">&#39;)</span><span class="gp">&gt;&gt;&gt; </span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="s">&#39;echo ${content}&#39;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="s">&#39;Some $%^$## &quot;&quot; + &#39;</span> <span class="n">content</span><span class="s">&#39;)</span><span class="gp">&gt;&gt;&gt; </span>
 <span class="n">result</span><span class="o">.</span><span class="n">code</span>
 <span class="go">0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">result</span><span class="p">:</span>
@@ -298,17 +244,13 @@ retrieved from result.stdout and result.stderr variables.</p>
 <span class="go">echo &quot;Some \$%^\$## &quot;&quot; + &#39; content&quot;</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="opsutils.stat">
 <tt class="descclassname">opsutils.</tt><tt class="descname">stat</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#opsutils.stat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Display stat info for files and directories.</p>
-<dl class="docutils">
-<dt>Examples:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">stat</span><span class="p">(</span><span class="s">&#39;/tmp&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">stat</span><span class="p">(</span><span class="s">&#39;/tmp&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">name</span>
 <span class="go">root</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">mode</span><span class="o">.</span><span class="n">other</span><span class="o">.</span><span class="n">write</span>
@@ -319,17 +261,13 @@ retrieved from result.stdout and result.stderr variables.</p>
 <span class="go">4096</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="opsutils.user">
-<tt class="descclassname">opsutils.</tt><tt class="descname">user</tt><big>(</big><em>id=None</em>, <em>name=None</em><big>)</big><a class="headerlink" href="#opsutils.user" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">opsutils.</tt><tt class="descname">user</tt><big>(</big><em>name=None</em>, <em>id=None</em><big>)</big><a class="headerlink" href="#opsutils.user" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get information about a user.</p>
-<dl class="docutils">
-<dt>Examples:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">u</span> <span class="o">=</span> <span class="n">user</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">u</span> <span class="o">=</span> <span class="n">user</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">name</span>
 <span class="go">root</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">home</span>
@@ -340,8 +278,6 @@ retrieved from result.stdout and result.stderr variables.</p>
 <span class="go">0</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="function">
@@ -349,9 +285,7 @@ retrieved from result.stdout and result.stderr variables.</p>
 <tt class="descclassname">opsutils.</tt><tt class="descname">workspace</tt><big>(</big><em>suffix=''</em>, <em>prefix='tmp'</em>, <em>dir=None</em><big>)</big><a class="headerlink" href="#opsutils.workspace" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a secure and temporary workspace that will be automatically
 cleaned up.</p>
-<dl class="docutils">
-<dt>Examples:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="bp">None</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="bp">None</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">workspace</span><span class="p">()</span> <span class="k">as</span> <span class="n">w</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">path</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">path</span>
 <span class="gp">... </span>    <span class="k">print</span> <span class="n">w</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;dir1&#39;</span><span class="p">,</span> <span class="s">&#39;file1&#39;</span><span class="p">)</span>
@@ -360,8 +294,6 @@ cleaned up.</p>
 <span class="go">False</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 </div>
