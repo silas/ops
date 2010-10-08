@@ -13,7 +13,19 @@ augment the built-in Python [os][os] and [shutil][shutil] modules.
     from opsutils import *
 
     for path in find('/tmp').filter(name='*.py', file=True).exclude(mtime__day=13):
-        chown(path, user='root', group='root')
+        result = run('python ${path}', path=path)
+        print 'Command: %s' % result.command
+        print 'Code: %s' % result.code
+        if result:
+            print 'Stdout: %s' % result.stdout
+        else:
+            print 'STderr: %s' % result.stderr
+
+Which would produce a result like:
+
+    Command: python /tmp/test.py
+    Code: 0
+    Stdout: Hello World
 
 ### License
 
