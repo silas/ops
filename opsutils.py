@@ -62,47 +62,59 @@ def chmod(path, mode=None, user=None, group=None, other=None, recursive=False):
     return successful
 _ops_chmod = chmod
 
-def _chown(path, **kwargs):
-    user = kwargs.get('user')
-    group = kwargs.get('group')
-    uid = kwargs.get('uid', -1)
-    gid = kwargs.get('gid', -1)
-    successful = True
-    if uid == -1 and user is not None:
-        try:
-            uid = pwd.getpwnam(user)[2]
-        except KeyError:
-            logging.error('chown: uid lookup failed: %s' % user)
-            successful = False
-    if gid == -1 and group is not None:
-        try:
-            gid = grp.getgrnam(group)[2]
-        except KeyError:
-            logging.error('chown: gid lookup failed: %s' % group)
-            successful = False
+def _chown(path, uid=-1, gid=-1):
     try:
         os.chown(path, uid, gid)
+        return True
     except OSError, error:
         logging.error('chown: execute failed: %s (%s)' % (path, error))
-        successful = False
-    return successful
+    return False
 
-def chown(path, **kwargs):
+def chown(path, user=None, group=None, recursive=False):
     """Change file owner and group.
 
-
     Examples:
-      >>> if chown('/tmp/one', user='root', group='apache'):
+      >>> if chown('/tmp/one', user='root', group='wheel'):
       ...     print 'OK'
       OK
     """
     successful = True
-    recursive = kwargs.get('recursive')
-    if recursive:
-        for p in _ops_find(path, no_peek=True):
-            successful = _chown(p, **kwargs) and successful
+    uid = -1
+    gid = -1
+    if user is not None:
+        if isinstance(user, basestring):
+            user = _ops_user(name=user)
+        elif isinstance(user, int):
+            user = _ops_user(id=user)
+        if isinstance(user, _ops_user):
+            if user:
+                uid = user.id
+            else:
+                logging.error('chown: unable to get uid')
+                successful = False
+        else:
+            successful = False
+    if group is not None:
+        if isinstance(group, basestring):
+            group = _ops_group(name=group)
+        elif isinstance(group, int):
+            group = _ops_user(id=group)
+        if isinstance(group, _ops_group):
+            if group:
+                gid = group.id
+            else:
+                logging.error('chown: unable to get gid')
+                successful = False
+        else:
+            successful = False
+    if not (uid == -1  and gid == -1):
+        if recursive:
+            for p in _ops_find(path, no_peek=True):
+                successful = _chown(p, uid=uid, gid=gid) and successful
+        else:
+            successful = _chown(path, uid=uid, gid=gid)
     else:
-        successful = _chown(path, **kwargs)
+        successful = False
     return successful
 _ops_chown = chown
 
