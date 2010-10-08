@@ -12,6 +12,11 @@ class GroupTestCase(unittest.TestCase):
         self.id = os.getgid()
         self.name = grp.getgrgid(self.id)[0]
 
+    def test_default(self):
+        group = opsutils.group(self.name)
+        self.assertEqual(group.id, self.id)
+        self.assertTrue(group)
+
     def test_get_by_id(self):
         group = opsutils.group(id=self.id)
         self.assertEqual(group.name, self.name)

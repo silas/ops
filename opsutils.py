@@ -353,7 +353,7 @@ class group(object):
       0
     """
 
-    def __init__(self, id=None, name=None):
+    def __init__(self, name=None, id=None):
         self._id = id
         self._name = name
         self._bool = None
@@ -888,7 +888,7 @@ class user(object):
       0
     """
 
-    def __init__(self, id=None, name=None):
+    def __init__(self, name=None, id=None):
         self._id = id
         self._name = name
         self._bool = None

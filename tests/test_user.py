@@ -12,6 +12,11 @@ class UserTestCase(unittest.TestCase):
         self.id = os.geteuid()
         self.name = pwd.getpwuid(self.id)[0]
 
+    def test_default(self):
+        user = opsutils.user(self.name)
+        self.assertEqual(user.id, self.id)
+        self.assertTrue(user)
+
     def test_get_by_id(self):
         user = opsutils.user(id=self.id)
         self.assertEqual(user.name, self.name)
