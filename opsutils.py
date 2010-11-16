@@ -3,35 +3,24 @@
 #
 # This file is subject to the New BSD License (see the LICENSE file).
 
-import copy
-import datetime
-import fnmatch
-import glob
-import grp
-import inspect
-import logging as logginglib
-import numbers
-import os
-import pipes
-import pwd
-import re
-import shutil
-import string
-import subprocess
-import stat as statlib
 import sys
-import tempfile
 
-logging = logginglib.getLogger('opsutils')
+def _m(name):
+    try:
+        return sys.modules[name]
+    except KeyError:
+        __import__(name)
+        return sys.modules[name]
+
+logging = _m('logging').getLogger('opsutils')
 
 DIRECTORY_STACK_NAME = '__utils_directory_stack'
-NUMBER_RE = re.compile('^[-+]?([0-9]+\.?[0-9]*)|([0-9]*\.?[0-9]+)$')
 
 def _chmod(path, value=None):
     if isinstance(value, int):
         value = mode(value)
     try:
-        os.chmod(path, value.numeric)
+        _m('os').chmod(path, value.numeric)
         return True
     except OSError, error:
         logging.error('chmod: %s' % error)
@@ -66,7 +55,7 @@ _ops_chmod = chmod
 
 def _chown(path, uid=-1, gid=-1):
     try:
-        os.chown(path, uid, gid)
+        _m('os').chown(path, uid, gid)
         return True
     except OSError, error:
         logging.error('chown: execute failed: %s (%s)' % (path, error))
@@ -128,19 +117,19 @@ def cp(src_path, dst_path, follow_links=False, recursive=True):
     """
     successful = False
     try:
-        if follow_links and os.path.islink(src_path):
-            src_path = os.path.realpath(src_path)
-        if follow_links and os.path.islink(dst_path):
-            dst_path = os.path.realpath(dst_path)
-        if os.path.isdir(src_path):
+        if follow_links and _m('os').path.islink(src_path):
+            src_path = _m('os').path.realpath(src_path)
+        if follow_links and _m('os').path.islink(dst_path):
+            dst_path = _m('os').path.realpath(dst_path)
+        if _m('os').path.isdir(src_path):
             if not recursive:
                 return successful
-            shutil.copytree(src_path, dst_path, symlinks=follow_links)
+            _m('shutil').copytree(src_path, dst_path, symlinks=follow_links)
             successful = True
-        elif os.path.exists(src_path):
-            if os.path.isdir(dst_path):
-                dst_path = os.path.join(dst_path, os.path.basename(src_path))
-            shutil.copy2(src_path, dst_path)
+        elif _m('os').path.exists(src_path):
+            if _m('os').path.isdir(dst_path):
+                dst_path = _m('os').path.join(dst_path, _m('os').path.basename(src_path))
+            _m('shutil').copy2(src_path, dst_path)
             successful = True
         else:
             logging.error('cp: source not found: %s' % src_path)
@@ -163,8 +152,8 @@ def dirs(no_class=False):
       []
     """
     # Get locals from caller
-    curframe = inspect.currentframe()
-    calframe = inspect.getouterframes(curframe, 2)
+    curframe = _m('inspect').currentframe()
+    calframe = _m('inspect').getouterframes(curframe, 2)
     locals = calframe[1][0].f_locals
     # Use self if caller is a method and no_class is false
     if not no_class and 'self' in locals:
@@ -233,8 +222,8 @@ class _FindNameRule(_FindRule):
         self.pattern = pattern
 
     def __call__(self, path):
-        name = os.path.basename(path)
-        return self.render(fnmatch.fnmatch(name, self.pattern))
+        name = _m('os').path.basename(path)
+        return self.render(_m('fnmatch').fnmatch(name, self.pattern))
 
 class _FindTimeRule(_FindRule):
 
@@ -247,13 +236,13 @@ class _FindTimeRule(_FindRule):
     def __call__(self, path):
         dt = getattr(path.stat, self.type)
         if not self.op or self.op == 'exact':
-            if isinstance(self.time, datetime.date):
+            if isinstance(self.time, _m('datetime').date):
                 return self.render(dt.year == self.time.year and
                         dt.month == self.time.month and
                         dt.day == self.time.day)
             return self.render(dt == self.time)
-        if isinstance(self.time, datetime.date) and not isinstance(self.time, datetime.datetime):
-            time = datetime.datetime(year=self.time.year, month=self.time.month, day=self.time.day)
+        if isinstance(self.time, _m('datetime').date) and not isinstance(self.time, _m('datetime').datetime):
+            time = _m('datetime').datetime(year=self.time.year, month=self.time.month, day=self.time.day)
         else:
             time = self.time
         if self.op == 'lt':
@@ -289,7 +278,7 @@ class find(object):
 
     def __init__(self, path, no_peek=False, top_down=False):
         try:
-            self.path = os.path.realpath(path)
+            self.path = _m('os').path.realpath(path)
         except OSError:
             self.path = None
         self.rules = []
@@ -303,7 +292,7 @@ class find(object):
             p = path(self.path)
             if self._match(p):
                 yield p
-        for root_path, dir_list, file_list in os.walk(self.path, topdown=self.top_down):
+        for root_path, dir_list, file_list in _m('os').walk(self.path, topdown=self.top_down):
             if self.no_peek and not self.top_down:
                 for d in dir_list:
                     p = path(root=self.path, name=d)
@@ -347,14 +336,18 @@ class find(object):
         return self
 _ops_find = find
 
+_ops_getenv_NUMBER_RE = None
 def getenv(name, default=None, type='basestring'):
     """Get environment variable.
 
       >>> getenv('PATH')
       '/bin'
     """
+    global _ops_getenv_NUMBER_RE
+    if _ops_getenv_NUMBER_RE is None:
+        _ops_getenv_NUMBER_RE = _m('re').compile('^[-+]?([0-9]+\.?[0-9]*)|([0-9]*\.?[0-9]+)$')
     exists = hasenv(name)
-    value = os.environ.get(name)
+    value = _m('os').environ.get(name)
     if type in (basestring, 'basestring'):
         if value is not None:
             return value
@@ -375,22 +368,22 @@ def getenv(name, default=None, type='basestring'):
             elif default is None:
                 return False
         return False if default is None else default
-    elif type in (numbers.Number, 'number'):
+    elif type in (_m('numbers').Number, 'number'):
         if value is not None:
             if value.isdigit():
                 return int(value)
-            elif value != '.' and NUMBER_RE.match(value):
+            elif value != '.' and _ops_getenv_NUMBER_RE.match(value):
                 return eval(value)
         return 0 if default is None else default
     elif type in (int, 'int', 'integer'):
         try:
             return int(value)
         except Exception:
-            if isinstance(value, basestring) and NUMBER_RE.match(value):
+            if isinstance(value, basestring) and _ops_getenv_NUMBER_RE.match(value):
                 return int(eval(value))
             return 0 if default is None else default
     elif type in (float, 'float'):
-        if value is not None and NUMBER_RE.match(value):
+        if value is not None and _ops_getenv_NUMBER_RE.match(value):
             return float(value)
         return 0.0 if default is None else default
     return default
@@ -410,7 +403,7 @@ class group(object):
         self._name = name
         self._bool = None
         if id is None and name is None:
-            self._id = os.getegid()
+            self._id = _m('os').getegid()
 
     def __nonzero__(self):
         if self._bool is None:
@@ -422,9 +415,9 @@ class group(object):
         if not hasattr(self, '_data'):
             try:
                 if self._name:
-                    self._data = grp.getgrnam(self._name)
+                    self._data = _m('grp').getgrnam(self._name)
                 else:
-                    self._data = grp.getgrgid(self._id)
+                    self._data = _m('grp').getgrgid(self._id)
                 self._bool = True
             except KeyError:
                 self._bool = False
@@ -466,7 +459,7 @@ def hasenv(name):
       >>> hasenv('PATH')
       True
     """
-    return name in os.environ
+    return name in _m('os').environ
 _ops_hasenv = hasenv
 
 def mkdir(path, recursive=True):
@@ -477,13 +470,13 @@ def mkdir(path, recursive=True):
       ...     print 'OK'
       OK
     """
-    if os.path.exists(path):
+    if _m('os').path.exists(path):
         return True
     try:
         if recursive:
-            os.makedirs(path)
+            _m('os').makedirs(path)
         else:
-            os.mkdir(path)
+            _m('os').mkdir(path)
     except OSError, error:
         logging.error('mkdir: execute failed: %s (%s)' % (path, error))
         return False
@@ -545,7 +538,7 @@ class mode(object):
             type_value = getattr(self, type_name)
             for bits_name, bits_abbr in self._BITS:
                 if getattr(type_value, bits_name):
-                    mode |= getattr(statlib, 'S_I%s%s' % (bits_abbr, type_abbr))
+                    mode |= getattr(_m('stat'), 'S_I%s%s' % (bits_abbr, type_abbr))
         return mode
 
     @numeric.setter
@@ -553,7 +546,7 @@ class mode(object):
         for type_name, type_abbr in self._TYPES:
             type_value = getattr(self, type_name)
             for bits_name, bits_abbr in self._BITS:
-                value = bool(mode & getattr(statlib, 'S_I%s%s' % (bits_abbr, type_abbr)))
+                value = bool(mode & getattr(_m('stat'), 'S_I%s%s' % (bits_abbr, type_abbr)))
                 setattr(type_value, bits_name, value)
 
     @property
@@ -646,9 +639,9 @@ class path(unicode):
             return value
         cls.stat = property(_path_stat_get, _path_stat_set)
         if root is not None and name is not None:
-            value = os.path.join(root, name)
+            value = _m('os').path.join(root, name)
         try:
-            value = os.path.realpath(value)
+            value = _m('os').path.realpath(value)
         except OSError:
             value = ''
         obj = unicode.__new__(cls, value)
@@ -675,8 +668,8 @@ def popd(no_class=False):
       /
     """
     # Get locals from caller
-    curframe = inspect.currentframe()
-    calframe = inspect.getouterframes(curframe, 2)
+    curframe = _m('inspect').currentframe()
+    calframe = _m('inspect').getouterframes(curframe, 2)
     locals = calframe[1][0].f_locals
     # Use self if caller is a method and no_class is false
     if not no_class and 'self' in locals:
@@ -690,7 +683,7 @@ def popd(no_class=False):
         if len(stack) > 0:
             path = stack.pop()
             try:
-                os.chdir(path)
+                _m('os').chdir(path)
                 successful = True
             except OSError:
                 logging.error('popd: unable to chdir: %s' % path)
@@ -714,8 +707,8 @@ def pushd(path, no_class=False):
     See ``pushd`` for examples.
     """
     # Get locals from caller
-    curframe = inspect.currentframe()
-    calframe = inspect.getouterframes(curframe, 2)
+    curframe = _m('inspect').currentframe()
+    calframe = _m('inspect').getouterframes(curframe, 2)
     locals = calframe[1][0].f_locals
     # Use self if caller is a method and no_class is false
     if not no_class and 'self' in locals:
@@ -728,8 +721,8 @@ def pushd(path, no_class=False):
     # Do pushd
     successful = False
     try:
-        stack.append(os.getcwd())
-        os.chdir(path)
+        stack.append(_m('os').getcwd())
+        _m('os').chdir(path)
         successful = True
     except OSError:
         logging.error('pushd: unable to chdir: %s' % path)
@@ -754,15 +747,15 @@ def rm(path, recursive=False):
     """
     try:
         if recursive:
-            if os.path.isfile(path):
-                os.remove(path)
+            if _m('os').path.isfile(path):
+                _m('os').remove(path)
             else:
-                shutil.rmtree(path)
+                _m('shutil').rmtree(path)
         else:
-            if os.path.isfile(path):
-                os.remove(path)
+            if _m('os').path.isfile(path):
+                _m('os').remove(path)
             else:
-                os.rmdir(path)
+                _m('os').rmdir(path)
     except OSError, error:
         logging.error('rm: execute failed: %s (%s)' % (path, error))
         return False
@@ -790,24 +783,24 @@ def run(command, **kwargs):
         if kwargs.get('env_empty'):
             env = {}
         else:
-            env = copy.deepcopy(os.environ)
+            env = _m('copy').deepcopy(_m('os').environ)
         env.update(kwargs['env'])
     if kwargs:
         args = {}
         for name, value in kwargs.items():
             if not isinstance(value, basestring):
                 value = unicode(value)
-            args[name] = pipes.quote(value)
-        command = string.Template(command).safe_substitute(args)
+            args[name] = _m('pipes').quote(value)
+        command = _m('string').Template(command).safe_substitute(args)
     logging.debug('run: %s' % command)
-    ref = subprocess.Popen(
+    ref = _m('subprocess').Popen(
         command,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        stdout=_m('subprocess').PIPE,
+        stderr=_m('subprocess').PIPE,
         shell=kwargs.get('shell', True),
         close_fds=kwargs.get('close_fds', True),
         env=env,
-        cwd=kwargs.get('cwd', tempfile.gettempdir()),
+        cwd=kwargs.get('cwd', _m('tempfile').gettempdir()),
     )
     data = ref.communicate()
     return objectify({
@@ -841,14 +834,14 @@ def setenv(name, value, add=False, append=False, prepend=False, sep=':', unique=
             if unique and sep and value in current_value.split(sep):
                 return False
             if append:
-                os.environ[name] = getenv(name, default='') + sep + value
+                _m('os').environ[name] = getenv(name, default='') + sep + value
             # Don't prepend if we asked for append and unique
             if prepend and not (append and unique):
-                os.environ[name] = value + sep + getenv(name, default='')
+                _m('os').environ[name] = value + sep + getenv(name, default='')
         else:
-            os.environ[name] = value
+            _m('os').environ[name] = value
     else:
-        os.environ[name] = value
+        _m('os').environ[name] = value
     return True
 _ops_setenv = setenv
 
@@ -872,7 +865,7 @@ class stat(object):
     @property
     def data(self):
         if not hasattr(self, '_data'):
-            self._data = os.stat(self.path)
+            self._data = _m('os').stat(self.path)
         return self._data
 
     @property
@@ -937,7 +930,7 @@ class stat(object):
 
     @property
     def atime(self):
-        return datetime.datetime.fromtimestamp(self.data[7])
+        return _m('datetime').datetime.fromtimestamp(self.data[7])
 
     @property
     def st_mtime(self):
@@ -945,7 +938,7 @@ class stat(object):
 
     @property
     def mtime(self):
-        return datetime.datetime.fromtimestamp(self.data[8])
+        return _m('datetime').datetime.fromtimestamp(self.data[8])
 
     @property
     def st_ctime(self):
@@ -953,18 +946,18 @@ class stat(object):
 
     @property
     def ctime(self):
-        return datetime.datetime.fromtimestamp(self.data[9])
+        return _m('datetime').datetime.fromtimestamp(self.data[9])
 
     @property
     def file(self):
         if not hasattr(self, '_file'):
-            self._file = os.path.isfile(self.path)
+            self._file = _m('os').path.isfile(self.path)
         return self._file
 
     @property
     def directory(self):
         if not hasattr(self, '_directory'):
-            self._directory = os.path.isdir(self.path)
+            self._directory = _m('os').path.isdir(self.path)
         return self._directory
 _ops_stat = stat
 
@@ -987,7 +980,7 @@ class user(object):
         self._name = name
         self._bool = None
         if id is None and name is None:
-            self._id = os.geteuid()
+            self._id = _m('os').geteuid()
 
     def __nonzero__(self):
         if self._bool is None:
@@ -999,9 +992,9 @@ class user(object):
         if not hasattr(self, '_data'):
             try:
                 if self._name:
-                    self._data = pwd.getpwnam(self._name)
+                    self._data = _m('pwd').getpwnam(self._name)
                 else:
-                    self._data = pwd.getpwuid(self._id)
+                    self._data = _m('pwd').getpwuid(self._id)
                 self._bool = True
             except KeyError:
                 self._data = [None] * 7
@@ -1080,11 +1073,11 @@ class workspace(object):
         self._path = None
 
     def __enter__(self):
-        self._path = tempfile.mkdtemp(suffix=self.suffix, prefix=self.prefix)
+        self._path = _m('tempfile').mkdtemp(suffix=self.suffix, prefix=self.prefix)
         return self
 
     def __exit__(self, type, value, traceback):
-        if self.path and os.path.exists(self.path):
+        if self.path and _m('os').path.exists(self.path):
             _ops_chmod(self.path, 0700, recursive=True)
             _ops_rm(self.path, recursive=True)
 
@@ -1093,7 +1086,7 @@ class workspace(object):
         return self._path
 
     def join(self, *args):
-        return os.path.join(self.path, *args)
+        return _m('os').path.join(self.path, *args)
 _ops_workspace = workspace
 
 __all__ = [
@@ -1103,7 +1096,9 @@ __all__ = [
     'dirs',
     'exit',
     'find',
+    'getenv',
     'group',
+    'hasenv',
     'mode',
     'mkdir',
     'objectify',
@@ -1112,6 +1107,7 @@ __all__ = [
     'pushd',
     'rm',
     'run',
+    'setenv',
     'stat',
     'user',
     'workspace',
