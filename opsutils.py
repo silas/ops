@@ -10,9 +10,11 @@ import glob
 import grp
 import inspect
 import logging as logginglib
+import numbers
 import os
 import pipes
 import pwd
+import re
 import shutil
 import string
 import subprocess
@@ -23,6 +25,7 @@ import tempfile
 logging = logginglib.getLogger('opsutils')
 
 DIRECTORY_STACK_NAME = '__utils_directory_stack'
+NUMBER_RE = re.compile('^[-+]?([0-9]+\.?[0-9]*)|([0-9]*\.?[0-9]+)$')
 
 def _chmod(path, value=None):
     if isinstance(value, int):
@@ -344,6 +347,55 @@ class find(object):
         return self
 _ops_find = find
 
+def getenv(name, default=None, type='basestring'):
+    """Get environment variable.
+
+      >>> getenv('PATH')
+      '/bin'
+    """
+    exists = hasenv(name)
+    value = os.environ.get(name)
+    if type in (basestring, 'basestring'):
+        if value is not None:
+            return value
+        return '' if default is None else default
+    elif type in (str, 'str', 'string'):
+        if value is not None:
+            return value if isinstance(value, str) else str(value)
+        return '' if default is None else default
+    elif type in (unicode, 'unicode'):
+        if value is not None:
+            return value if isinstance(value, unicode) else unicode(value)
+        return u'' if default is None else default
+    elif type in (bool, 'bool', 'boolean'):
+        if value is not None:
+            value = value.lower().strip()
+            if value in ('1', 'true', 'yes'):
+                return True
+            elif default is None:
+                return False
+        return False if default is None else default
+    elif type in (numbers.Number, 'number'):
+        if value is not None:
+            if value.isdigit():
+                return int(value)
+            elif value != '.' and NUMBER_RE.match(value):
+                return eval(value)
+        return 0 if default is None else default
+    elif type in (int, 'int', 'integer'):
+        try:
+            return int(value)
+        except Exception:
+            if isinstance(value, basestring) and NUMBER_RE.match(value):
+                return int(eval(value))
+            return 0 if default is None else default
+    elif type in (float, 'float'):
+        if value is not None and NUMBER_RE.match(value):
+            return float(value)
+        return 0.0 if default is None else default
+    return default
+_ops_getenv = getenv
+
 class group(object):
     """Get information about a group.
 
@@ -407,6 +459,15 @@ class group(object):
     def members(self):
         return [_ops_user(name=name) for name in self.gr_mem]
 _ops_group = group
+
+def hasenv(name):
+    """Check if environment variable exists.
+
+      >>> hasenv('PATH')
+      True
+    """
+    return name in os.environ
+_ops_hasenv = hasenv
 
 def mkdir(path, recursive=True):
     """Create a directory at the specified path. By default this function
@@ -757,6 +818,39 @@ def run(command, **kwargs):
         'stderr': data[1],
     })
 _ops_rm = rm
+
+def setenv(name, value, add=False, append=False, prepend=False, sep=':', unique=False):
+    """Set environment variable.
+
+      >>> setenv('PATH', '/bin')
+      True
+      >>> setenv('PATH', '/sbin', append=True)
+      True
+      >>> setenv('PATH', '/sbin', prepend=True, unique=True)
+      False
+    """
+    if add and hasenv(name):
+        return False
+    if not isinstance(value, basestring):
+        value = unicode(value)
+    if not isinstance(sep, basestring):
+        sep = unicode(sep)
+    if append or prepend:
+        current_value = getenv(name, default='')
+        if current_value:
+            if unique and sep and value in current_value.split(sep):
+                return False
+            if append:
+                os.environ[name] = getenv(name, default='') + sep + value
+            # Don't prepend if we asked for append and unique
+            if prepend and not (append and unique):
+                os.environ[name] = value + sep + getenv(name, default='')
+        else:
+            os.environ[name] = value
+    else:
+        os.environ[name] = value
+    return True
+_ops_setenv = setenv
 
 class stat(object):
     """Display stat info for files and directories.
