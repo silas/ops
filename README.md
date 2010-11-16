@@ -19,7 +19,7 @@ augment the built-in Python [os][os] and [shutil][shutil] modules.
         if result:
             print 'Stdout: %s' % result.stdout
         else:
-            print 'STderr: %s' % result.stderr
+            print 'Stderr: %s' % result.stderr
 
 Which would produce a result like:
 
