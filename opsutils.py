@@ -3,14 +3,8 @@
 #
 # This file is subject to the New BSD License (see the LICENSE file).
 
-import sys
-
 def _m(name):
-    try:
-        return sys.modules[name]
-    except KeyError:
-        __import__(name)
-        return sys.modules[name]
+    return __import__(name)
 
 logging = _m('logging').getLogger('opsutils')
 
@@ -176,12 +170,12 @@ def exit(code=0, text=''):
         text = unicode(text)
     if code > 0:
         if text:
-            print >> sys.stderr, text
-        sys.exit(code)
+            print >> _m('sys').stderr, text
+        _m('sys').exit(code)
     else:
         if text:
             print text
-        sys.exit(0)
+        _m('sys').exit(0)
 _ops_exit = exit
 
 class _FindRule(object):
