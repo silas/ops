@@ -1,4 +1,4 @@
-# Copyright (c) 2010, Silas Sewell
+# Copyright (c) 2010, OpsDojo Inc.
 # All rights reserved.
 #
 # This file is subject to the New BSD License (see the LICENSE file).
@@ -342,6 +342,12 @@ def getenv(name, default=None, type='basestring'):
 
       >>> getenv('PATH')
       '/bin'
+      >>> setenv('TEST', '10.0')
+      True
+      >>> getenv('TEST', type='number')
+      10.0
+      >>> getenv('TEST', type=int)
+      10
     """
     global _ops_getenv_NUMBER_RE
     if _ops_getenv_NUMBER_RE is None:
@@ -392,9 +398,9 @@ _ops_getenv = getenv
 class group(object):
     """Get information about a group.
 
-      >>> print group(id=0).name
-      root
-      >>> print group(name='root').id
+      >>> group(id=0).name
+      'root'
+      >>> group(name='root').id
       0
     """
 
@@ -579,9 +585,9 @@ class objectify(dict):
 
       >>> o = objectify({'name': 'hello', 'value': 'world'})
       >>> o.name
-      test
+      'test'
       >>> o.value
-      world
+      'world'
     """
 
     def __getattr__(self, name):
@@ -657,11 +663,11 @@ def popd(no_class=False):
     be disabled by passing no_class=True.
 
       >>> os.getcwd()
-      /
+      '/'
       >>> if not pushd('/tmp'):
       ...     print 'Unable to pushd'
       >>> os.getcwd()
-      /tmp
+      '/tmp'
       >>> if not popd():
       ...     print 'Unable to popd'
       >>> os.getcwd()
@@ -819,8 +825,12 @@ def setenv(name, value, add=False, append=False, prepend=False, sep=':', unique=
       True
       >>> setenv('PATH', '/sbin', append=True)
       True
-      >>> setenv('PATH', '/sbin', prepend=True, unique=True)
+      >>> getenv('PATH')
+      '/bin:/sbin'
+      >>> setenv('PATH', '/sbin', prepend=True, sep=':', unique=True)
       False
+      >>> getenv('PATH')
+      '/bin:/sbin'
     """
     if add and hasenv(name):
         return False
@@ -850,7 +860,7 @@ class stat(object):
 
       >>> s = stat('/tmp')
       >>> s.user.name
-      root
+      'root'
       >>> s.mode.other.write
       True
       >>> s.atime
@@ -966,11 +976,11 @@ class user(object):
 
       >>> u = user(id=0)
       >>> u.name
-      root
+      'root'
       >>> u.home
-      /root
+      '/root'
       >>> u.shell
-      /bin/bash
+      '/bin/bash'
       >>> user(name='root').id
       0
     """

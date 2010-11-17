@@ -39,7 +39,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'opsutils'
-copyright = u'2010, Silas Sewell'
+copyright = u'2010, OpsDojo Inc.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -174,7 +174,7 @@ htmlhelp_basename = 'opsutilsdoc'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'opsutils.tex', u'opsutils Documentation',
-   u'Silas Sewell', 'manual'),
+   u'OpsDojo Inc.', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

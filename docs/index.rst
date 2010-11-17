@@ -18,7 +18,9 @@ API
 .. autofunction:: opsutils.dirs
 .. autofunction:: opsutils.exit
 .. autofunction:: opsutils.find
+.. autofunction:: opsutils.getenv
 .. autofunction:: opsutils.group
+.. autofunction:: opsutils.hasenv
 .. autofunction:: opsutils.mkdir
 .. autofunction:: opsutils.mode
 .. autofunction:: opsutils.objectify
@@ -27,6 +29,7 @@ API
 .. autofunction:: opsutils.pushd
 .. autofunction:: opsutils.rm
 .. autofunction:: opsutils.run
+.. autofunction:: opsutils.setenv
 .. autofunction:: opsutils.stat
 .. autofunction:: opsutils.user
 .. autofunction:: opsutils.workspace
