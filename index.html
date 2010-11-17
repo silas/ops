@@ -117,13 +117,39 @@ otherwise.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="opsutils.getenv">
+<tt class="descclassname">opsutils.</tt><tt class="descname">getenv</tt><big>(</big><em>name</em>, <em>default=None</em>, <em>type='basestring'</em><big>)</big><a class="headerlink" href="#opsutils.getenv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get environment variable.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">getenv</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">)</span>
+<span class="go">&#39;/bin&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">setenv</span><span class="p">(</span><span class="s">&#39;TEST&#39;</span><span class="p">,</span> <span class="s">&#39;10.0&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">getenv</span><span class="p">(</span><span class="s">&#39;TEST&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&#39;number&#39;</span><span class="p">)</span>
+<span class="go">10.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">getenv</span><span class="p">(</span><span class="s">&#39;TEST&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+<span class="go">10</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
 <dt id="opsutils.group">
 <tt class="descclassname">opsutils.</tt><tt class="descname">group</tt><big>(</big><em>name=None</em>, <em>id=None</em><big>)</big><a class="headerlink" href="#opsutils.group" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get information about a group.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">group</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
-<span class="go">root</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">group</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;root&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">group</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;root&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;root&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
 <span class="go">0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="opsutils.hasenv">
+<tt class="descclassname">opsutils.</tt><tt class="descname">hasenv</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#opsutils.hasenv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if environment variable exists.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">hasenv</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">)</span>
+<span class="go">True</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -161,9 +187,9 @@ recursively creates the path.</p>
 <dd><p>Use property access syntax to retrieve values from a dict-like object.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">o</span> <span class="o">=</span> <span class="n">objectify</span><span class="p">({</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;hello&#39;</span><span class="p">,</span> <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="s">&#39;world&#39;</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">o</span><span class="o">.</span><span class="n">name</span>
-<span class="go">test</span>
+<span class="go">&#39;test&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">o</span><span class="o">.</span><span class="n">value</span>
-<span class="go">world</span>
+<span class="go">&#39;world&#39;</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -191,11 +217,11 @@ directory. By default popd will look for the stack variable in self if
 in a method and the local scope if in a function. The class behaviour can
 be disabled by passing no_class=True.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
-<span class="go">/</span>
+<span class="go">&#39;/&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="ow">not</span> <span class="n">pushd</span><span class="p">(</span><span class="s">&#39;/tmp&#39;</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;Unable to pushd&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
-<span class="go">/tmp</span>
+<span class="go">&#39;/tmp&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="ow">not</span> <span class="n">popd</span><span class="p">():</span>
 <span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;Unable to popd&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
@@ -247,12 +273,30 @@ retrieved from result.stdout and result.stderr variables.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="opsutils.setenv">
+<tt class="descclassname">opsutils.</tt><tt class="descname">setenv</tt><big>(</big><em>name</em>, <em>value</em>, <em>add=False</em>, <em>append=False</em>, <em>prepend=False</em>, <em>sep=':'</em>, <em>unique=False</em><big>)</big><a class="headerlink" href="#opsutils.setenv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set environment variable.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">setenv</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">,</span> <span class="s">&#39;/bin&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">setenv</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">,</span> <span class="s">&#39;/sbin&#39;</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">getenv</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">)</span>
+<span class="go">&#39;/bin:/sbin&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">setenv</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">,</span> <span class="s">&#39;/sbin&#39;</span><span class="p">,</span> <span class="n">prepend</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;:&#39;</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">getenv</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">)</span>
+<span class="go">&#39;/bin:/sbin&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
 <dt id="opsutils.stat">
 <tt class="descclassname">opsutils.</tt><tt class="descname">stat</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#opsutils.stat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Display stat info for files and directories.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">stat</span><span class="p">(</span><span class="s">&#39;/tmp&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">name</span>
-<span class="go">root</span>
+<span class="go">&#39;root&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">mode</span><span class="o">.</span><span class="n">other</span><span class="o">.</span><span class="n">write</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">atime</span>
@@ -269,11 +313,11 @@ retrieved from result.stdout and result.stderr variables.</p>
 <dd><p>Get information about a user.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">u</span> <span class="o">=</span> <span class="n">user</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">name</span>
-<span class="go">root</span>
+<span class="go">&#39;root&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">home</span>
-<span class="go">/root</span>
+<span class="go">&#39;/root&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">shell</span>
-<span class="go">/bin/bash</span>
+<span class="go">&#39;/bin/bash&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">user</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;root&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
 <span class="go">0</span>
 </pre></div>
@@ -353,7 +397,7 @@ cleaned up.</p>
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2010, Silas Sewell.
+      &copy; Copyright 2010, OpsDojo Inc.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
     </div>
   </body>

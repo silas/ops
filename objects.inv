@@ -2,7 +2,7 @@
 # Project: opsutils
 # Version: 0.1
 opsutils.stat function index.html
-opsutils.workspace function index.html
+opsutils.getenv function index.html
 opsutils.run function index.html
 opsutils.user function index.html
 opsutils.objectify function index.html
@@ -10,10 +10,13 @@ opsutils.chmod function index.html
 opsutils.dirs function index.html
 opsutils.pushd function index.html
 opsutils.chown function index.html
+opsutils.hasenv function index.html
 opsutils.rm function index.html
 opsutils.find function index.html
+opsutils.workspace function index.html
 opsutils.mkdir function index.html
 opsutils.popd function index.html
+opsutils.setenv function index.html
 opsutils.cp function index.html
 opsutils.mode function index.html
 opsutils.group function index.html
