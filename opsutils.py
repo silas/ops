@@ -393,8 +393,6 @@ class env(object):
 
           >>> env.get('PATH')
           '/bin'
-          >>> env.get('TEST', '10.0')
-          True
           >>> env.get('TEST', type='number')
           10.0
           >>> env.get('TEST', type=int)
