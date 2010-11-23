@@ -94,6 +94,69 @@ built-in Python <a class="reference external" href="http://docs.python.org/libra
 </div>
 </dd></dl>
 
+<dl class="class">
+<dt id="opsutils.env">
+<em class="property">class </em><tt class="descclassname">opsutils.</tt><tt class="descname">env</tt><a class="headerlink" href="#opsutils.env" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="staticmethod">
+<dt id="opsutils.env.get">
+<em class="property">static </em><tt class="descname">get</tt><big>(</big><em>name</em>, <em>default=None</em>, <em>type='basestring'</em><big>)</big><a class="headerlink" href="#opsutils.env.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get environment variable.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">)</span>
+<span class="go">&#39;/bin&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;TEST&#39;</span><span class="p">,</span> <span class="s">&#39;10.0&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;TEST&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&#39;number&#39;</span><span class="p">)</span>
+<span class="go">10.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;TEST&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+<span class="go">10</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="opsutils.env.has">
+<em class="property">static </em><tt class="descname">has</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#opsutils.env.has" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if environment variable exists.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="opsutils.env.set">
+<em class="property">static </em><tt class="descname">set</tt><big>(</big><em>name</em>, <em>value</em>, <em>add=False</em>, <em>append=False</em>, <em>prepend=False</em>, <em>sep=':'</em>, <em>unique=False</em><big>)</big><a class="headerlink" href="#opsutils.env.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set environment variable.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">,</span> <span class="s">&#39;/bin&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">,</span> <span class="s">&#39;/sbin&#39;</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">)</span>
+<span class="go">&#39;/bin:/sbin&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">,</span> <span class="s">&#39;/sbin&#39;</span><span class="p">,</span> <span class="n">prepend</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;:&#39;</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">)</span>
+<span class="go">&#39;/bin:/sbin&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="opsutils.env.type">
+<em class="property">static </em><tt class="descname">type</tt><big>(</big><em>value</em>, <em>default=None</em>, <em>type='basestring'</em><big>)</big><a class="headerlink" href="#opsutils.env.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert string variables to a specified type.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="s">&#39;true&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&#39;boolean&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="s">&#39;11.5&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&#39;number&#39;</span><span class="p">)</span>
+<span class="go">11.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="s">&#39;10.3&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+<span class="go">10</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="function">
 <dt id="opsutils.exit">
 <tt class="descclassname">opsutils.</tt><tt class="descname">exit</tt><big>(</big><em>code=0</em>, <em>text=''</em><big>)</big><a class="headerlink" href="#opsutils.exit" title="Permalink to this definition">¶</a></dt>
@@ -117,22 +180,6 @@ otherwise.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="opsutils.getenv">
-<tt class="descclassname">opsutils.</tt><tt class="descname">getenv</tt><big>(</big><em>name</em>, <em>default=None</em>, <em>type='basestring'</em><big>)</big><a class="headerlink" href="#opsutils.getenv" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get environment variable.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">getenv</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">)</span>
-<span class="go">&#39;/bin&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">setenv</span><span class="p">(</span><span class="s">&#39;TEST&#39;</span><span class="p">,</span> <span class="s">&#39;10.0&#39;</span><span class="p">)</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">getenv</span><span class="p">(</span><span class="s">&#39;TEST&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&#39;number&#39;</span><span class="p">)</span>
-<span class="go">10.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">getenv</span><span class="p">(</span><span class="s">&#39;TEST&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-<span class="go">10</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="function">
 <dt id="opsutils.group">
 <tt class="descclassname">opsutils.</tt><tt class="descname">group</tt><big>(</big><em>name=None</em>, <em>id=None</em><big>)</big><a class="headerlink" href="#opsutils.group" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get information about a group.</p>
@@ -140,16 +187,6 @@ otherwise.</p>
 <span class="go">&#39;root&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">group</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;root&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
 <span class="go">0</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="function">
-<dt id="opsutils.hasenv">
-<tt class="descclassname">opsutils.</tt><tt class="descname">hasenv</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#opsutils.hasenv" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check if environment variable exists.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">hasenv</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">)</span>
-<span class="go">True</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -268,24 +305,6 @@ retrieved from result.stdout and result.stderr variables.</p>
 <span class="go">Stdout: Some $%^$## &quot;&quot; + &#39; content</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">result</span><span class="o">.</span><span class="n">command</span>
 <span class="go">echo &quot;Some \$%^\$## &quot;&quot; + &#39; content&quot;</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="function">
-<dt id="opsutils.setenv">
-<tt class="descclassname">opsutils.</tt><tt class="descname">setenv</tt><big>(</big><em>name</em>, <em>value</em>, <em>add=False</em>, <em>append=False</em>, <em>prepend=False</em>, <em>sep=':'</em>, <em>unique=False</em><big>)</big><a class="headerlink" href="#opsutils.setenv" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set environment variable.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">setenv</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">,</span> <span class="s">&#39;/bin&#39;</span><span class="p">)</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">setenv</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">,</span> <span class="s">&#39;/sbin&#39;</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">getenv</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">)</span>
-<span class="go">&#39;/bin:/sbin&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">setenv</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">,</span> <span class="s">&#39;/sbin&#39;</span><span class="p">,</span> <span class="n">prepend</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;:&#39;</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="go">False</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">getenv</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">)</span>
-<span class="go">&#39;/bin:/sbin&#39;</span>
 </pre></div>
 </div>
 </dd></dl>

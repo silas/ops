@@ -12,26 +12,27 @@ built-in Python `os`_ and `shutil`_ modules.
 API
 ---
 
-.. autofunction:: opsutils.chmod
-.. autofunction:: opsutils.chown
-.. autofunction:: opsutils.cp
-.. autofunction:: opsutils.dirs
-.. autofunction:: opsutils.exit
-.. autofunction:: opsutils.find
-.. autofunction:: opsutils.getenv
-.. autofunction:: opsutils.group
-.. autofunction:: opsutils.hasenv
-.. autofunction:: opsutils.mkdir
-.. autofunction:: opsutils.mode
-.. autofunction:: opsutils.objectify
-.. autofunction:: opsutils.path
-.. autofunction:: opsutils.popd
-.. autofunction:: opsutils.pushd
-.. autofunction:: opsutils.rm
-.. autofunction:: opsutils.run
-.. autofunction:: opsutils.setenv
-.. autofunction:: opsutils.stat
-.. autofunction:: opsutils.user
+.. currentmodule:: opsutils
+
+.. autofunction:: chmod
+.. autofunction:: chown
+.. autofunction:: cp
+.. autofunction:: dirs
+.. autoclass:: env
+   :members:
+.. autofunction:: exit
+.. autofunction:: find
+.. autofunction:: group
+.. autofunction:: mkdir
+.. autofunction:: mode
+.. autofunction:: objectify
+.. autofunction:: path
+.. autofunction:: popd
+.. autofunction:: pushd
+.. autofunction:: rm
+.. autofunction:: run
+.. autofunction:: stat
+.. autofunction:: user
 .. autofunction:: opsutils.workspace
 
 Indices and tables
