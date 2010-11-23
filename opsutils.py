@@ -330,64 +330,125 @@ class find(object):
         return self
 _ops_find = find
 
-_ops_getenv_NUMBER_RE = None
-def getenv(name, default=None, type='basestring'):
-    """Get environment variable.
+class env(object):
 
-      >>> getenv('PATH')
-      '/bin'
-      >>> setenv('TEST', '10.0')
-      True
-      >>> getenv('TEST', type='number')
-      10.0
-      >>> getenv('TEST', type=int)
-      10
-    """
-    global _ops_getenv_NUMBER_RE
-    if _ops_getenv_NUMBER_RE is None:
-        _ops_getenv_NUMBER_RE = _m('re').compile('^[-+]?([0-9]+\.?[0-9]*)|([0-9]*\.?[0-9]+)$')
-    exists = hasenv(name)
-    value = _m('os').environ.get(name)
-    if type in (basestring, 'basestring'):
-        if value is not None:
-            return value
-        return '' if default is None else default
-    elif type in (str, 'str', 'string'):
-        if value is not None:
-            return value if isinstance(value, str) else str(value)
-        return '' if default is None else default
-    elif type in (unicode, 'unicode'):
-        if value is not None:
-            return value if isinstance(value, unicode) else unicode(value)
-        return u'' if default is None else default
-    elif type in (bool, 'bool', 'boolean'):
-        if value is not None:
-            value = value.lower().strip()
-            if value in ('1', 'true', 'yes'):
-                return True
-            elif default is None:
-                return False
-        return False if default is None else default
-    elif type in (_m('numbers').Number, 'number'):
-        if value is not None:
-            if value.isdigit():
-                return int(value)
-            elif value != '.' and _ops_getenv_NUMBER_RE.match(value):
-                return eval(value)
-        return 0 if default is None else default
-    elif type in (int, 'int', 'integer'):
-        try:
-            return int(value)
-        except Exception:
-            if isinstance(value, basestring) and _ops_getenv_NUMBER_RE.match(value):
-                return int(eval(value))
+    NUMBER_RE = None
+
+    @staticmethod
+    def type(value, default=None, type='basestring'):
+        """Convert string variables to a specified type.
+
+          >>> env.type('true', type='boolean')
+          True
+          >>> env.type('11.5', type='number')
+          11.5
+          >>> env.type('10.3', type=int)
+          10
+        """
+        if env.NUMBER_RE is None:
+            env.NUMBER_RE = _m('re').compile('^[-+]?([0-9]+\.?[0-9]*)|([0-9]*\.?[0-9]+)$')
+        if type in (basestring, 'basestring'):
+            if value is not None:
+                return value
+            return '' if default is None else default
+        elif type in (str, 'str', 'string'):
+            if value is not None:
+                return value if isinstance(value, str) else str(value)
+            return '' if default is None else default
+        elif type in (unicode, 'unicode'):
+            if value is not None:
+                return value if isinstance(value, unicode) else unicode(value)
+            return u'' if default is None else default
+        elif type in (bool, 'bool', 'boolean'):
+            if value is not None:
+                value = value.lower().strip()
+                if value in ('1', 'true', 'yes'):
+                    return True
+                elif default is None:
+                    return False
+            return False if default is None else default
+        elif type in (_m('numbers').Number, 'number'):
+            if value is not None:
+                if value.isdigit():
+                    return int(value)
+                elif value != '.' and env.NUMBER_RE.match(value):
+                    return eval(value)
             return 0 if default is None else default
-    elif type in (float, 'float'):
-        if value is not None and _ops_getenv_NUMBER_RE.match(value):
-            return float(value)
-        return 0.0 if default is None else default
-    return default
-_ops_getenv = getenv
+        elif type in (int, 'int', 'integer'):
+            try:
+                return int(value)
+            except Exception:
+                if isinstance(value, basestring) and env.NUMBER_RE.match(value):
+                    return int(eval(value))
+                return 0 if default is None else default
+        elif type in (float, 'float'):
+            if value is not None and env.NUMBER_RE.match(value):
+                return float(value)
+            return 0.0 if default is None else default
+        return default
+
+    @staticmethod
+    def get(name, default=None, type='basestring'):
+        """Get environment variable.
+
+          >>> env.get('PATH')
+          '/bin'
+          >>> env.get('TEST', '10.0')
+          True
+          >>> env.get('TEST', type='number')
+          10.0
+          >>> env.get('TEST', type=int)
+          10
+        """
+        exists = env.has(name)
+        value = _m('os').environ.get(name)
+        return env.type(value, default, type)
+
+    @staticmethod
+    def has(name):
+        """Check if environment variable exists.
+
+          >>> env.has('PATH')
+          True
+        """
+        return name in _m('os').environ
+
+    @staticmethod
+    def set(name, value, add=False, append=False, prepend=False, sep=':', unique=False):
+        """Set environment variable.
+
+          >>> env.set('PATH', '/bin')
+          True
+          >>> env.set('PATH', '/sbin', append=True)
+          True
+          >>> env.set('PATH')
+          '/bin:/sbin'
+          >>> env.set('PATH', '/sbin', prepend=True, sep=':', unique=True)
+          False
+          >>> env.set('PATH')
+          '/bin:/sbin'
+        """
+        if add and env.has(name):
+            return False
+        if not isinstance(value, basestring):
+            value = unicode(value)
+        if not isinstance(sep, basestring):
+            sep = unicode(sep)
+        if append or prepend:
+            current_value = env.get(name, default='')
+            if current_value:
+                if unique and sep and value in current_value.split(sep):
+                    return False
+                if append:
+                    _m('os').environ[name] = env.get(name, default='') + sep + value
+                # Don't prepend if we asked for append and unique
+                if prepend and not (append and unique):
+                    _m('os').environ[name] = value + sep + env.get(name, default='')
+            else:
+                _m('os').environ[name] = value
+        else:
+            _m('os').environ[name] = value
+        return True
 
 class group(object):
     """Get information about a group.
@@ -452,15 +513,6 @@ class group(object):
     def members(self):
         return [_ops_user(name=name) for name in self.gr_mem]
 _ops_group = group
-
-def hasenv(name):
-    """Check if environment variable exists.
-
-      >>> hasenv('PATH')
-      True
-    """
-    return name in _m('os').environ
-_ops_hasenv = hasenv
 
 def mkdir(path, recursive=True):
     """Create a directory at the specified path. By default this function
@@ -812,43 +864,6 @@ def run(command, **kwargs):
     })
 _ops_rm = rm
 
-def setenv(name, value, add=False, append=False, prepend=False, sep=':', unique=False):
-    """Set environment variable.
-
-      >>> setenv('PATH', '/bin')
-      True
-      >>> setenv('PATH', '/sbin', append=True)
-      True
-      >>> getenv('PATH')
-      '/bin:/sbin'
-      >>> setenv('PATH', '/sbin', prepend=True, sep=':', unique=True)
-      False
-      >>> getenv('PATH')
-      '/bin:/sbin'
-    """
-    if add and hasenv(name):
-        return False
-    if not isinstance(value, basestring):
-        value = unicode(value)
-    if not isinstance(sep, basestring):
-        sep = unicode(sep)
-    if append or prepend:
-        current_value = getenv(name, default='')
-        if current_value:
-            if unique and sep and value in current_value.split(sep):
-                return False
-            if append:
-                _m('os').environ[name] = getenv(name, default='') + sep + value
-            # Don't prepend if we asked for append and unique
-            if prepend and not (append and unique):
-                _m('os').environ[name] = value + sep + getenv(name, default='')
-        else:
-            _m('os').environ[name] = value
-    else:
-        _m('os').environ[name] = value
-    return True
-_ops_setenv = setenv
-
 class stat(object):
     """Display stat info for files and directories.
 
@@ -1098,11 +1113,10 @@ __all__ = [
     'chown',
     'cp',
     'dirs',
+    'env',
     'exit',
     'find',
-    'getenv',
     'group',
-    'hasenv',
     'mode',
     'mkdir',
     'objectify',
@@ -1111,7 +1125,6 @@ __all__ = [
     'pushd',
     'rm',
     'run',
-    'setenv',
     'stat',
     'user',
     'workspace',

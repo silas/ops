@@ -3,7 +3,7 @@ import os
 import unittest
 import opsutils
 
-class GetEnvTestCase(unittest.TestCase):
+class EnvGetTestCase(unittest.TestCase):
 
     def setUp(self):
         os.environ.clear()
@@ -13,32 +13,32 @@ class GetEnvTestCase(unittest.TestCase):
         os.environ['opsutils-float'] = '-10.5'
 
     def test_default(self):
-        self.assertEqual(opsutils.getenv('opsutils-empty'), '')
-        self.assertEqual(opsutils.getenv('opsutils-empty', default='test'), 'test')
+        self.assertEqual(opsutils.env.get('opsutils-empty'), '')
+        self.assertEqual(opsutils.env.get('opsutils-empty', default='test'), 'test')
 
-        self.assertEqual(opsutils.getenv('opsutils-string'), 'string')
-        self.assertEqual(opsutils.getenv('opsutils-string', default='test'), 'string')
+        self.assertEqual(opsutils.env.get('opsutils-string'), 'string')
+        self.assertEqual(opsutils.env.get('opsutils-string', default='test'), 'string')
 
-        self.assertTrue(isinstance(opsutils.getenv('opsutils-integer'), str))
-        self.assertTrue(isinstance(opsutils.getenv('opsutils-string'), str))
-        self.assertTrue(isinstance(opsutils.getenv('opsutils-unicode'), unicode))
+        self.assertTrue(isinstance(opsutils.env.get('opsutils-integer'), str))
+        self.assertTrue(isinstance(opsutils.env.get('opsutils-string'), str))
+        self.assertTrue(isinstance(opsutils.env.get('opsutils-unicode'), unicode))
 
     def test_string(self):
-        self.assertEqual(opsutils.getenv('opsutils-empty', type='string'), '')
-        self.assertEqual(opsutils.getenv('opsutils-empty', default='test', type='string'), 'test')
+        self.assertEqual(opsutils.env.get('opsutils-empty', type='string'), '')
+        self.assertEqual(opsutils.env.get('opsutils-empty', default='test', type='string'), 'test')
 
-        self.assertTrue(isinstance(opsutils.getenv('opsutils-integer', type=str), str))
-        self.assertTrue(isinstance(opsutils.getenv('opsutils-integer', type='str'), str))
-        self.assertTrue(isinstance(opsutils.getenv('opsutils-integer', type='string'), str))
-        self.assertTrue(isinstance(opsutils.getenv('opsutils-unicode', type='string'), str))
+        self.assertTrue(isinstance(opsutils.env.get('opsutils-integer', type=str), str))
+        self.assertTrue(isinstance(opsutils.env.get('opsutils-integer', type='str'), str))
+        self.assertTrue(isinstance(opsutils.env.get('opsutils-integer', type='string'), str))
+        self.assertTrue(isinstance(opsutils.env.get('opsutils-unicode', type='string'), str))
 
     def test_unicode(self):
-        self.assertEqual(opsutils.getenv('opsutils-empty', type='unicode'), '')
-        self.assertEqual(opsutils.getenv('opsutils-empty', default=u'test', type='unicode'), u'test')
+        self.assertEqual(opsutils.env.get('opsutils-empty', type='unicode'), '')
+        self.assertEqual(opsutils.env.get('opsutils-empty', default=u'test', type='unicode'), u'test')
 
-        self.assertTrue(isinstance(opsutils.getenv('opsutils-integer', type=unicode), unicode))
-        self.assertTrue(isinstance(opsutils.getenv('opsutils-integer', type='unicode'), unicode))
-        self.assertTrue(isinstance(opsutils.getenv('opsutils-string', type='unicode'), unicode))
+        self.assertTrue(isinstance(opsutils.env.get('opsutils-integer', type=unicode), unicode))
+        self.assertTrue(isinstance(opsutils.env.get('opsutils-integer', type='unicode'), unicode))
+        self.assertTrue(isinstance(opsutils.env.get('opsutils-string', type='unicode'), unicode))
 
     def test_boolean(self):
         os.environ['opsutils-boolean-one'] = '1'
@@ -48,95 +48,95 @@ class GetEnvTestCase(unittest.TestCase):
         os.environ['opsutils-boolean-yes'] = 'yes'
         os.environ['opsutils-boolean-no'] = 'no'
 
-        self.assertEqual(opsutils.getenv('opsutils-empty', type='boolean'), False)
-        self.assertEqual(opsutils.getenv('opsutils-empty', default=True, type='boolean'), True)
+        self.assertEqual(opsutils.env.get('opsutils-empty', type='boolean'), False)
+        self.assertEqual(opsutils.env.get('opsutils-empty', default=True, type='boolean'), True)
 
-        self.assertEqual(opsutils.getenv('opsutils-boolean-zero', type='boolean'), False)
-        self.assertEqual(opsutils.getenv('opsutils-boolean-one', type='boolean'), True)
-        self.assertEqual(opsutils.getenv('opsutils-boolean-true', type='boolean'), True)
-        self.assertEqual(opsutils.getenv('opsutils-boolean-false', type='boolean'), False)
-        self.assertEqual(opsutils.getenv('opsutils-boolean-yes', type='boolean'), True)
-        self.assertEqual(opsutils.getenv('opsutils-boolean-no', type='boolean'), False)
+        self.assertEqual(opsutils.env.get('opsutils-boolean-zero', type='boolean'), False)
+        self.assertEqual(opsutils.env.get('opsutils-boolean-one', type='boolean'), True)
+        self.assertEqual(opsutils.env.get('opsutils-boolean-true', type='boolean'), True)
+        self.assertEqual(opsutils.env.get('opsutils-boolean-false', type='boolean'), False)
+        self.assertEqual(opsutils.env.get('opsutils-boolean-yes', type='boolean'), True)
+        self.assertEqual(opsutils.env.get('opsutils-boolean-no', type='boolean'), False)
 
     def test_number(self):
-        self.assertEqual(opsutils.getenv('opsutils-empty', type='number'), 0)
-        self.assertEqual(opsutils.getenv('opsutils-empty', default=5, type='number'), 5)
+        self.assertEqual(opsutils.env.get('opsutils-empty', type='number'), 0)
+        self.assertEqual(opsutils.env.get('opsutils-empty', default=5, type='number'), 5)
 
-        self.assertTrue(isinstance(opsutils.getenv('opsutils-integer', type=numbers.Number), int))
-        self.assertTrue(isinstance(opsutils.getenv('opsutils-integer', type='number'), int))
-        self.assertTrue(isinstance(opsutils.getenv('opsutils-float', type='number'), float))
+        self.assertTrue(isinstance(opsutils.env.get('opsutils-integer', type=numbers.Number), int))
+        self.assertTrue(isinstance(opsutils.env.get('opsutils-integer', type='number'), int))
+        self.assertTrue(isinstance(opsutils.env.get('opsutils-float', type='number'), float))
 
     def test_integer(self):
         os.environ['opsutils-integer-invalid'] = '.'
 
-        self.assertEqual(opsutils.getenv('opsutils-empty', type='integer'), 0)
-        self.assertEqual(opsutils.getenv('opsutils-empty', default=5, type='integer'), 5)
-        self.assertEqual(opsutils.getenv('opsutils-integer-invalid', default=5, type='integer'), 5)
-        self.assertEqual(opsutils.getenv('opsutils-float', type='integer'), -10)
+        self.assertEqual(opsutils.env.get('opsutils-empty', type='integer'), 0)
+        self.assertEqual(opsutils.env.get('opsutils-empty', default=5, type='integer'), 5)
+        self.assertEqual(opsutils.env.get('opsutils-integer-invalid', default=5, type='integer'), 5)
+        self.assertEqual(opsutils.env.get('opsutils-float', type='integer'), -10)
 
-        self.assertTrue(isinstance(opsutils.getenv('opsutils-integer', type=int), int))
-        self.assertTrue(isinstance(opsutils.getenv('opsutils-integer', type='int'), int))
-        self.assertTrue(isinstance(opsutils.getenv('opsutils-float', type='int'), int))
+        self.assertTrue(isinstance(opsutils.env.get('opsutils-integer', type=int), int))
+        self.assertTrue(isinstance(opsutils.env.get('opsutils-integer', type='int'), int))
+        self.assertTrue(isinstance(opsutils.env.get('opsutils-float', type='int'), int))
 
     def test_float(self):
         os.environ['opsutils-float-invalid'] = '.'
 
-        self.assertEqual(opsutils.getenv('opsutils-empty', type='float'), 0.0)
-        self.assertEqual(opsutils.getenv('opsutils-empty', default=5.0, type='float'), 5.0)
-        self.assertEqual(opsutils.getenv('opsutils-float-invalid', default=5.0, type='float'), 5.0)
-        self.assertEqual(opsutils.getenv('opsutils-integer', type='float'), 10.0)
-        self.assertEqual(opsutils.getenv('opsutils-float', type='float'), -10.5)
+        self.assertEqual(opsutils.env.get('opsutils-empty', type='float'), 0.0)
+        self.assertEqual(opsutils.env.get('opsutils-empty', default=5.0, type='float'), 5.0)
+        self.assertEqual(opsutils.env.get('opsutils-float-invalid', default=5.0, type='float'), 5.0)
+        self.assertEqual(opsutils.env.get('opsutils-integer', type='float'), 10.0)
+        self.assertEqual(opsutils.env.get('opsutils-float', type='float'), -10.5)
 
-        self.assertTrue(isinstance(opsutils.getenv('opsutils-integer', type=float), float))
-        self.assertTrue(isinstance(opsutils.getenv('opsutils-integer', type='float'), float))
-        self.assertTrue(isinstance(opsutils.getenv('opsutils-integer', type='float'), float))
+        self.assertTrue(isinstance(opsutils.env.get('opsutils-integer', type=float), float))
+        self.assertTrue(isinstance(opsutils.env.get('opsutils-integer', type='float'), float))
+        self.assertTrue(isinstance(opsutils.env.get('opsutils-integer', type='float'), float))
 
-class SetEnvTestCase(unittest.TestCase):
+class EnvSetTestCase(unittest.TestCase):
 
     def setUp(self):
         os.environ.clear()
         os.environ['opsutils'] = 'one'
 
     def test_add(self):
-        opsutils.setenv('opsutils', 'two', add=True)
-        self.assertEqual(opsutils.getenv('opsutils'), 'one')
+        opsutils.env.set('opsutils', 'two', add=True)
+        self.assertEqual(opsutils.env.get('opsutils'), 'one')
 
-        opsutils.setenv('opsutils-two', 'two', add=True)
-        self.assertEqual(opsutils.getenv('opsutils-two'), 'two')
+        opsutils.env.set('opsutils-two', 'two', add=True)
+        self.assertEqual(opsutils.env.get('opsutils-two'), 'two')
 
     def test_append(self):
-        opsutils.setenv('opsutils', 'two', append=True, sep='')
-        self.assertEqual(opsutils.getenv('opsutils'), 'onetwo')
+        opsutils.env.set('opsutils', 'two', append=True, sep='')
+        self.assertEqual(opsutils.env.get('opsutils'), 'onetwo')
 
-        opsutils.setenv('opsutils', 'three', append=True)
-        self.assertEqual(opsutils.getenv('opsutils'), 'onetwo:three')
+        opsutils.env.set('opsutils', 'three', append=True)
+        self.assertEqual(opsutils.env.get('opsutils'), 'onetwo:three')
 
-        self.assertFalse(opsutils.setenv('opsutils', 'onetwo', append=True, unique=True))
-        self.assertFalse(opsutils.setenv('opsutils', 'three', append=True, unique=True))
-        self.assertTrue(opsutils.setenv('opsutils', 'four', append=True, unique=True))
-        self.assertEqual(opsutils.getenv('opsutils'), 'onetwo:three:four')
+        self.assertFalse(opsutils.env.set('opsutils', 'onetwo', append=True, unique=True))
+        self.assertFalse(opsutils.env.set('opsutils', 'three', append=True, unique=True))
+        self.assertTrue(opsutils.env.set('opsutils', 'four', append=True, unique=True))
+        self.assertEqual(opsutils.env.get('opsutils'), 'onetwo:three:four')
 
-        self.assertTrue(opsutils.setenv('opsutils-two', 'one', prepend=True, unique=True))
-        self.assertEqual(opsutils.getenv('opsutils-two'), 'one')
+        self.assertTrue(opsutils.env.set('opsutils-two', 'one', prepend=True, unique=True))
+        self.assertEqual(opsutils.env.get('opsutils-two'), 'one')
 
     def test_prepend(self):
-        opsutils.setenv('opsutils', 'two', prepend=True, sep='')
-        self.assertEqual(opsutils.getenv('opsutils'), 'twoone')
+        opsutils.env.set('opsutils', 'two', prepend=True, sep='')
+        self.assertEqual(opsutils.env.get('opsutils'), 'twoone')
 
-        opsutils.setenv('opsutils', 'three', prepend=True)
-        self.assertEqual(opsutils.getenv('opsutils'), 'three:twoone')
+        opsutils.env.set('opsutils', 'three', prepend=True)
+        self.assertEqual(opsutils.env.get('opsutils'), 'three:twoone')
 
-        self.assertFalse(opsutils.setenv('opsutils', 'twoone', prepend=True, unique=True))
-        self.assertFalse(opsutils.setenv('opsutils', 'three', prepend=True, unique=True))
-        self.assertTrue(opsutils.setenv('opsutils', 'four', prepend=True, unique=True))
-        self.assertEqual(opsutils.getenv('opsutils'), 'four:three:twoone')
+        self.assertFalse(opsutils.env.set('opsutils', 'twoone', prepend=True, unique=True))
+        self.assertFalse(opsutils.env.set('opsutils', 'three', prepend=True, unique=True))
+        self.assertTrue(opsutils.env.set('opsutils', 'four', prepend=True, unique=True))
+        self.assertEqual(opsutils.env.get('opsutils'), 'four:three:twoone')
 
-        self.assertTrue(opsutils.setenv('opsutils-two', 'one', prepend=True, unique=True))
-        self.assertEqual(opsutils.getenv('opsutils-two'), 'one')
+        self.assertTrue(opsutils.env.set('opsutils-two', 'one', prepend=True, unique=True))
+        self.assertEqual(opsutils.env.get('opsutils-two'), 'one')
 
     def test_set(self):
-        opsutils.setenv('opsutils', 'two')
-        self.assertEqual(opsutils.getenv('opsutils'), 'two')
+        opsutils.env.set('opsutils', 'two')
+        self.assertEqual(opsutils.env.get('opsutils'), 'two')
 
 if __name__ == '__main__':
     unittest.main()
