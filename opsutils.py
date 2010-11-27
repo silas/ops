@@ -3,6 +3,8 @@
 #
 # This file is subject to the New BSD License (see the LICENSE file).
 
+_ops_type = type
+
 def _m(name):
     return __import__(name)
 
@@ -335,18 +337,22 @@ class env(object):
     NUMBER_RE = None
 
     @staticmethod
-    def type(value, default=None, type='basestring'):
+    def type(value, default=None, type=None):
         """Convert string variables to a specified type.
 
           >>> env.type('true', type='boolean')
           True
-          >>> env.type('11.5', type='number')
-          11.5
-          >>> env.type('10.3', type=int)
-          10
+          >>> env.type('11', type='number')
+          11
+          >>> env.type('10.3', default=11.0)
+          10.3
         """
         if env.NUMBER_RE is None:
             env.NUMBER_RE = _m('re').compile('^[-+]?([0-9]+\.?[0-9]*)|([0-9]*\.?[0-9]+)$')
+        if type is None and default is None:
+            type = basestring
+        elif type is None:
+            type = _ops_type(default)
         if type in (basestring, 'basestring'):
             if value is not None:
                 return value
@@ -447,6 +453,7 @@ class env(object):
         else:
             _m('os').environ[name] = value
         return True
+_ops_env = env
 
 class group(object):
     """Get information about a group.
