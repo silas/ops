@@ -624,6 +624,9 @@ class objectify(dict):
       'world'
     """
 
+    def __init__(self, data=None):
+        dict.__init__(self, data or {})
+
     def __getattr__(self, name):
         try:
             return self[name]

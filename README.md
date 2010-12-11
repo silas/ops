@@ -20,7 +20,7 @@ ops is a collection Python modules for operations automation.
         else:
             print 'Stderr: %s' % result.stderr
 
-Which would produce a result like:
+Which might produce something like:
 
     Command: python /tmp/test.py
     Code: 0
