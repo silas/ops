@@ -1,26 +1,6 @@
-# Sphinx inventory version 1
+# Sphinx inventory version 2
 # Project: opsutils
 # Version: 0.1
-opsutils.workspace function index.html
-opsutils.env.set staticmethod index.html
-opsutils.chmod function index.html
-opsutils.exit function index.html
-opsutils.rm function index.html
-opsutils.cp function index.html
-opsutils.stat function index.html
-opsutils.dirs function index.html
-opsutils.popd function index.html
-opsutils.mode function index.html
-opsutils.env class index.html
-opsutils.group function index.html
-opsutils.chown function index.html
-opsutils.env.get staticmethod index.html
-opsutils.find function index.html
-opsutils.objectify function index.html
-opsutils.env.type staticmethod index.html
-opsutils.run function index.html
-opsutils.env.has staticmethod index.html
-opsutils.user function index.html
-opsutils.mkdir function index.html
-opsutils.pushd function index.html
-opsutils.path function index.html
+# The remainder of this file is compressed using zlib.
+xÚ•ÒÁj!à{žBH¯»kÞ ‡B ŒÎ®6êˆ£MÒ§¯a·B	¯ã7ò;Ndë“¥«’j÷AŸ(¨a§òmˆëÁèj[õÆ¶R¯÷Òf¦ôGÓOuíX¨.Æý†Kmeï8è™6œelÕ)}gª=È~jÉTÏIíÔÃõ/jxàÖAm*¨íC ÔÞ#;Ç¸p9KÖ¾ê'¨ÍMŽuu¨5Ý¹
+ŠKKpZÎðËèêë¾Oð“ªak_à÷•ˆÊÄ%êà¿àš·Œ‡îËb>}PGÓíyÃ7	Šù
