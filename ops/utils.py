@@ -7,7 +7,7 @@ _m = __import__
 
 logging = _m('logging').getLogger('ops')
 
-DIRECTORY_STACK_NAME = '__utils_directory_stack'
+DIRECTORY_STACK_NAME = '__ops_directory_stack'
 _TYPE = type
 
 def _chmod(path, value=None):
@@ -619,9 +619,14 @@ class objectify(dict):
 
       >>> o = objectify({'name': 'hello', 'value': 'world'})
       >>> o.name
-      'test'
+      'hello'
       >>> o.value
       'world'
+      >>> o = objectify({'name': 'hello'}, default=None)
+      >>> o.name
+      'test'
+      >>> o.value
+      None
     """
 
     def __init__(self, data=None, **kwargs):
