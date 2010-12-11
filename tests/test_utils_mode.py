@@ -2,60 +2,60 @@ import helper
 
 import sys
 import unittest
-import opsutils
+import ops.utils
 
 class ModeBitsTestCase(unittest.TestCase):
 
     def test_default(self):
-        b = opsutils._ModeBits()
+        b = ops.utils._ModeBits()
         self.assertEqual(b.read, None)
         self.assertEqual(b.write, None)
         self.assertEqual(b.execute, None)
 
     def test_seven(self):
-        b = opsutils._ModeBits(7)
+        b = ops.utils._ModeBits(7)
         self.assertTrue(b.read)
         self.assertTrue(b.write)
         self.assertTrue(b.execute)
 
     def test_six(self):
-        b = opsutils._ModeBits(6)
+        b = ops.utils._ModeBits(6)
         self.assertTrue(b.read)
         self.assertTrue(b.write)
         self.assertFalse(b.execute)
 
     def test_five(self):
-        b = opsutils._ModeBits(5)
+        b = ops.utils._ModeBits(5)
         self.assertTrue(b.read)
         self.assertFalse(b.write)
         self.assertTrue(b.execute)
 
     def test_four(self):
-        b = opsutils._ModeBits(4)
+        b = ops.utils._ModeBits(4)
         self.assertTrue(b.read)
         self.assertFalse(b.write)
         self.assertFalse(b.execute)
 
     def test_three(self):
-        b = opsutils._ModeBits(3)
+        b = ops.utils._ModeBits(3)
         self.assertFalse(b.read)
         self.assertTrue(b.write)
         self.assertTrue(b.execute)
 
     def test_two(self):
-        b = opsutils._ModeBits(2)
+        b = ops.utils._ModeBits(2)
         self.assertFalse(b.read)
         self.assertTrue(b.write)
         self.assertFalse(b.execute)
 
     def test_one(self):
-        b = opsutils._ModeBits(1)
+        b = ops.utils._ModeBits(1)
         self.assertFalse(b.read)
         self.assertFalse(b.write)
         self.assertTrue(b.execute)
 
     def test_zero(self):
-        b = opsutils._ModeBits(0)
+        b = ops.utils._ModeBits(0)
         self.assertFalse(b.read)
         self.assertFalse(b.write)
         self.assertFalse(b.execute)
@@ -63,14 +63,14 @@ class ModeBitsTestCase(unittest.TestCase):
 class ModeTestCase(unittest.TestCase):
 
     def test_default(self):
-        m = opsutils.mode()
+        m = ops.utils.mode()
 
         self.assertEqual(m.user.read, None)
         self.assertEqual(m.group.write, None)
         self.assertEqual(m.other.execute, None)
 
     def test_get(self):
-        m = opsutils.mode(0740)
+        m = ops.utils.mode(0740)
 
         self.assertTrue(m.user.read)
         self.assertTrue(m.user.write)
@@ -85,14 +85,14 @@ class ModeTestCase(unittest.TestCase):
         self.assertFalse(m.other.execute)
 
     def test_set(self):
-        m = opsutils.mode(0640)
+        m = ops.utils.mode(0640)
 
         m.group.write = True
         m.other.read = True
         self.assertEqual(m.numeric, 0664)
 
     def test_set_type(self):
-        m = opsutils.mode()
+        m = ops.utils.mode()
 
         m.user = 7
         self.assertTrue(m.user.read)

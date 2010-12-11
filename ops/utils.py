@@ -3,14 +3,12 @@
 #
 # This file is subject to the New BSD License (see the LICENSE file).
 
-_ops_type = type
+_m = __import__
 
-def _m(name):
-    return __import__(name)
-
-logging = _m('logging').getLogger('opsutils')
+logging = _m('logging').getLogger('ops')
 
 DIRECTORY_STACK_NAME = '__utils_directory_stack'
+_TYPE = type
 
 def _chmod(path, value=None):
     if isinstance(value, int):
@@ -102,7 +100,6 @@ def chown(path, user=None, group=None, recursive=False):
     else:
         successful = False
     return successful
-_ops_chown = chown
 
 def cp(src_path, dst_path, follow_links=False, recursive=True):
     """Copy source to destination.
@@ -132,7 +129,6 @@ def cp(src_path, dst_path, follow_links=False, recursive=True):
     except OSError, error:
         logging.error('cp: execute failed: %s => %s (%s)' % (src_path, dst_path, error))
     return successful
-_ops_cp = cp
 
 def dirs(no_class=False):
     """Returns a reference to the directory stack used by pushd and popd.
@@ -160,7 +156,119 @@ def dirs(no_class=False):
     else:
         stack = locals[DIRECTORY_STACK_NAME]
     return stack
-_ops_dirs = dirs
+
+def env_get(name, default=None, type=None):
+    """Get environment variable.
+
+      >>> env_get('PATH')
+      '/bin'
+      >>> env_get('TEST', type='number')
+      10.0
+      >>> env_get('TEST', type=int)
+      10
+    """
+    exists = env_has(name)
+    value = _m('os').environ.get(name)
+    return env_type(value, default, type)
+
+def env_has(name):
+    """Check if environment variable exists.
+
+      >>> env_has('PATH')
+      True
+    """
+    return name in _m('os').environ
+
+def env_set(name, value, add=False, append=False, prepend=False, sep=':', unique=False):
+    """Set environment variable.
+
+      >>> env_set('PATH', '/bin')
+      True
+      >>> env_set('PATH', '/sbin', append=True)
+      True
+      >>> env_set('PATH')
+      '/bin:/sbin'
+      >>> env_set('PATH', '/sbin', prepend=True, sep=':', unique=True)
+      False
+      >>> env_set('PATH')
+      '/bin:/sbin'
+    """
+    if add and env_has(name):
+        return False
+    if not isinstance(value, basestring):
+        value = unicode(value)
+    if not isinstance(sep, basestring):
+        sep = unicode(sep)
+    if append or prepend:
+        current_value = env_get(name, default='')
+        if current_value:
+            if unique and sep and value in current_value.split(sep):
+                return False
+            if append:
+                _m('os').environ[name] = env_get(name, default='') + sep + value
+            # Don't prepend if we asked for append and unique
+            if prepend and not (append and unique):
+                _m('os').environ[name] = value + sep + env_get(name, default='')
+        else:
+            _m('os').environ[name] = value
+    else:
+        _m('os').environ[name] = value
+    return True
+
+def env_type(value, default=None, type=None):
+    """Convert string variables to a specified type.
+
+      >>> env_type('true', type='boolean')
+      True
+      >>> env_type('11', type='number')
+      11
+      >>> env_type('10.3', default=11.0)
+      10.3
+    """
+    NUMBER_RE = _m('re').compile('^[-+]?([0-9]+\.?[0-9]*)|([0-9]*\.?[0-9]+)$')
+    if type is None and default is None:
+        type = basestring
+    elif type is None:
+        type = _TYPE(default)
+    if type in (basestring, 'basestring'):
+        if value is not None:
+            return value
+        return '' if default is None else default
+    elif type in (str, 'str', 'string'):
+        if value is not None:
+            return value if isinstance(value, str) else str(value)
+        return '' if default is None else default
+    elif type in (unicode, 'unicode'):
+        if value is not None:
+            return value if isinstance(value, unicode) else unicode(value)
+        return u'' if default is None else default
+    elif type in (bool, 'bool', 'boolean'):
+        if value is not None:
+            value = value.lower().strip()
+            if value in ('1', 'true', 'yes'):
+                return True
+            elif default is None:
+                return False
+        return False if default is None else default
+    elif type in (_m('numbers').Number, 'number'):
+        if value is not None:
+            if value.isdigit():
+                return int(value)
+            elif value != '.' and NUMBER_RE.match(value):
+                return eval(value)
+        return 0 if default is None else default
+    elif type in (int, 'int', 'integer'):
+        try:
+            return int(value)
+        except Exception:
+            if isinstance(value, basestring) and NUMBER_RE.match(value):
+                return int(eval(value))
+            return 0 if default is None else default
+    elif type in (float, 'float'):
+        if value is not None and NUMBER_RE.match(value):
+            return float(value)
+        return 0.0 if default is None else default
+    return default
 
 def exit(code=0, text=''):
     """Exit and print text (if defined) to stderr if code > 0 or stdout
@@ -178,7 +286,6 @@ def exit(code=0, text=''):
         if text:
             print text
         _m('sys').exit(0)
-_ops_exit = exit
 
 class _FindRule(object):
 
@@ -332,129 +439,6 @@ class find(object):
         return self
 _ops_find = find
 
-class env(object):
-
-    NUMBER_RE = None
-
-    @staticmethod
-    def type(value, default=None, type=None):
-        """Convert string variables to a specified type.
-
-          >>> env.type('true', type='boolean')
-          True
-          >>> env.type('11', type='number')
-          11
-          >>> env.type('10.3', default=11.0)
-          10.3
-        """
-        if env.NUMBER_RE is None:
-            env.NUMBER_RE = _m('re').compile('^[-+]?([0-9]+\.?[0-9]*)|([0-9]*\.?[0-9]+)$')
-        if type is None and default is None:
-            type = basestring
-        elif type is None:
-            type = _ops_type(default)
-        if type in (basestring, 'basestring'):
-            if value is not None:
-                return value
-            return '' if default is None else default
-        elif type in (str, 'str', 'string'):
-            if value is not None:
-                return value if isinstance(value, str) else str(value)
-            return '' if default is None else default
-        elif type in (unicode, 'unicode'):
-            if value is not None:
-                return value if isinstance(value, unicode) else unicode(value)
-            return u'' if default is None else default
-        elif type in (bool, 'bool', 'boolean'):
-            if value is not None:
-                value = value.lower().strip()
-                if value in ('1', 'true', 'yes'):
-                    return True
-                elif default is None:
-                    return False
-            return False if default is None else default
-        elif type in (_m('numbers').Number, 'number'):
-            if value is not None:
-                if value.isdigit():
-                    return int(value)
-                elif value != '.' and env.NUMBER_RE.match(value):
-                    return eval(value)
-            return 0 if default is None else default
-        elif type in (int, 'int', 'integer'):
-            try:
-                return int(value)
-            except Exception:
-                if isinstance(value, basestring) and env.NUMBER_RE.match(value):
-                    return int(eval(value))
-                return 0 if default is None else default
-        elif type in (float, 'float'):
-            if value is not None and env.NUMBER_RE.match(value):
-                return float(value)
-            return 0.0 if default is None else default
-        return default
-
-    @staticmethod
-    def get(name, default=None, type='basestring'):
-        """Get environment variable.
-
-          >>> env.get('PATH')
-          '/bin'
-          >>> env.get('TEST', type='number')
-          10.0
-          >>> env.get('TEST', type=int)
-          10
-        """
-        exists = env.has(name)
-        value = _m('os').environ.get(name)
-        return env.type(value, default, type)
-
-    @staticmethod
-    def has(name):
-        """Check if environment variable exists.
-
-          >>> env.has('PATH')
-          True
-        """
-        return name in _m('os').environ
-
-    @staticmethod
-    def set(name, value, add=False, append=False, prepend=False, sep=':', unique=False):
-        """Set environment variable.
-
-          >>> env.set('PATH', '/bin')
-          True
-          >>> env.set('PATH', '/sbin', append=True)
-          True
-          >>> env.set('PATH')
-          '/bin:/sbin'
-          >>> env.set('PATH', '/sbin', prepend=True, sep=':', unique=True)
-          False
-          >>> env.set('PATH')
-          '/bin:/sbin'
-        """
-        if add and env.has(name):
-            return False
-        if not isinstance(value, basestring):
-            value = unicode(value)
-        if not isinstance(sep, basestring):
-            sep = unicode(sep)
-        if append or prepend:
-            current_value = env.get(name, default='')
-            if current_value:
-                if unique and sep and value in current_value.split(sep):
-                    return False
-                if append:
-                    _m('os').environ[name] = env.get(name, default='') + sep + value
-                # Don't prepend if we asked for append and unique
-                if prepend and not (append and unique):
-                    _m('os').environ[name] = value + sep + env.get(name, default='')
-            else:
-                _m('os').environ[name] = value
-        else:
-            _m('os').environ[name] = value
-        return True
-_ops_env = env
-
 class group(object):
     """Get information about a group.
 
@@ -538,7 +522,6 @@ def mkdir(path, recursive=True):
         logging.error('mkdir: execute failed: %s (%s)' % (path, error))
         return False
     return True
-_ops_mkdir = mkdir
 
 class _ModeBits(object):
 
@@ -668,7 +651,6 @@ class objectify(dict):
             if not name.startswith('_'):
                 values[name] = value
         return values
-_ops_objectify = objectify
 
 def _path_stat_get(self):
     if not hasattr(self, '_stat'):
@@ -705,7 +687,6 @@ class path(unicode):
         if isinstance(stat, _ops_stat):
             obj._stat = stat
         return obj
-_ops_path = path
 
 def popd(no_class=False):
     """Remove last path from the stack and make it the current working
@@ -753,7 +734,6 @@ def popd(no_class=False):
         '_bool': successful,
         'path': path,
     })
-_ops_popd = popd
 
 def pushd(path, no_class=False):
     """Add the current working directory to the stack and switch to the path
@@ -792,7 +772,6 @@ def pushd(path, no_class=False):
         '_bool': successful,
         'path': path,
     })
-_ops_pushd = pushd
 
 def rm(path, recursive=False):
     """Delete a specified file or directory. This function does not recursively
@@ -867,7 +846,6 @@ def run(command, **kwargs):
         'stdout': data[0],
         'stderr': data[1],
     })
-_ops_rm = rm
 
 class stat(object):
     """Display stat info for files and directories.
@@ -1111,14 +1089,16 @@ class workspace(object):
 
     def join(self, *args):
         return _m('os').path.join(self.path, *args)
-_ops_workspace = workspace
 
 __all__ = [
     'chmod',
     'chown',
     'cp',
     'dirs',
-    'env',
+    'env_get',
+    'env_has',
+    'env_set',
+    'env_type',
     'exit',
     'find',
     'group',

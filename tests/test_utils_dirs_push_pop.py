@@ -3,7 +3,7 @@ import helper
 import os
 import unittest
 import uuid
-import opsutils
+import ops.utils
 
 class DirsPushPopTestCase(unittest.TestCase):
 
@@ -24,57 +24,57 @@ class DirsPushPopTestCase(unittest.TestCase):
     def test_class(self):
         self.check_path(self.path0)
 
-        opsutils.pushd(self.path1)
+        ops.utils.pushd(self.path1)
         self.check_path(self.path1)
 
-        opsutils.pushd(self.path2)
+        ops.utils.pushd(self.path2)
         self.check_path(self.path2)
 
-        opsutils.pushd(self.path3)
+        ops.utils.pushd(self.path3)
         self.check_path(self.path3)
 
-        opsutils.popd()
+        ops.utils.popd()
         self.check_path(self.path2)
 
-        opsutils.popd()
+        ops.utils.popd()
         self.check_path(self.path1)
 
-        opsutils.popd()
+        ops.utils.popd()
         self.check_path(self.path0)
 
     def test_no_class(self):
         self.check_path(self.path0)
 
-        opsutils.pushd(self.path1)
+        ops.utils.pushd(self.path1)
         self.check_path(self.path1)
 
-        opsutils.pushd(self.path2, no_class=True)
+        ops.utils.pushd(self.path2, no_class=True)
         self.check_path(self.path2)
 
-        opsutils.popd()
+        ops.utils.popd()
         self.check_path(self.path0)
 
-        opsutils.popd(no_class=True)
+        ops.utils.popd(no_class=True)
         self.check_path(self.path1)
 
     @staticmethod
     def assert_function_static():
-        assert len(opsutils.dirs()) == 0
-        opsutils.pushd(os.path.join(os.getcwd(), '..'))
-        assert len(opsutils.dirs()) == 1
+        assert len(ops.utils.dirs()) == 0
+        ops.utils.pushd(os.path.join(os.getcwd(), '..'))
+        assert len(ops.utils.dirs()) == 1
 
     def test_function(self):
         self.check_path(self.path0)
 
-        opsutils.pushd(self.path3)
+        ops.utils.pushd(self.path3)
         self.check_path(self.path3)
 
-        self.assertEqual(len(opsutils.dirs()), 1)
+        self.assertEqual(len(ops.utils.dirs()), 1)
         self.assert_function_static()
-        self.assertEqual(len(opsutils.dirs()), 1)
+        self.assertEqual(len(ops.utils.dirs()), 1)
         self.check_path(self.path2)
 
-        opsutils.popd()
+        ops.utils.popd()
         self.check_path(self.path0)
 
 if __name__ == '__main__':

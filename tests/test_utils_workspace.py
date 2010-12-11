@@ -2,7 +2,7 @@ import helper
 
 import os
 import unittest
-import opsutils
+import ops.utils
 
 class WorkspaceTestCase(unittest.TestCase):
 
@@ -10,7 +10,7 @@ class WorkspaceTestCase(unittest.TestCase):
         prefix = 'prefix-'
         suffix = '-suffix'
         path = None
-        with opsutils.workspace(suffix=suffix, prefix=prefix) as w:
+        with ops.utils.workspace(suffix=suffix, prefix=prefix) as w:
             path = w.path
             name = os.path.basename(w.path)
             self.assertTrue(os.path.isdir(path))
@@ -21,10 +21,10 @@ class WorkspaceTestCase(unittest.TestCase):
     def test_bad_permissions(self):
         path = None
         name = 'test'
-        with opsutils.workspace() as w:
+        with ops.utils.workspace() as w:
             path = w.path
-            opsutils.mkdir(w.join(name))
-            opsutils.chmod(w.path, 0000)
+            ops.utils.mkdir(w.join(name))
+            ops.utils.chmod(w.path, 0000)
             self.assertTrue(os.path.isdir(path))
         self.assertFalse(os.path.exists(path))
 

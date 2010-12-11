@@ -2,7 +2,7 @@ import helper
 
 import os
 import unittest
-import opsutils
+import ops.utils
 
 class MkdirTestCase(unittest.TestCase):
 
@@ -14,10 +14,10 @@ class MkdirTestCase(unittest.TestCase):
 
     def check_dirs(self, single, multiple, **kwargs):
         path = self.workspace.join('single')
-        opsutils.mkdir(path, **kwargs)
+        ops.utils.mkdir(path, **kwargs)
         self.assertEqual(os.path.isdir(path), single)
         path = self.workspace.join('multiple', 'levels', 'here')
-        opsutils.mkdir(path, **kwargs)
+        ops.utils.mkdir(path, **kwargs)
         self.assertEqual(os.path.isdir(path), multiple)
 
     def test_default(self):

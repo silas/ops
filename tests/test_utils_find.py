@@ -5,63 +5,63 @@ import copy
 import os
 import time
 import unittest
-import opsutils
+import ops.utils
 
 class FindRuleTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.rule = opsutils._FindRule()
+        self.rule = ops.utils._FindRule()
 
     def test_call(self):
         try:
-            self.rule(opsutils.path('/tmp'))
+            self.rule(ops.utils.path('/tmp'))
         except NotImplementedError:
             pass
 
     def test_render(self):
         self.assertTrue(self.rule.render())
         self.assertFalse(self.rule.render(False))
-        rule = opsutils._FindRule(exclude=True)
+        rule = ops.utils._FindRule(exclude=True)
         self.assertFalse(rule.render())
         self.assertTrue(rule.render(False))
 
 class FindDirectoryRuleTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.rule = opsutils._FindDirectoryRule(True)
-        self.file_path = opsutils.path(__file__)
+        self.rule = ops.utils._FindDirectoryRule(True)
+        self.file_path = ops.utils.path(__file__)
 
     def test_call(self):
         self.assertFalse(self.rule(self.file_path))
 
     def test_directory(self):
-        path = opsutils.path(os.path.dirname(self.file_path))
+        path = ops.utils.path(os.path.dirname(self.file_path))
         self.assertTrue(self.rule(path))
 
 class FindFileRuleTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.rule = opsutils._FindFileRule(True)
-        self.file_path = opsutils.path(__file__)
+        self.rule = ops.utils._FindFileRule(True)
+        self.file_path = ops.utils.path(__file__)
 
     def test_file(self):
         self.assertTrue(self.rule(self.file_path))
 
     def test_directory(self):
-        path = opsutils.path(os.path.dirname(self.file_path))
+        path = ops.utils.path(os.path.dirname(self.file_path))
         self.assertFalse(self.rule(path))
 
 class FindNameRuleTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.rule = opsutils._FindNameRule('*hello[12].py?')
+        self.rule = ops.utils._FindNameRule('*hello[12].py?')
 
     def test_match(self):
-        self.assertTrue(self.rule(opsutils.path('hello1.pyc')))
-        self.assertTrue(self.rule(opsutils.path('test-hello2.pyo')))
+        self.assertTrue(self.rule(ops.utils.path('hello1.pyc')))
+        self.assertTrue(self.rule(ops.utils.path('test-hello2.pyo')))
 
     def test_no_match(self):
-        self.assertFalse(self.rule(opsutils.path('world.py')))
+        self.assertFalse(self.rule(ops.utils.path('world.py')))
 
 class FindTimeRuleTestCase(unittest.TestCase):
 
@@ -70,7 +70,7 @@ class FindTimeRuleTestCase(unittest.TestCase):
         self.dt_lt = datetime.datetime(year=2001, month=1, day=2, hour=3, minute=4, second=5)
         self.dt_gt = datetime.datetime(year=2021, month=2, day=3, hour=4, minute=5, second=6)
         p = time.mktime(self.dt_eq.timetuple())
-        s = opsutils.stat('/tmp')
+        s = ops.utils.stat('/tmp')
         s._data = [
             0,  # st_mode
             0,  # st_ino
@@ -83,10 +83,10 @@ class FindTimeRuleTestCase(unittest.TestCase):
             p,  # st_mtime
             p,  # st_ctime
         ]
-        self.path = opsutils.path('/tmp', stat=s)
+        self.path = ops.utils.path('/tmp', stat=s)
 
     def rule(self, o, v, type='ctime'):
-        return opsutils._FindTimeRule(type, o, v)(self.path)
+        return ops.utils._FindTimeRule(type, o, v)(self.path)
 
     def test_exact(self):
         self.assertTrue(self.rule('', self.dt_eq))
@@ -153,37 +153,37 @@ class FindTestCase(unittest.TestCase):
                     f.write('hello world')
 
     def test_add_rule_name(self):
-        find = opsutils.find('.')
+        find = ops.utils.find('.')
         find._add_rule({'name': '*.pyc'})
         self.assertEqual(len(find.rules), 1)
-        self.assertTrue(isinstance(find.rules[0], opsutils._FindNameRule))
+        self.assertTrue(isinstance(find.rules[0], ops.utils._FindNameRule))
 
     def test_add_rule_directory(self):
-        find = opsutils.find('.')
+        find = ops.utils.find('.')
         find._add_rule({'directory': True})
         self.assertEqual(len(find.rules), 1)
-        self.assertTrue(isinstance(find.rules[0], opsutils._FindDirectoryRule))
+        self.assertTrue(isinstance(find.rules[0], ops.utils._FindDirectoryRule))
 
     def test_add_rule_file(self):
-        find = opsutils.find('.')
+        find = ops.utils.find('.')
         find._add_rule({'file': True})
         self.assertEqual(len(find.rules), 1)
-        self.assertTrue(isinstance(find.rules[0], opsutils._FindFileRule))
+        self.assertTrue(isinstance(find.rules[0], ops.utils._FindFileRule))
 
     def test_add_rule_time(self):
-        find = opsutils.find('.')
+        find = ops.utils.find('.')
         find._add_rule({'atime__year': 2010})
         find._add_rule({'ctime__month': 5})
         find._add_rule({'mtime__day': 1})
         self.assertEqual(len(find.rules), 3)
-        self.assertTrue(isinstance(find.rules[0], opsutils._FindTimeRule))
-        self.assertTrue(isinstance(find.rules[1], opsutils._FindTimeRule))
-        self.assertTrue(isinstance(find.rules[2], opsutils._FindTimeRule))
+        self.assertTrue(isinstance(find.rules[0], ops.utils._FindTimeRule))
+        self.assertTrue(isinstance(find.rules[1], ops.utils._FindTimeRule))
+        self.assertTrue(isinstance(find.rules[2], ops.utils._FindTimeRule))
 
     def test_filter(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
         count = 0
-        for path in opsutils.find(dir_path).filter(name='test_find.py'):
+        for path in ops.utils.find(dir_path).filter(name='test_utils_find.py'):
             count += 1
         self.assertEqual(count, 1)
 
@@ -191,18 +191,18 @@ class FindTestCase(unittest.TestCase):
         dir_path = os.path.dirname(os.path.realpath(__file__))
         total_count = 0
         exclude_count = 0
-        for path in opsutils.find(dir_path):
+        for path in ops.utils.find(dir_path):
             total_count += 1
-        for path in opsutils.find(dir_path).exclude(name='test_find.py'):
+        for path in ops.utils.find(dir_path).exclude(name='test_utils_find.py'):
             exclude_count += 1
         self.assertEqual(exclude_count+1, total_count)
 
     def test_top_down(self):
         self.setup_directory()
 
-        list1 = list(opsutils.find(self.workspace.path))
-        list2 = list(opsutils.find(self.workspace.path, top_down=True))
-        list3 = list(opsutils.find(self.workspace.path, no_peek=True, top_down=True))
+        list1 = list(ops.utils.find(self.workspace.path))
+        list2 = list(ops.utils.find(self.workspace.path, top_down=True))
+        list3 = list(ops.utils.find(self.workspace.path, no_peek=True, top_down=True))
 
         self.assertEqual(len(list1), 22)
         self.assertEqual(len(list2), len(list1))

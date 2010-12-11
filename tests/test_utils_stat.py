@@ -6,7 +6,7 @@ import pwd
 import os
 import unittest
 import uuid
-import opsutils
+import ops.utils
 
 class StatTestCase(unittest.TestCase):
 
@@ -22,7 +22,7 @@ class StatTestCase(unittest.TestCase):
 
     def test_values(self):
         path = self.workspace.path
-        stat = opsutils.stat(path)
+        stat = ops.utils.stat(path)
 
         self.assertTrue(isinstance(stat.st_mode, int))
 
@@ -36,12 +36,12 @@ class StatTestCase(unittest.TestCase):
         self.assertEqual(stat.nlink, stat.st_nlink)
 
         self.assertEqual(stat.st_uid, self.uid)
-        self.assertTrue(isinstance(stat.user, opsutils.user))
+        self.assertTrue(isinstance(stat.user, ops.utils.user))
         self.assertTrue(stat.user.id, self.uid)
         self.assertTrue(stat.user.name, self.user)
 
         self.assertEqual(stat.st_gid, self.gid)
-        self.assertTrue(isinstance(stat.group, opsutils.group))
+        self.assertTrue(isinstance(stat.group, ops.utils.group))
         self.assertTrue(stat.group.id, self.gid)
         self.assertTrue(stat.group.name, self.group)
 

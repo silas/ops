@@ -1,8 +1,7 @@
-opsutils
-========
+ops
+===
 
-[opsutils][opsutils] is a collection of convenience functions intended to
-augment the built-in Python [os][os] and [shutil][shutil] modules.
+ops is a collection Python modules for operations automation.
 
 ### Requirements
 
@@ -10,7 +9,7 @@ augment the built-in Python [os][os] and [shutil][shutil] modules.
 
 ### Example
 
-    from opsutils import *
+    from ops.utils import *
 
     for path in find('/tmp').filter(name='*.py', file=True).exclude(mtime__day=13):
         result = run('python ${path}', path=path)
@@ -31,6 +30,5 @@ Which would produce a result like:
 
 This work is licensed under the New BSD License (see the LICENSE file).
 
-[opsutils]: http://github.com/opsdojo/opsutils/raw/master/opsutils.py
 [os]: http://docs.python.org/library/os.html
 [shutil]: http://docs.python.org/library/shutil.html

@@ -2,12 +2,12 @@ import helper
 
 import copy
 import unittest
-import opsutils
+import ops.utils
 
 class ObjectifyTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.o = opsutils.objectify()
+        self.o = ops.utils.objectify()
 
     def test_bool_empty(self):
         self.assertFalse(self.o)
@@ -27,7 +27,7 @@ class ObjectifyTestCase(unittest.TestCase):
 
     def test_dict(self):
         d = {'hello': 'world', 'thanks': 'mom'}
-        o = opsutils.objectify(copy.deepcopy(d))
+        o = ops.utils.objectify(copy.deepcopy(d))
         self.assertEqual(len(o), len(d))
         for key, value in d.items():
             self.assertEqual(o[key], value)

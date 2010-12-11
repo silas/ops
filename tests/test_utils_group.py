@@ -4,7 +4,7 @@ import grp
 import os
 import unittest
 import uuid
-import opsutils
+import ops.utils
 
 class GroupTestCase(unittest.TestCase):
 
@@ -13,28 +13,28 @@ class GroupTestCase(unittest.TestCase):
         self.name = grp.getgrgid(self.id)[0]
 
     def test_default(self):
-        group = opsutils.group(self.name)
+        group = ops.utils.group(self.name)
         self.assertEqual(group.id, self.id)
         self.assertTrue(group)
 
     def test_get_by_id(self):
-        group = opsutils.group(id=self.id)
+        group = ops.utils.group(id=self.id)
         self.assertEqual(group.name, self.name)
         self.assertTrue(group)
 
     def test_get_by_invalid_id(self):
-        group = opsutils.group(id=-1)
+        group = ops.utils.group(id=-1)
         self.assertTrue(group.id is None)
         self.assertTrue(group.name is None)
         self.assertFalse(group)
 
     def test_get_by_name(self):
-        group = opsutils.group(name=self.name)
+        group = ops.utils.group(name=self.name)
         self.assertEqual(group.id, self.id)
         self.assertTrue(group)
 
     def test_get_by_invalid_name(self):
-        group = opsutils.group(name=uuid.uuid4().get_hex())
+        group = ops.utils.group(name=uuid.uuid4().get_hex())
         self.assertTrue(group.id is None)
         self.assertTrue(group.name is None)
         self.assertFalse(group)

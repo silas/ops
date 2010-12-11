@@ -3,7 +3,7 @@ import helper
 import os
 import unittest
 import uuid
-import opsutils
+import ops.utils
 
 class RunTestCase(unittest.TestCase):
 
@@ -12,7 +12,7 @@ class RunTestCase(unittest.TestCase):
         self.run_path = os.path.join(self.root_path, 'assets', 'run.py')
 
     def do(self, text='', code=0):
-        r = opsutils.run('python ${run} ${code} ${text}',
+        r = ops.utils.run('python ${run} ${code} ${text}',
             run=self.run_path,
             code=code,
             text=text,
