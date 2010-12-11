@@ -169,7 +169,7 @@ def env_get(name, default=None, type=None):
     """
     exists = env_has(name)
     value = _m('os').environ.get(name)
-    return env_type(value, default, type)
+    return normalize(value, default, type)
 
 def env_has(name):
     """Check if environment variable exists.
@@ -214,61 +214,6 @@ def env_set(name, value, add=False, append=False, prepend=False, sep=':', unique
     else:
         _m('os').environ[name] = value
     return True
-
-def env_type(value, default=None, type=None):
-    """Convert string variables to a specified type.
-
-      >>> env_type('true', type='boolean')
-      True
-      >>> env_type('11', type='number')
-      11
-      >>> env_type('10.3', default=11.0)
-      10.3
-    """
-    NUMBER_RE = _m('re').compile('^[-+]?([0-9]+\.?[0-9]*)|([0-9]*\.?[0-9]+)$')
-    if type is None and default is None:
-        type = basestring
-    elif type is None:
-        type = _TYPE(default)
-    if type in (basestring, 'basestring'):
-        if value is not None:
-            return value
-        return '' if default is None else default
-    elif type in (str, 'str', 'string'):
-        if value is not None:
-            return value if isinstance(value, str) else str(value)
-        return '' if default is None else default
-    elif type in (unicode, 'unicode'):
-        if value is not None:
-            return value if isinstance(value, unicode) else unicode(value)
-        return u'' if default is None else default
-    elif type in (bool, 'bool', 'boolean'):
-        if value is not None:
-            value = value.lower().strip()
-            if value in ('1', 'true', 'yes'):
-                return True
-            elif default is None:
-                return False
-        return False if default is None else default
-    elif type in (_m('numbers').Number, 'number'):
-        if value is not None:
-            if value.isdigit():
-                return int(value)
-            elif value != '.' and NUMBER_RE.match(value):
-                return eval(value)
-        return 0 if default is None else default
-    elif type in (int, 'int', 'integer'):
-        try:
-            return int(value)
-        except Exception:
-            if isinstance(value, basestring) and NUMBER_RE.match(value):
-                return int(eval(value))
-            return 0 if default is None else default
-    elif type in (float, 'float'):
-        if value is not None and NUMBER_RE.match(value):
-            return float(value)
-        return 0.0 if default is None else default
-    return default
 
 def exit(code=0, text=''):
     """Exit and print text (if defined) to stderr if code > 0 or stdout
@@ -613,6 +558,61 @@ class mode(object):
     def other(self, value=None):
         self._set_bits('_other', value)
 _ops_mode = mode
+
+def normalize(value, default=None, type=None):
+    """Convert string variables to a specified type.
+
+      >>> normalize('true', type='boolean')
+      True
+      >>> normalize('11', type='number')
+      11
+      >>> normalize('10.3', default=11.0)
+      10.3
+    """
+    NUMBER_RE = _m('re').compile('^[-+]?([0-9]+\.?[0-9]*)|([0-9]*\.?[0-9]+)$')
+    if type is None and default is None:
+        type = basestring
+    elif type is None:
+        type = _TYPE(default)
+    if type in (basestring, 'basestring'):
+        if value is not None:
+            return value
+        return '' if default is None else default
+    elif type in (str, 'str', 'string'):
+        if value is not None:
+            return value if isinstance(value, str) else str(value)
+        return '' if default is None else default
+    elif type in (unicode, 'unicode'):
+        if value is not None:
+            return value if isinstance(value, unicode) else unicode(value)
+        return u'' if default is None else default
+    elif type in (bool, 'bool', 'boolean'):
+        if value is not None:
+            value = value.lower().strip()
+            if value in ('1', 'true', 'yes'):
+                return True
+            elif default is None:
+                return False
+        return False if default is None else default
+    elif type in (_m('numbers').Number, 'number'):
+        if value is not None:
+            if value.isdigit():
+                return int(value)
+            elif value != '.' and NUMBER_RE.match(value):
+                return eval(value)
+        return 0 if default is None else default
+    elif type in (int, 'int', 'integer'):
+        try:
+            return int(value)
+        except Exception:
+            if isinstance(value, basestring) and NUMBER_RE.match(value):
+                return int(eval(value))
+            return 0 if default is None else default
+    elif type in (float, 'float'):
+        if value is not None and NUMBER_RE.match(value):
+            return float(value)
+        return 0.0 if default is None else default
+    return default
 
 class objectify(dict):
     """Use property access syntax to retrieve values from a dict-like object.
@@ -1098,12 +1098,12 @@ __all__ = [
     'env_get',
     'env_has',
     'env_set',
-    'env_type',
     'exit',
     'find',
     'group',
     'mode',
     'mkdir',
+    'normalize',
     'objectify',
     'path',
     'popd',
