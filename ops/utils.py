@@ -624,20 +624,37 @@ class objectify(dict):
       'world'
     """
 
-    def __init__(self, data=None):
+    def __init__(self, data=None, **kwargs):
         dict.__init__(self, data or {})
+        if 'default' in kwargs:
+            self['_default'] = kwargs['default']
 
     def __getattr__(self, name):
         try:
             return self[name]
         except KeyError:
-            raise AttributeError(name)
+            try:
+                return self['_default']
+            except KeyError:
+                raise AttributeError(name)
 
     def __nonzero__(self):
         try:
             return self['_bool']
         except KeyError:
-            return len(self) > 0
+            if len(self) == 0:
+                return False
+            for key in self:
+                if not key.startswith('_'):
+                    return True
+            return False
+
+    def __len__(self):
+        count = 0
+        for key in self:
+            if not key.startswith('_'):
+                count += 1
+        return count
 
     def __repr__(self):
         return repr(self.dict())

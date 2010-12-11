@@ -25,6 +25,15 @@ class ObjectifyTestCase(unittest.TestCase):
         self.o['_bool'] = True
         self.assertTrue(self.o)
 
+    def test_default(self):
+        try:
+            self.o.fail
+            raise Exception("Accessor didn't raise AttributeError.")
+        except AttributeError:
+            pass
+        o = ops.utils.objectify(default='test')
+        self.assertEqual(o.fail, 'test')
+
     def test_dict(self):
         d = {'hello': 'world', 'thanks': 'mom'}
         o = ops.utils.objectify(copy.deepcopy(d))
