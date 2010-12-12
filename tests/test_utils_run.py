@@ -17,7 +17,6 @@ class RunTestCase(unittest.TestCase):
             code=code,
             text=text,
         )
-        print r.command
         return r
 
     def text(self):
@@ -36,6 +35,19 @@ class RunTestCase(unittest.TestCase):
         self.assertFalse(results)
         self.assertEqual(results.stdout, 'stdout: %s' % text)
         self.assertEqual(results.stderr, 'stderr: %s' % text)
+
+    def test_dict(self):
+        args = {'-f': self.run_path}
+        results = ops.utils.run('test ${args}', args=args)
+        self.assertTrue(results)
+        self.assertEqual(results.code, 0)
+        print results.command
+
+    def test_list(self):
+        args = ['?!*', '=', '?!*']
+        results = ops.utils.run('test ${args}', args=args)
+        self.assertTrue(results)
+        self.assertEqual(results.code, 0)
 
 if __name__ == '__main__':
     unittest.main()

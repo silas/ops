@@ -848,10 +848,16 @@ def run(command, **kwargs):
         env.update(kwargs['env'])
     if kwargs:
         args = {}
+        q = _m('pipes').quote
         for name, value in kwargs.items():
-            if not isinstance(value, basestring):
-                value = unicode(value)
-            args[name] = _m('pipes').quote(value)
+            if isinstance(value, basestring):
+                args[name] = q(value)
+            elif isinstance(value, (list, tuple)):
+                args[name] = u' '.join([q(unicode(v)) for v in value])
+            elif isinstance(value, dict):
+                args[name] = u' '.join([u'%s %s' % (q(n), q(v)) for n, v in value.items()])
+            else:
+                args[name] = _m('pipes').quote(unicode(value))
         command = _m('string').Template(command).safe_substitute(args)
     logging.debug('run: %s' % command)
     ref = _m('subprocess').Popen(
