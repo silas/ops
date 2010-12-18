@@ -1,0 +1,7 @@
+include CONTRIBUTORS
+include LICENSE
+include README.md
+recursive-include docs *.rst
+recursive-exclude docs/_build *
+recursive-include ops *.py
+recursive-exclude tests *.py
