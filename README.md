@@ -29,6 +29,3 @@ Which might produce something like:
 ### License
 
 This work is licensed under the New BSD License (see the LICENSE file).
-
-[os]: http://docs.python.org/library/os.html
-[shutil]: http://docs.python.org/library/shutil.html
