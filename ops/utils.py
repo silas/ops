@@ -1,7 +1,7 @@
 # Copyright (c) 2010, OpsDojo Inc.
 # All rights reserved.
 #
-# This file is subject to the New BSD License (see the LICENSE file).
+# This file is subject to the MIT License (see the LICENSE file).
 
 _m = __import__
 

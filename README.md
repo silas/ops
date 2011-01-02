@@ -28,4 +28,4 @@ Which might produce something like:
 
 ### License
 
-This work is licensed under the New BSD License (see the LICENSE file).
+This work is licensed under the MIT License (see the LICENSE file).

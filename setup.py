@@ -14,7 +14,7 @@ setup(
     long_description=long_description.strip(),
     author='Silas Sewell',
     author_email='silas@opsdojo.com',
-    license='BSD',
+    license='MIT',
     url='https://github.com/opsdojo/ops',
     packages=[
         'ops',
@@ -22,7 +22,7 @@ setup(
     classifiers=[
           'Intended Audience :: Developers',
           'Intended Audience :: System Administrators',
-          'License :: OSI Approved :: BSD License',
+          'License :: OSI Approved :: MIT License',
           'Operating System :: Unix',
           'Operating System :: POSIX',
           'Programming Language :: Python',
