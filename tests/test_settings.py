@@ -4,20 +4,26 @@ import ops.settings
 
 class Settings(ops.settings.Settings):
 
-    class Database(ops.settings.Section):
-        type = ops.settings.String(default='sqlite3')
-        port = ops.settings.Number(default=0)
+    class Section(ops.settings.Section):
+        boolean_false = ops.settings.Boolean(default=False)
+        boolean_true = ops.settings.Boolean(default=True)
+        float = ops.settings.Number(default=1.5)
+        integer = ops.settings.Integer(default=1)
+        string = ops.settings.String(default='string')
 
 class SettingsTestCase(unittest.TestCase):
 
     _env = {
-        'TEST_DATABASE_TYPE': 'mysql',
-        'TEST_DATABASE_PORT': '2',
+        'APP_SECTION_BOOLEAN_FALSE': 'true',
+        'APP_SECTION_BOOLEAN_TRUE': 'false',
+        'APP_SECTION_FLOAT': '+10.5',
+        'APP_SECTION_INTEGER': '-10',
+        'APP_SECTION_STRING': 'env.string',
     }
 
     def setUp(self):
         os.environ.clear()
-        self.name = 'test'
+        self.name = 'app'
 
     def setup_env(self):
         for name, value in self._env.items():
@@ -30,27 +36,76 @@ class SettingsTestCase(unittest.TestCase):
     def options(self):
         return self.parse()
 
-    def test_number(self):
+    def test_boolean_default(self):
         o = self.options
-        self.assertEqual(o.database.port, 0)
+        self.assertEqual(o.section.boolean_false, False)
+        self.assertEqual(o.section.boolean_true, True)
 
-        o = self.parse(['--database-port', '1'])
-        self.assertEqual(o.database.port, 1)
+    def test_boolean_optparse(self):
+        o = self.parse(['--section-boolean-false', '--section-boolean-true'])
+        self.assertEqual(o.section.boolean_false, True)
+        self.assertEqual(o.section.boolean_true, False)
 
+    def test_boolean_env(self):
         self.setup_env()
         o = self.options
-        self.assertEqual(o.database.port, 2)
+        self.assertEqual(o.section.boolean_false, True)
+        self.assertEqual(o.section.boolean_true, False)
 
-    def test_string(self):
+    def test_float_default(self):
         o = self.options
-        self.assertEqual(o.database.type, 'sqlite3')
+        self.assertEqual(o.section.float, 1.5)
 
-        o = self.parse(['--database-type', 'psql'])
-        self.assertEqual(o.database.type, 'psql')
+    def test_float_optparse(self):
+        o = self.parse(['--section-float', '+11.5'])
+        self.assertEqual(o.section.float, 11.5)
 
+    def test_float_env(self):
         self.setup_env()
         o = self.options
-        self.assertEqual(o.database.type, 'mysql')
+        self.assertEqual(o.section.float, 10.5)
+
+    def test_integer_default(self):
+        o = self.options
+        self.assertEqual(o.section.integer, 1)
+
+    def test_integer_optparse(self):
+        o = self.parse(['--section-integer', '+11.5'])
+        self.assertEqual(o.section.integer, 11)
+
+    def test_integer_env(self):
+        self.setup_env()
+        o = self.options
+        self.assertEqual(o.section.integer, -10)
+
+    def test_number_default(self):
+        o = self.options
+        self.assertEqual(o.section.float, 1.5)
+        self.assertEqual(o.section.integer, 1)
+
+    def test_number_optparse(self):
+        o = self.parse(['--section-float', '-11.5', '--section-integer', '+11'])
+        self.assertEqual(o.section.float, -11.5)
+        self.assertEqual(o.section.integer, 11)
+
+    def test_number_env(self):
+        self.setup_env()
+        o = self.options
+        self.assertEqual(o.section.float, 10.5)
+        self.assertEqual(o.section.integer, -10)
+
+    def test_string_default(self):
+        o = self.options
+        self.assertEqual(o.section.string, 'string')
+
+    def test_string_optparse(self):
+        o = self.parse(['--section-string', 'test'])
+        self.assertEqual(o.section.string, 'test')
+
+    def test_string_env(self):
+        self.setup_env()
+        o = self.options
+        self.assertEqual(o.section.string, 'env.string')
 
 if __name__ == '__main__':
     unittest.main()

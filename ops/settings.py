@@ -66,6 +66,49 @@ class Type(object):
         if self.required and value is None:
             raise ops.exceptions.ValidationError('required')
 
+class Boolean(Type):
+
+    def __init__(self, **kwargs):
+        kwargs['type'] = kwargs.get('type', 'boolean')
+        super(Boolean, self).__init__(**kwargs)
+
+    def validate(self, value):
+        super(Boolean, self).validate(value)
+        if value is None:
+            return
+        if not isinstance(value, bool):
+            raise ops.exceptions.ValidationError('not a boolean')
+
+    def optparse_add(self, *args, **kwargs):
+        kwargs['action'] = 'store_false' if self.default else 'store_true'
+        super(Boolean, self).optparse_add(*args, **kwargs)
+
+class Float(Type):
+
+    def __init__(self, **kwargs):
+        kwargs['type'] = kwargs.get('type', 'float')
+        super(Float, self).__init__(**kwargs)
+
+    def validate(self, value):
+        super(Float, self).validate(value)
+        if value is None:
+            return
+        if not isinstance(value, int):
+            raise ops.exceptions.ValidationError('not a float')
+
+class Integer(Type):
+
+    def __init__(self, **kwargs):
+        kwargs['type'] = kwargs.get('type', 'integer')
+        super(Integer, self).__init__(**kwargs)
+
+    def validate(self, value):
+        super(Integer, self).validate(value)
+        if value is None:
+            return
+        if not isinstance(value, int):
+            raise ops.exceptions.ValidationError('not an integer')
+
 class Number(Type):
 
     def __init__(self, **kwargs):
@@ -91,23 +134,6 @@ class String(Type):
             return
         if not isinstance(value, basestring):
             raise ops.exceptions.ValidationError('not a string')
-
-class Boolean(Type):
-
-    def __init__(self, **kwargs):
-        kwargs['type'] = kwargs.get('type', 'boolean')
-        super(Boolean, self).__init__(**kwargs)
-
-    def validate(self, value):
-        super(Boolean, self).validate(value)
-        if value is None:
-            return
-        if not isinstance(value, bool):
-            raise ops.exceptions.ValidationError('not a boolean')
-
-    def optparse_add(self, *args, **kwargs):
-        kwargs['action'] = 'store_true'
-        super(Boolean, self).optparse_add(*args, **kwargs)
 
 class Section(object):
 
