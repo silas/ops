@@ -218,9 +218,12 @@ class Settings(object):
                 config_file = optparse_options.config_file
 
         if config_file:
-            configparser_options = ConfigParser.SafeConfigParser()
-            if not configparser_options.read([config_file]):
-                raise ops.exceptions.Error('unable to read %s' % config_file)
+            try:
+                configparser_options = ConfigParser.SafeConfigParser()
+                if not configparser_options.read([config_file]):
+                    raise ops.exceptions.Error('unable to read %s' % config_file)
+            except ConfigParser.ParsingError, error:
+                raise ops.exceptions.Error(error)
 
         for name, section in self.sections.items():
             sections[name] = section(
