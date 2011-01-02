@@ -221,9 +221,6 @@ class Settings(object):
                     self._command_line.add_option_group(group)
         return self._command_line
 
-    def command_line_parse(self):
-        return self.command_line.parse_args()
-
     def parse(self, args=None, config_file=None):
         sections = {}
 
