@@ -12,6 +12,8 @@ class EnvGetTestCase(unittest.TestCase):
         os.environ['ops.utils-unicode'] = u'unicode'
         os.environ['ops.utils-integer'] = '+10'
         os.environ['ops.utils-float'] = '-10.5'
+        os.environ['ops.utils-boolean-true'] = 'true'
+        os.environ['ops.utils-boolean-false'] = 'false'
 
     def test_default(self):
         self.assertEqual(ops.utils.env_get('ops.utils-empty'), '')
@@ -25,86 +27,62 @@ class EnvGetTestCase(unittest.TestCase):
         self.assertTrue(isinstance(ops.utils.env_get('ops.utils-unicode'), unicode))
 
     def test_string(self):
-        self.assertEqual(ops.utils.env_get('ops.utils-empty', type='string'), '')
-        self.assertEqual(ops.utils.env_get('ops.utils-empty', default='test', type='string'), 'test')
+        TYPE='string'
 
-        self.assertTrue(isinstance(ops.utils.env_get('ops.utils-integer', type=str), str))
-        self.assertTrue(isinstance(ops.utils.env_get('ops.utils-integer', type='str'), str))
-        self.assertTrue(isinstance(ops.utils.env_get('ops.utils-integer', type='string'), str))
-        self.assertTrue(isinstance(ops.utils.env_get('ops.utils-unicode', type='string'), str))
+        self.assertEqual(ops.utils.env_get('ops.utils-empty', type=TYPE), '')
+        self.assertEqual(ops.utils.env_get('ops.utils-empty', default='test', type=TYPE), 'test')
 
-        self.assertRaises(ops.exceptions.ValidationError, ops.utils.env_get, 'ops.utils-empty', raise_exception=True)
+        self.assertEqual(ops.utils.env_get('ops.utils-string', type=TYPE), 'string')
+        self.assertRaises(ops.exceptions.ValidationError, ops.utils.env_get, 'ops.utils-empty', type=TYPE, raise_exception=True)
 
     def test_unicode(self):
-        self.assertEqual(ops.utils.env_get('ops.utils-empty', type='unicode'), '')
-        self.assertEqual(ops.utils.env_get('ops.utils-empty', default=u'test', type='unicode'), u'test')
+        TYPE='unicode'
 
-        self.assertTrue(isinstance(ops.utils.env_get('ops.utils-integer', type=unicode), unicode))
-        self.assertTrue(isinstance(ops.utils.env_get('ops.utils-integer', type='unicode'), unicode))
-        self.assertTrue(isinstance(ops.utils.env_get('ops.utils-string', type='unicode'), unicode))
+        self.assertEqual(ops.utils.env_get('ops.utils-empty', type=TYPE), '')
+        self.assertEqual(ops.utils.env_get('ops.utils-empty', default=u'test', type=TYPE), u'test')
+
+        self.assertEqual(ops.utils.env_get('ops.utils-unicode', type=TYPE), 'unicode')
+        self.assertRaises(ops.exceptions.ValidationError, ops.utils.env_get, 'ops.utils-empty', type=TYPE, raise_exception=True)
 
     def test_boolean(self):
-        os.environ['ops.utils-boolean-one'] = '1'
-        os.environ['ops.utils-boolean-zero'] = '0'
-        os.environ['ops.utils-boolean-true'] = 'true'
-        os.environ['ops.utils-boolean-false'] = 'false'
-        os.environ['ops.utils-boolean-yes'] = 'yes'
-        os.environ['ops.utils-boolean-no'] = 'no'
-        os.environ['ops.utils-boolean-on'] = 'on'
-        os.environ['ops.utils-boolean-off'] = 'off'
+        TYPE='boolean'
 
-        self.assertEqual(ops.utils.env_get('ops.utils-empty', type='boolean'), False)
-        self.assertEqual(ops.utils.env_get('ops.utils-empty', default=True, type='boolean'), True)
+        self.assertEqual(ops.utils.env_get('ops.utils-empty', type=TYPE), False)
+        self.assertEqual(ops.utils.env_get('ops.utils-empty', default=True, type=TYPE), True)
 
-        self.assertEqual(ops.utils.env_get('ops.utils-boolean-zero', type='boolean'), False)
-        self.assertEqual(ops.utils.env_get('ops.utils-boolean-one', type='boolean'), True)
-        self.assertEqual(ops.utils.env_get('ops.utils-boolean-true', type='boolean'), True)
-        self.assertEqual(ops.utils.env_get('ops.utils-boolean-false', type='boolean'), False)
-        self.assertEqual(ops.utils.env_get('ops.utils-boolean-yes', type='boolean'), True)
-        self.assertEqual(ops.utils.env_get('ops.utils-boolean-no', type='boolean'), False)
-        self.assertEqual(ops.utils.env_get('ops.utils-boolean-on', type='boolean'), True)
-        self.assertEqual(ops.utils.env_get('ops.utils-boolean-off', type='boolean'), False)
-
-        self.assertRaises(ops.exceptions.ValidationError, ops.utils.env_get, 'ops.utils-string', type='boolean', raise_exception=True)
+        self.assertEqual(ops.utils.env_get('ops.utils-boolean-true', type=TYPE), True)
+        self.assertEqual(ops.utils.env_get('ops.utils-boolean-false', type=TYPE), False)
+        self.assertRaises(ops.exceptions.ValidationError, ops.utils.env_get, 'ops.utils-string', type=TYPE, raise_exception=True)
 
     def test_number(self):
-        self.assertEqual(ops.utils.env_get('ops.utils-empty', type='number'), 0)
-        self.assertEqual(ops.utils.env_get('ops.utils-empty', default=5, type='number'), 5)
+        TYPE='number'
 
-        self.assertTrue(isinstance(ops.utils.env_get('ops.utils-integer', type=numbers.Number), int))
-        self.assertTrue(isinstance(ops.utils.env_get('ops.utils-integer', type='number'), int))
-        self.assertTrue(isinstance(ops.utils.env_get('ops.utils-float', type='number'), float))
+        self.assertEqual(ops.utils.env_get('ops.utils-empty', type=TYPE), 0)
+        self.assertEqual(ops.utils.env_get('ops.utils-empty', default=5, type=TYPE), 5)
 
-        self.assertRaises(ops.exceptions.ValidationError, ops.utils.env_get, 'ops.utils-string', type='number', raise_exception=True)
+        self.assertEqual(ops.utils.env_get('ops.utils-integer', type=TYPE), 10)
+        self.assertEqual(ops.utils.env_get('ops.utils-float', type=TYPE), -10.5)
+        self.assertRaises(ops.exceptions.ValidationError, ops.utils.env_get, 'ops.utils-string', type=TYPE, raise_exception=True)
 
     def test_integer(self):
-        os.environ['ops.utils-integer-invalid'] = '.'
+        TYPE='integer'
 
-        self.assertEqual(ops.utils.env_get('ops.utils-empty', type='integer'), 0)
-        self.assertEqual(ops.utils.env_get('ops.utils-empty', default=5, type='integer'), 5)
-        self.assertEqual(ops.utils.env_get('ops.utils-integer-invalid', default=5, type='integer'), 5)
-        self.assertEqual(ops.utils.env_get('ops.utils-float', type='integer'), -10)
+        self.assertEqual(ops.utils.env_get('ops.utils-empty', type=TYPE), 0)
+        self.assertEqual(ops.utils.env_get('ops.utils-empty', default=5, type=TYPE), 5)
+        self.assertEqual(ops.utils.env_get('ops.utils-integer', type=TYPE), 10)
+        self.assertEqual(ops.utils.env_get('ops.utils-float', type=TYPE), -10)
 
-        self.assertTrue(isinstance(ops.utils.env_get('ops.utils-integer', type=int), int))
-        self.assertTrue(isinstance(ops.utils.env_get('ops.utils-integer', type='int'), int))
-        self.assertTrue(isinstance(ops.utils.env_get('ops.utils-float', type='int'), int))
-
-        self.assertRaises(ops.exceptions.ValidationError, ops.utils.env_get, 'ops.utils-string', type='integer', raise_exception=True)
+        self.assertRaises(ops.exceptions.ValidationError, ops.utils.env_get, 'ops.utils-string', type=TYPE, raise_exception=True)
 
     def test_float(self):
-        os.environ['ops.utils-float-invalid'] = '.'
+        TYPE='float'
 
-        self.assertEqual(ops.utils.env_get('ops.utils-empty', type='float'), 0.0)
-        self.assertEqual(ops.utils.env_get('ops.utils-empty', default=5.0, type='float'), 5.0)
-        self.assertEqual(ops.utils.env_get('ops.utils-float-invalid', default=5.0, type='float'), 5.0)
-        self.assertEqual(ops.utils.env_get('ops.utils-integer', type='float'), 10.0)
-        self.assertEqual(ops.utils.env_get('ops.utils-float', type='float'), -10.5)
+        self.assertEqual(ops.utils.env_get('ops.utils-empty', type=TYPE), 0.0)
+        self.assertEqual(ops.utils.env_get('ops.utils-empty', default=5.0, type=TYPE), 5.0)
+        self.assertEqual(ops.utils.env_get('ops.utils-integer', type=TYPE), 10.0)
+        self.assertEqual(ops.utils.env_get('ops.utils-float', type=TYPE), -10.5)
 
-        self.assertTrue(isinstance(ops.utils.env_get('ops.utils-integer', type=float), float))
-        self.assertTrue(isinstance(ops.utils.env_get('ops.utils-integer', type='float'), float))
-        self.assertTrue(isinstance(ops.utils.env_get('ops.utils-integer', type='float'), float))
-
-        self.assertRaises(ops.exceptions.ValidationError, ops.utils.env_get, 'ops.utils-string', type='float', raise_exception=True)
+        self.assertRaises(ops.exceptions.ValidationError, ops.utils.env_get, 'ops.utils-string', type=TYPE, raise_exception=True)
 
 class EnvSetTestCase(unittest.TestCase):
 

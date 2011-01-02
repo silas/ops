@@ -569,7 +569,7 @@ def normalize(value, default=None, type=None, raise_exception=False):
       >>> normalize('10.3', default=11.0)
       10.3
     """
-    NUMBER_RE = _m('re').compile('^[-+]?([0-9]+\.?[0-9]*)|([0-9]*\.?[0-9]+)$')
+    NUMBER_RE = _m('re').compile('^[-+]?(([0-9]+\.?[0-9]*)|([0-9]*\.?[0-9]+))$')
     if type is None and default is None:
         type = basestring
     elif type is None:
@@ -614,7 +614,7 @@ def normalize(value, default=None, type=None, raise_exception=False):
         if value is not None:
             if value.isdigit():
                 return int(value)
-            elif value != '.' and NUMBER_RE.match(value):
+            elif NUMBER_RE.match(value):
                 return eval(value)
         if default is None:
             if raise_exception:
