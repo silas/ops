@@ -1,3 +1,4 @@
+import ConfigParser
 import optparse
 import numbers
 import ops.exceptions
@@ -5,12 +6,13 @@ import ops.utils
 
 class Type(object):
 
-    def __init__(self, default=None, required=True, type=None, optparse=True, optparse_opts=None):
+    def __init__(self, default=None, required=True, type=None, help=None, optparse_opts=None, optparse_metavar=None):
         self.default = default
         self.required = required
         self.type = type
-        self.optparse = optparse
+        self.help = help
         self.optparse_opts = optparse_opts
+        self.optparse_metavar = optparse_metavar
 
     def env_value(self, prefix='', suffix='', type=None):
         name = [self.name]
@@ -19,35 +21,46 @@ class Type(object):
         if suffix:
             name.append(suffix)
         name = '_'.join(name).upper()
-        value = ops.utils.env_get(name, default=self.default, type=self.type)
-        if value is None or value == self.default:
+        if not ops.utils.env_has(name):
             return
-        return value
+        try:
+            return ops.utils.env_get(name, type=self.type, raise_exception=True)
+        except ops.exceptions.ValidationError:
+            return ops.utils.env_get(name)
+
+    def configparser_value(self, parser):
+        if parser.has_option(self.section._name, self.name):
+            value = parser.get(self.section._name, self.name)
+            if value is None:
+                return
+            try:
+                return ops.utils.normalize(value, type=self.type, raise_exception=True)
+            except ops.exceptions.ValidationError:
+                return value
 
     @property
     def optparse_dest(self):
         return '%s_%s' % (self.section._name, self.name)
 
-    def optparse_add(self, parser):
+    def optparse_add(self, parser, action='store'):
         if not self.optparse_opts:
-            self.optparse_opts = [
-                '--%s' % '-'.join([self.section._name, self.name]) if self.section._name else self.name
-            ]
-        kwargs = {
-            'dest': self.optparse_dest,
-        }
-        if self.default is not None:
-            kwargs['default'] = self.default
+            name = '--%s' % '-'.join([self.section._name, self.name]) if self.section._name else self.name
+            self.optparse_opts = [name.replace('_', '-')]
+        kwargs = {'action': action, 'dest': self.optparse_dest}
+        if self.help is not None:
+            kwargs['help'] = self.help
+        if self.optparse_metavar is not None:
+            kwargs['metavar'] = self.optparse_metavar
         parser.add_option(*self.optparse_opts, **kwargs)
 
     def optparse_value(self, options):
-        if options is None:
-            return
-        value = unicode(getattr(options, self.optparse_dest))
-        value = ops.utils.normalize(value, default=self.default, type=self.type)
-        if value is None or value == self.default:
-            return
-        return value
+        value = getattr(options, self.optparse_dest)
+        if value is None:
+            return value
+        try:
+            return ops.utils.normalize(unicode(value), type=self.type, raise_exception=True)
+        except ops.exceptions.ValidationError:
+            return value
 
     def validate(self, value):
         if self.required and value is None:
@@ -55,8 +68,9 @@ class Type(object):
 
 class Number(Type):
 
-    def __init__(self, default=None, required=True, type='number'):
-        super(Number, self).__init__(default=default, required=required, type=type)
+    def __init__(self, **kwargs):
+        kwargs['type'] = kwargs.get('type', 'number')
+        super(Number, self).__init__(**kwargs)
 
     def validate(self, value):
         super(Number, self).validate(value)
@@ -67,8 +81,9 @@ class Number(Type):
 
 class String(Type):
 
-    def __init__(self, default=None, required=True, type='basestring'):
-        super(String, self).__init__(default=default, required=required, type=type)
+    def __init__(self, **kwargs):
+        kwargs['type'] = kwargs.get('type', 'basestring')
+        super(String, self).__init__(**kwargs)
 
     def validate(self, value):
         super(String, self).validate(value)
@@ -76,6 +91,23 @@ class String(Type):
             return
         if not isinstance(value, basestring):
             raise ops.exceptions.ValidationError('not a string')
+
+class Boolean(Type):
+
+    def __init__(self, **kwargs):
+        kwargs['type'] = kwargs.get('type', 'boolean')
+        super(Boolean, self).__init__(**kwargs)
+
+    def validate(self, value):
+        super(Boolean, self).validate(value)
+        if value is None:
+            return
+        if not isinstance(value, bool):
+            raise ops.exceptions.ValidationError('not a boolean')
+
+    def optparse_add(self, *args, **kwargs):
+        kwargs['action'] = 'store_true'
+        super(Boolean, self).optparse_add(*args, **kwargs)
 
 class Section(object):
 
@@ -97,26 +129,50 @@ class Section(object):
                         self._objects[obj.name] = obj
         return self._objects
 
-    def __call__(self, optparse_options=None):
+    def __call__(self, configparser_options=None, env=None, optparse_options=None):
         options = {}
+        if configparser_options and not configparser_options.has_section(self._name):
+            configparser_options = None
+
         for name, option in self.objects.items():
-            value = option.optparse_value(optparse_options)
-            if value is None:
-                value = option.env_value(prefix='_'.join([self._options.name, self._name]) if self._options.name else self.name)
+            value = None
+            if optparse_options:
+                value = option.optparse_value(optparse_options)
+            if value is None and configparser_options:
+                value = option.configparser_value(configparser_options)
+            if value is None and env:
+                value = option.env_value(prefix='_'.join([self._options.name, self._name]) if self._options.name else self._name)
             if value is None:
                 value = option.default
             option.validate(value)
             options[name] = value
+
         return ops.utils.objectify(options)
+
+    def _meta(self, name, default=None):
+        if hasattr(self, 'Meta') and hasattr(self.Meta, name):
+            return getattr(self.Meta, name)
+        return default
+
+    def _optparse_group(self, parser):
+        if self.objects:
+            group_args = [self._meta('name', self._name)]
+            if self._meta('description'):
+                group_args.append(self._meta('description'))
+            group = optparse.OptionGroup(parser, *group_args)
+            for option in self.objects.values():
+                option.optparse_add(group)
+            return group
 
 class Settings(object):
 
-    def __init__(self, name='', environment=True, optparse=True):
+    def __init__(self, name='', env=True, optparse=True, configparser=True):
         self._command_line = None
         self._sections = None
         self.name = name
-        self.environment = environment
+        self.env = env
         self.optparse = optparse
+        self.configparser = configparser
 
     @property
     def sections(self):
@@ -134,23 +190,43 @@ class Settings(object):
         if self._command_line is None:
             self._command_line = optparse.OptionParser()
             for section in self.sections.values():
-                for option in section.objects.values():
-                    option.optparse_add(self._command_line)
+                group = section._optparse_group(self._command_line)
+                if group is not None:
+                    self._command_line.add_option_group(group)
         return self._command_line
 
     def command_line_parse(self):
         return self.command_line.parse_args()
 
-    def parse(self, args=None):
+    def parse(self, args=None, config_file=None):
         sections = {}
 
+        configparser_options = None
         optparse_options = None
         optparse_args = None
 
         if self.optparse:
+            if self.configparser:
+                self.command_line.add_option(
+                    '-c',
+                    dest='config_file',
+                    help='read configuration from FILE',
+                    metavar='FILE',
+                )
             optparse_options, optparse_args = self.command_line.parse_args(args)
+            if config_file is None:
+                config_file = optparse_options.config_file
+
+        if config_file:
+            configparser_options = ConfigParser.SafeConfigParser()
+            if not configparser_options.read([config_file]):
+                raise ops.exceptions.Error('unable to read %s' % config_file)
 
         for name, section in self.sections.items():
-            sections[name] = section(optparse_options=optparse_options)
+            sections[name] = section(
+                configparser_options=configparser_options,
+                env=self.env,
+                optparse_options=optparse_options,
+            )
 
         return ops.utils.objectify(sections)
