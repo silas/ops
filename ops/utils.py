@@ -157,7 +157,7 @@ def dirs(no_class=False):
         stack = locals[DIRECTORY_STACK_NAME]
     return stack
 
-def env_get(name, default=None, type=None):
+def env_get(name, default=None, type=None, raise_exception=False):
     """Get environment variable.
 
       >>> env_get('PATH')
@@ -169,7 +169,7 @@ def env_get(name, default=None, type=None):
     """
     exists = env_has(name)
     value = _m('os').environ.get(name)
-    return normalize(value, default, type)
+    return normalize(value, default, type, raise_exception=raise_exception)
 
 def env_has(name):
     """Check if environment variable exists.
@@ -559,7 +559,7 @@ class mode(object):
         self._set_bits('_other', value)
 _ops_mode = mode
 
-def normalize(value, default=None, type=None):
+def normalize(value, default=None, type=None, raise_exception=False):
     """Convert string variables to a specified type.
 
       >>> normalize('true', type='boolean')
@@ -577,41 +577,69 @@ def normalize(value, default=None, type=None):
     if type in (basestring, 'basestring'):
         if value is not None:
             return value
-        return '' if default is None else default
+        if default is None:
+            if raise_exception:
+                raise _m('ops').exceptions.ValidationError('invalid string')
+            else:
+                return ''
     elif type in (str, 'str', 'string'):
         if value is not None:
             return value if isinstance(value, str) else str(value)
-        return '' if default is None else default
+        if default is None:
+            if raise_exception:
+                raise _m('ops').exceptions.ValidationError('invalid string')
+            else:
+                return ''
     elif type in (unicode, 'unicode'):
         if value is not None:
             return value if isinstance(value, unicode) else unicode(value)
-        return u'' if default is None else default
+        if default is None:
+            if raise_exception:
+                raise _m('ops').exceptions.ValidationError('invalid string')
+            else:
+                return u''
     elif type in (bool, 'bool', 'boolean'):
         if value is not None:
             value = value.lower().strip()
-            if value in ('1', 'true', 'yes'):
+            if value in ('1', 'true', 'yes', 'on'):
                 return True
-            elif default is None:
+            elif value in ('0', 'false', 'no', 'off'):
                 return False
-        return False if default is None else default
+        if default is None:
+            if raise_exception:
+                raise _m('ops').exceptions.ValidationError('invalid boolean')
+            else:
+                return False
     elif type in (_m('numbers').Number, 'number'):
         if value is not None:
             if value.isdigit():
                 return int(value)
             elif value != '.' and NUMBER_RE.match(value):
                 return eval(value)
-        return 0 if default is None else default
+        if default is None:
+            if raise_exception:
+                raise _m('ops').exceptions.ValidationError('invalid number')
+            else:
+                return 0
     elif type in (int, 'int', 'integer'):
         try:
             return int(value)
         except Exception:
             if isinstance(value, basestring) and NUMBER_RE.match(value):
                 return int(eval(value))
-            return 0 if default is None else default
+            if default is None:
+                if raise_exception:
+                    raise _m('ops').exceptions.ValidationError('invalid number')
+                else:
+                    return 0
     elif type in (float, 'float'):
         if value is not None and NUMBER_RE.match(value):
             return float(value)
-        return 0.0 if default is None else default
+        if default is None:
+            if raise_exception:
+                raise _m('ops').exceptions.ValidationError('invalid number')
+            else:
+                return 0.0
     return default
 
 class objectify(dict):

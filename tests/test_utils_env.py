@@ -1,6 +1,7 @@
 import numbers
 import os
 import unittest
+import ops.exceptions
 import ops.utils
 
 class EnvGetTestCase(unittest.TestCase):
@@ -32,6 +33,8 @@ class EnvGetTestCase(unittest.TestCase):
         self.assertTrue(isinstance(ops.utils.env_get('ops.utils-integer', type='string'), str))
         self.assertTrue(isinstance(ops.utils.env_get('ops.utils-unicode', type='string'), str))
 
+        self.assertRaises(ops.exceptions.ValidationError, ops.utils.env_get, 'ops.utils-empty', raise_exception=True)
+
     def test_unicode(self):
         self.assertEqual(ops.utils.env_get('ops.utils-empty', type='unicode'), '')
         self.assertEqual(ops.utils.env_get('ops.utils-empty', default=u'test', type='unicode'), u'test')
@@ -47,6 +50,8 @@ class EnvGetTestCase(unittest.TestCase):
         os.environ['ops.utils-boolean-false'] = 'false'
         os.environ['ops.utils-boolean-yes'] = 'yes'
         os.environ['ops.utils-boolean-no'] = 'no'
+        os.environ['ops.utils-boolean-on'] = 'on'
+        os.environ['ops.utils-boolean-off'] = 'off'
 
         self.assertEqual(ops.utils.env_get('ops.utils-empty', type='boolean'), False)
         self.assertEqual(ops.utils.env_get('ops.utils-empty', default=True, type='boolean'), True)
@@ -57,6 +62,10 @@ class EnvGetTestCase(unittest.TestCase):
         self.assertEqual(ops.utils.env_get('ops.utils-boolean-false', type='boolean'), False)
         self.assertEqual(ops.utils.env_get('ops.utils-boolean-yes', type='boolean'), True)
         self.assertEqual(ops.utils.env_get('ops.utils-boolean-no', type='boolean'), False)
+        self.assertEqual(ops.utils.env_get('ops.utils-boolean-on', type='boolean'), True)
+        self.assertEqual(ops.utils.env_get('ops.utils-boolean-off', type='boolean'), False)
+
+        self.assertRaises(ops.exceptions.ValidationError, ops.utils.env_get, 'ops.utils-string', type='boolean', raise_exception=True)
 
     def test_number(self):
         self.assertEqual(ops.utils.env_get('ops.utils-empty', type='number'), 0)
@@ -65,6 +74,8 @@ class EnvGetTestCase(unittest.TestCase):
         self.assertTrue(isinstance(ops.utils.env_get('ops.utils-integer', type=numbers.Number), int))
         self.assertTrue(isinstance(ops.utils.env_get('ops.utils-integer', type='number'), int))
         self.assertTrue(isinstance(ops.utils.env_get('ops.utils-float', type='number'), float))
+
+        self.assertRaises(ops.exceptions.ValidationError, ops.utils.env_get, 'ops.utils-string', type='number', raise_exception=True)
 
     def test_integer(self):
         os.environ['ops.utils-integer-invalid'] = '.'
@@ -78,6 +89,8 @@ class EnvGetTestCase(unittest.TestCase):
         self.assertTrue(isinstance(ops.utils.env_get('ops.utils-integer', type='int'), int))
         self.assertTrue(isinstance(ops.utils.env_get('ops.utils-float', type='int'), int))
 
+        self.assertRaises(ops.exceptions.ValidationError, ops.utils.env_get, 'ops.utils-string', type='integer', raise_exception=True)
+
     def test_float(self):
         os.environ['ops.utils-float-invalid'] = '.'
 
@@ -90,6 +103,8 @@ class EnvGetTestCase(unittest.TestCase):
         self.assertTrue(isinstance(ops.utils.env_get('ops.utils-integer', type=float), float))
         self.assertTrue(isinstance(ops.utils.env_get('ops.utils-integer', type='float'), float))
         self.assertTrue(isinstance(ops.utils.env_get('ops.utils-integer', type='float'), float))
+
+        self.assertRaises(ops.exceptions.ValidationError, ops.utils.env_get, 'ops.utils-string', type='float', raise_exception=True)
 
 class EnvSetTestCase(unittest.TestCase):
 
