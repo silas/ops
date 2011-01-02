@@ -29,8 +29,13 @@ class SettingsTestCase(unittest.TestCase):
         for name, value in self._env.items():
             os.environ[name] = value
 
-    def parse(self, args=None):
-        return Settings(name=self.name).parse(args)
+    def setup_configparser(self):
+        path = os.path.dirname(os.path.realpath(__file__))
+        path = os.path.join(path, 'assets', 'test.cfg')
+        return self.parse(config_file=path)
+
+    def parse(self, *args, **kwargs):
+        return Settings(name=self.name).parse(*args, **kwargs)
 
     @property
     def options(self):
@@ -43,6 +48,11 @@ class SettingsTestCase(unittest.TestCase):
 
     def test_boolean_optparse(self):
         o = self.parse(['--section-boolean-false', '--section-boolean-true'])
+        self.assertEqual(o.section.boolean_false, True)
+        self.assertEqual(o.section.boolean_true, False)
+
+    def test_boolean_configparser(self):
+        o = self.setup_configparser()
         self.assertEqual(o.section.boolean_false, True)
         self.assertEqual(o.section.boolean_true, False)
 
@@ -60,6 +70,10 @@ class SettingsTestCase(unittest.TestCase):
         o = self.parse(['--section-float', '+11.5'])
         self.assertEqual(o.section.float, 11.5)
 
+    def test_float_configparser(self):
+        o = self.setup_configparser()
+        self.assertEqual(o.section.float, 12.5)
+
     def test_float_env(self):
         self.setup_env()
         o = self.options
@@ -72,6 +86,10 @@ class SettingsTestCase(unittest.TestCase):
     def test_integer_optparse(self):
         o = self.parse(['--section-integer', '+11.5'])
         self.assertEqual(o.section.integer, 11)
+
+    def test_integer_configparser(self):
+        o = self.setup_configparser()
+        self.assertEqual(o.section.integer, -12)
 
     def test_integer_env(self):
         self.setup_env()
@@ -88,6 +106,11 @@ class SettingsTestCase(unittest.TestCase):
         self.assertEqual(o.section.float, -11.5)
         self.assertEqual(o.section.integer, 11)
 
+    def test_number_configparser(self):
+        o = self.setup_configparser()
+        self.assertEqual(o.section.integer, -12)
+        self.assertEqual(o.section.float, 12.5)
+
     def test_number_env(self):
         self.setup_env()
         o = self.options
@@ -101,6 +124,10 @@ class SettingsTestCase(unittest.TestCase):
     def test_string_optparse(self):
         o = self.parse(['--section-string', 'test'])
         self.assertEqual(o.section.string, 'test')
+
+    def test_string_configparser(self):
+        o = self.setup_configparser()
+        self.assertEqual(o.section.string, 'config.string')
 
     def test_string_env(self):
         self.setup_env()
