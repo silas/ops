@@ -1,3 +1,8 @@
+# Copyright (c) 2011, OpsDojo Inc.
+# All rights reserved.
+#
+# This file is subject to the MIT License (see the LICENSE file).
+
 import ConfigParser
 import optparse
 import numbers

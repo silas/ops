@@ -1,4 +1,4 @@
-# Copyright (c) 2010, OpsDojo Inc.
+# Copyright (c) 2010-2011, OpsDojo Inc.
 # All rights reserved.
 #
 # This file is subject to the MIT License (see the LICENSE file).
