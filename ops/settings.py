@@ -88,24 +88,40 @@ class Boolean(Type):
         kwargs['action'] = 'store_false' if self.default else 'store_true'
         super(Boolean, self).optparse_add(*args, **kwargs)
 
-class Float(Type):
+class NumberMixin(object):
+
+    def init(self, kwargs):
+        self.min_value = kwargs.pop('min_value', None)
+        self.max_value = kwargs.pop('max_value', None)
+        return kwargs
+
+    def validate(self, value):
+        if self.min_value is not None and value < self.min_value:
+            raise ops.exceptions.ValidationError('less than %s' % self.min_value)
+        if self.max_value is not None and value > self.max_value:
+            raise ops.exceptions.ValidationError('more than %s' % self.max_value)
+
+class Float(Type, NumberMixin):
 
     def __init__(self, **kwargs):
         kwargs['type'] = kwargs.get('type', 'float')
-        super(Float, self).__init__(**kwargs)
+        kwargs = NumberMixin.init(self, kwargs)
+        Type.__init__(self, **kwargs)
 
     def validate(self, value):
         super(Float, self).validate(value)
         if value is None:
             return
-        if not isinstance(value, int):
+        if not isinstance(value, float):
             raise ops.exceptions.ValidationError('not a float')
+        NumberMixin.validate(self, value)
 
-class Integer(Type):
+class Integer(Type, NumberMixin):
 
     def __init__(self, **kwargs):
         kwargs['type'] = kwargs.get('type', 'integer')
-        super(Integer, self).__init__(**kwargs)
+        kwargs = NumberMixin.init(self, kwargs)
+        Type.__init__(self, **kwargs)
 
     def validate(self, value):
         super(Integer, self).validate(value)
@@ -113,12 +129,14 @@ class Integer(Type):
             return
         if not isinstance(value, int):
             raise ops.exceptions.ValidationError('not an integer')
+        NumberMixin.validate(self, value)
 
-class Number(Type):
+class Number(Type, NumberMixin):
 
     def __init__(self, **kwargs):
         kwargs['type'] = kwargs.get('type', 'number')
-        super(Number, self).__init__(**kwargs)
+        kwargs = NumberMixin.init(self, kwargs)
+        Type.__init__(self, **kwargs)
 
     def validate(self, value):
         super(Number, self).validate(value)
@@ -126,11 +144,14 @@ class Number(Type):
             return
         if not isinstance(value, numbers.Number):
             raise ops.exceptions.ValidationError('not a number')
+        NumberMixin.validate(self, value)
 
 class String(Type):
 
     def __init__(self, **kwargs):
         kwargs['type'] = kwargs.get('type', 'basestring')
+        self.min_length = kwargs.pop('min_length', None)
+        self.max_length = kwargs.pop('max_length', None)
         super(String, self).__init__(**kwargs)
 
     def validate(self, value):
@@ -139,6 +160,10 @@ class String(Type):
             return
         if not isinstance(value, basestring):
             raise ops.exceptions.ValidationError('not a string')
+        if self.min_length is not None and len(value) < self.min_length:
+            raise ops.exceptions.ValidationError('less than %s characters long' % self.min_length)
+        if self.max_length is not None and len(value) > self.max_length:
+            raise ops.exceptions.ValidationError('more than %s characters long' % self.max_length)
 
 class Section(object):
 
@@ -175,7 +200,10 @@ class Section(object):
                 value = option.env_value(prefix='_'.join([self._options.name, self._name]) if self._options.name else self._name)
             if value is None:
                 value = option.default
-            option.validate(value)
+            try:
+                option.validate(value)
+            except ops.exceptions.ValidationError, error:
+                raise ops.exceptions.ValidationError('%s in %s is %s' % (name, self._name, error))
             options[name] = value
 
         return ops.utils.objectify(options)
