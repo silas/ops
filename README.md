@@ -1,7 +1,8 @@
 ops
 ===
 
-ops is a collection Python modules for data center automation.
+ops is a collection of Python libraries and tools that makes building and
+running system applications a little easier.
 
 ### Requirements
 
