@@ -10,6 +10,7 @@ import ops.exceptions
 import ops.utils
 
 class Type(object):
+    """An abstract configuration option, override for custom types."""
 
     def __init__(self, default=None, required=True, type=None, help=None, optparse_opts=None, optparse_metavar=None):
         self.default = default
@@ -19,7 +20,12 @@ class Type(object):
         self.optparse_opts = optparse_opts
         self.optparse_metavar = optparse_metavar
 
-    def env_value(self, prefix='', suffix='', type=None):
+    def env_value(self, prefix='', suffix=''):
+        """Retrieved and normalize the value of an environment variable.
+
+        The name of the variable retrieved is uppercase
+        ``prefix + self.name + suffix``.
+        """
         name = [self.name]
         if prefix:
             name.insert(0, prefix)
@@ -34,6 +40,12 @@ class Type(object):
             return ops.utils.env_get(name)
 
     def configparser_value(self, parser):
+        """Retrieve and normalize the value of option ``self.name`` in section
+        ``self.section._name`` from an ini file.
+
+            [section]
+            option = value
+        """
         if parser.has_option(self.section._name, self.name):
             value = parser.get(self.section._name, self.name)
             if value is None:
@@ -48,6 +60,10 @@ class Type(object):
         return '%s_%s' % (self.section._name, self.name)
 
     def optparse_add(self, parser, action='store'):
+        """Add an option to an optparse parser in the format
+        ``--section-option=value`` in which all underscores are replaced with
+        dashes.
+        """
         if not self.optparse_opts:
             name = '--%s' % '-'.join([self.section._name, self.name]) if self.section._name else self.name
             self.optparse_opts = [name.replace('_', '-')]
@@ -59,6 +75,7 @@ class Type(object):
         parser.add_option(*self.optparse_opts, **kwargs)
 
     def optparse_value(self, options):
+        """Retrieve and normalize an option from the results of optparse."""
         value = getattr(options, self.optparse_dest)
         if value is None:
             return value
@@ -68,10 +85,15 @@ class Type(object):
             return value
 
     def validate(self, value):
+        """Validate the value of type.
+
+        You can extend this to add additional validators.
+        """
         if self.required and value is None:
             raise ops.exceptions.ValidationError('required')
 
 class Boolean(Type):
+    """A boolean option."""
 
     def __init__(self, **kwargs):
         kwargs['type'] = kwargs.get('type', 'boolean')
@@ -102,6 +124,7 @@ class NumberMixin(object):
             raise ops.exceptions.ValidationError('more than %s' % self.max_value)
 
 class Float(Type, NumberMixin):
+    """A float option."""
 
     def __init__(self, **kwargs):
         kwargs['type'] = kwargs.get('type', 'float')
@@ -117,6 +140,7 @@ class Float(Type, NumberMixin):
         NumberMixin.validate(self, value)
 
 class Integer(Type, NumberMixin):
+    """An integer option."""
 
     def __init__(self, **kwargs):
         kwargs['type'] = kwargs.get('type', 'integer')
@@ -132,6 +156,10 @@ class Integer(Type, NumberMixin):
         NumberMixin.validate(self, value)
 
 class Number(Type, NumberMixin):
+    """A number option.
+
+    This should be able to parse and validate any Python number.
+    """
 
     def __init__(self, **kwargs):
         kwargs['type'] = kwargs.get('type', 'number')
@@ -147,6 +175,7 @@ class Number(Type, NumberMixin):
         NumberMixin.validate(self, value)
 
 class String(Type):
+    """A string option."""
 
     def __init__(self, **kwargs):
         kwargs['type'] = kwargs.get('type', 'basestring')
@@ -166,6 +195,7 @@ class String(Type):
             raise ops.exceptions.ValidationError('more than %s characters long' % self.max_length)
 
 class Section(object):
+    """A collection of similar options."""
 
     def __init__(self, options, name):
         self._options = options
@@ -224,6 +254,8 @@ class Section(object):
             return group
 
 class Settings(object):
+    """This class defines your application settings and should be filled with
+    various sections."""
 
     def __init__(self, name='', env=True, optparse=True, configparser=True):
         self._command_line = None
@@ -255,6 +287,7 @@ class Settings(object):
         return self._command_line
 
     def parse(self, args=None, config_file=None):
+        """Parse and return settings."""
         sections = {}
 
         configparser_options = None
