@@ -6,9 +6,7 @@
 _m = __import__
 
 logging = _m('logging').getLogger('ops')
-
-DIRECTORY_STACK_NAME = '__ops_directory_stack'
-_TYPE = type
+type_ = type
 
 def _chmod(path, value=None):
     if isinstance(value, int):
@@ -546,7 +544,7 @@ def normalize(value, default=None, type=None, raise_exception=False):
     if type is None and default is None:
         type = basestring
     elif type is None:
-        type = _TYPE(default)
+        type = type_(default)
     if type in (basestring, 'basestring'):
         if value is not None:
             return value
