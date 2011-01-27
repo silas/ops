@@ -6,7 +6,8 @@
 ops
 ===
 
-ops is a collection Python modules for data center automation.
+ops is a collection of Python libraries and tools that makes building and
+running system applications a little easier.
 
 API
 ---
@@ -27,8 +28,6 @@ API
 .. autofunction:: normalize
 .. autofunction:: objectify
 .. autofunction:: path
-.. autofunction:: popd
-.. autofunction:: pushd
 .. autofunction:: rm
 .. autofunction:: run
 .. autofunction:: stat

@@ -130,33 +130,6 @@ def cp(src_path, dst_path, follow_links=False, recursive=True):
         logging.error('cp: execute failed: %s => %s (%s)' % (src_path, dst_path, error))
     return successful
 
-def dirs(no_class=False):
-    """Returns a reference to the directory stack used by pushd and popd.
-
-      >>> os.chdir('/tmp')
-      >>> if not pushd('/'):
-      ...     print 'Unable to pushd'
-      >>> dirs()
-      ['/tmp']
-      >>> if not popd():
-      ...     print 'Unable to popd'
-      >>> dirs()
-      []
-    """
-    # Get locals from caller
-    curframe = _m('inspect').currentframe()
-    calframe = _m('inspect').getouterframes(curframe, 2)
-    locals = calframe[1][0].f_locals
-    # Use self if caller is a method and no_class is false
-    if not no_class and 'self' in locals:
-        locals = locals['self'].__dict__
-    # Get or create directory stack variable
-    if DIRECTORY_STACK_NAME not in locals:
-        stack = locals[DIRECTORY_STACK_NAME] = []
-    else:
-        stack = locals[DIRECTORY_STACK_NAME]
-    return stack
-
 def env_get(name, default=None, type=None, raise_exception=False):
     """Get environment variable.
 
@@ -740,91 +713,6 @@ class path(unicode):
         if isinstance(stat, _ops_stat):
             obj._stat = stat
         return obj
-
-def popd(no_class=False):
-    """Remove last path from the stack and make it the current working
-    directory. By default popd will look for the stack variable in self if
-    in a method and the local scope if in a function. The class behaviour can
-    be disabled by passing no_class=True.
-
-      >>> os.getcwd()
-      '/'
-      >>> if not pushd('/tmp'):
-      ...     print 'Unable to pushd'
-      >>> os.getcwd()
-      '/tmp'
-      >>> if not popd():
-      ...     print 'Unable to popd'
-      >>> os.getcwd()
-      /
-    """
-    # Get locals from caller
-    curframe = _m('inspect').currentframe()
-    calframe = _m('inspect').getouterframes(curframe, 2)
-    locals = calframe[1][0].f_locals
-    # Use self if caller is a method and no_class is false
-    if not no_class and 'self' in locals:
-        locals = locals['self'].__dict__
-    # Get or create directory stack variable
-    path = ''
-    successful = False
-    if DIRECTORY_STACK_NAME in locals:
-        stack = locals[DIRECTORY_STACK_NAME]
-        # Do popd
-        if len(stack) > 0:
-            path = stack.pop()
-            try:
-                _m('os').chdir(path)
-                successful = True
-            except OSError:
-                logging.error('popd: unable to chdir: %s' % path)
-        else:
-            logging.error('popd: stack empty')
-    else:
-        logging.error('popd: stack does not exist')
-    # Return results with path
-    return objectify({
-        '_bool': successful,
-        'path': path,
-    })
-
-def pushd(path, no_class=False):
-    """Add the current working directory to the stack and switch to the path
-    specified. By default pushd will attach the the stack variable to self if
-    in a method and the local scope if in a function. The class behaviour can
-    be disabled by passing no_class=True.
-
-    See ``pushd`` for examples.
-    """
-    # Get locals from caller
-    curframe = _m('inspect').currentframe()
-    calframe = _m('inspect').getouterframes(curframe, 2)
-    locals = calframe[1][0].f_locals
-    # Use self if caller is a method and no_class is false
-    if not no_class and 'self' in locals:
-        locals = locals['self'].__dict__
-    # Get or create directory stack variable
-    if DIRECTORY_STACK_NAME not in locals:
-        stack = locals[DIRECTORY_STACK_NAME] = []
-    else:
-        stack = locals[DIRECTORY_STACK_NAME]
-    # Do pushd
-    successful = False
-    try:
-        stack.append(_m('os').getcwd())
-        _m('os').chdir(path)
-        successful = True
-    except OSError:
-        logging.error('pushd: unable to chdir: %s' % path)
-        stack.pop()
-    # Delete variable if empty
-    if not locals[DIRECTORY_STACK_NAME]:
-        del locals[DIRECTORY_STACK_NAME]
-    # Return results with path
-    return objectify({
-        '_bool': successful,
-        'path': path,
-    })
 
 def rm(path, recursive=False):
     """Delete a specified file or directory. This function does not recursively
