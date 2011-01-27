@@ -3,4 +3,4 @@
 #
 # This file is subject to the MIT License (see the LICENSE file).
 
-__version__ = '0.1.0'
+__version__ = '0.2.0'

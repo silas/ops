@@ -1,7 +1,7 @@
 ops
 ===
 
-ops is a collection of Python libraries and tools that makes building and
+ops is a collection of Python modules and tools that makes building and
 running system applications a little easier.
 
 ### Requirements

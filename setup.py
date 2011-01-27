@@ -2,7 +2,8 @@ from distutils.core import setup
 from ops import __version__ as version
 
 long_description = """
-ops is a collection Python modules for data center automation.
+ops is a collection of Python modules and tools that makes building and
+running system applications a little easier.
 
 You can find the latest docs at <http://opsdojo.github.com/ops/>`_.
 """
@@ -10,7 +11,7 @@ You can find the latest docs at <http://opsdojo.github.com/ops/>`_.
 setup(
     name='ops',
     version=version,
-    description='Tools for data center automation',
+    description='Modules and tools for system applications',
     long_description=long_description.strip(),
     author='Silas Sewell',
     author_email='silas@opsdojo.com',
