@@ -3,4 +3,5 @@
 #
 # This file is subject to the MIT License (see the LICENSE file).
 
+__copyright__ = '2010-2011, OpsDojo Inc'
 __version__ = '0.2.0'
