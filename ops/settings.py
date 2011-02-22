@@ -321,4 +321,6 @@ class Settings(object):
                 optparse_options=optparse_options,
             )
 
+        sections['args'] = optparse_args
+
         return ops.utils.objectify(sections)

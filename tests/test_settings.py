@@ -57,6 +57,14 @@ class SettingsTestCase(unittest.TestCase):
     def parse(self, *args, **kwargs):
         return Settings(name=self.name).parse(*args, **kwargs)
 
+    def test_args(self):
+        o = self.parse()
+        self.assertFalse(o.args)
+        o = self.parse(['one', '--section-boolean-true', 'two'])
+        self.assertEqual(len(o.args), 2)
+        self.assertEqual(o.args[0], 'one')
+        self.assertEqual(o.args[1], 'two')
+
     def test_boolean_default(self):
         o = self.parse()
         self.assertEqual(o.section.boolean_false, False)
