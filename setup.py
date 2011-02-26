@@ -5,7 +5,7 @@ long_description = """
 ops is a collection of Python modules and tools that makes building and
 running system applications a little easier.
 
-You can find the latest docs at <http://opsdojo.github.com/ops/>`_.
+You can find the latest docs at http://opsdojo.github.com/ops/.
 """
 
 setup(
