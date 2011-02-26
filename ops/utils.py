@@ -157,11 +157,11 @@ def env_set(name, value, add=False, append=False, prepend=False, sep=':', unique
       True
       >>> env_set('PATH', '/sbin', append=True)
       True
-      >>> env_set('PATH')
+      >>> env_get('PATH')
       '/bin:/sbin'
       >>> env_set('PATH', '/sbin', prepend=True, sep=':', unique=True)
       False
-      >>> env_set('PATH')
+      >>> env_get('PATH')
       '/bin:/sbin'
     """
     if add and env_has(name):
