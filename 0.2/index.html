@@ -7,13 +7,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>ops &mdash; ops v0.2.0 documentation</title>
+    <title>ops &mdash; ops v0.2.1 documentation</title>
     <link rel="stylesheet" href="static/default.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.2.0',
+        VERSION:     '0.2.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +22,7 @@
     <script type="text/javascript" src="static/jquery.js"></script>
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
-    <link rel="top" title="ops v0.2.0 documentation" href="#" /> 
+    <link rel="top" title="ops v0.2.1 documentation" href="#" /> 
   </head>
   <body>
     <div class="related">
@@ -31,7 +31,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li><a href="#">ops v0.2.0 documentation</a> &raquo;</li> 
+        <li><a href="#">ops v0.2.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -46,20 +46,20 @@
 running system applications a little easier.</p>
 <div class="section" id="settings">
 <h2>Settings<a class="headerlink" href="#settings" title="Permalink to this headline">¶</a></h2>
-<p>Lets say we create a <tt class="docutils literal"><span class="pre">hello.py</span></tt> file with the following code:</p>
+<p>Lets say we create <tt class="docutils literal"><span class="pre">hello.py</span></tt> with the following code:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">ops</span> <span class="kn">import</span> <span class="n">exceptions</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">utils</span>
 
 <span class="k">class</span> <span class="nc">Settings</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">Settings</span><span class="p">):</span>
 
     <span class="k">class</span> <span class="nc">General</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">Section</span><span class="p">):</span>
-        <span class="n">debug</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">Boolean</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">debug</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">Boolean</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;enable debugging&#39;</span><span class="p">)</span>
 
     <span class="k">class</span> <span class="nc">Http</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">Section</span><span class="p">):</span>
-        <span class="n">cookie_secret</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="n">min_length</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+        <span class="n">cookie_secret</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="n">min_length</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;key to encrypt HTTP cookies&#39;</span><span class="p">)</span>
 
     <span class="k">class</span> <span class="nc">Database</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">Section</span><span class="p">):</span>
-        <span class="n">host</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s">&#39;localhost&#39;</span><span class="p">)</span>
-        <span class="n">port</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">Integer</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">host</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s">&#39;localhost&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;MySQL database host&#39;</span><span class="p">)</span>
+        <span class="n">port</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">Integer</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;MySQL database port&#39;</span><span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="n">settings</span> <span class="o">=</span> <span class="n">Settings</span><span class="p">(</span><span class="s">&#39;TestServer&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">parse</span><span class="p">()</span>
@@ -72,7 +72,7 @@ running system applications a little easier.</p>
 <span class="k">print</span> <span class="s">&#39;Database port: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">settings</span><span class="o">.</span><span class="n">database</span><span class="o">.</span><span class="n">port</span>
 </pre></div>
 </div>
-<p>If we run <tt class="docutils literal"><span class="pre">hello.py</span> <span class="pre">--help</span></tt> we&#8217;ll get the following:</p>
+<p>If we run <tt class="docutils literal"><span class="pre">python</span> <span class="pre">hello.py</span> <span class="pre">--help</span></tt> we&#8217;ll get the following:</p>
 <div class="highlight-python"><pre>Usage: hello.py [options]
 
 Options:
@@ -87,23 +87,23 @@ Options:
 
   http:
     --http-cookie-secret=HTTP_COOKIE_SECRET
-                        Key to encrypt HTTP cookies
+                        key to encrypt HTTP cookies
 
   general:
-    --general-debug</pre>
+    --general-debug     enable debugging</pre>
 </div>
-<p>If we create <tt class="docutils literal"><span class="pre">hello.cfg</span></tt> as:</p>
+<p>If we then create <tt class="docutils literal"><span class="pre">hello.cfg</span></tt> with the following content:</p>
 <div class="highlight-python"><pre>[http]
 cookie_secret = not.a.good.pass</pre>
 </div>
-<p>And run <tt class="docutils literal"><span class="pre">hello.py</span> <span class="pre">-c</span> <span class="pre">hello.cfg</span></tt> we should get:</p>
+<p>And run <tt class="docutils literal"><span class="pre">python</span> <span class="pre">hello.py</span> <span class="pre">-c</span> <span class="pre">hello.cfg</span></tt> we should see:</p>
 <div class="highlight-python"><pre>Debug: False
 Cookie secret: not.a.good.pass
 Database host: localhost
 Database port: 3306</pre>
 </div>
 <p>If we run <tt class="docutils literal"><span class="pre">export</span> <span class="pre">TESTSERVER_GENERAL_DEBUG=true</span></tt> then
-<tt class="docutils literal"><span class="pre">hello.py</span> <span class="pre">-c</span> <span class="pre">hello.cfg</span> <span class="pre">--database-host=mysql</span></tt> we should get:</p>
+<tt class="docutils literal"><span class="pre">python</span> <span class="pre">hello.py</span> <span class="pre">-c</span> <span class="pre">hello.cfg</span> <span class="pre">--database-host=mysql</span></tt> we should get:</p>
 <div class="highlight-python"><pre>Debug: True
 Cookie secret: not.a.good.pass
 Database host: mysql
@@ -228,11 +228,11 @@ various sections.</p>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">env_set</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">,</span> <span class="s">&#39;/sbin&#39;</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">env_set</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env_get</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">)</span>
 <span class="go">&#39;/bin:/sbin&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">env_set</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">,</span> <span class="s">&#39;/sbin&#39;</span><span class="p">,</span> <span class="n">prepend</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;:&#39;</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="go">False</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">env_set</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env_get</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">)</span>
 <span class="go">&#39;/bin:/sbin&#39;</span>
 </pre></div>
 </div>
@@ -482,12 +482,12 @@ cleaned up.</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li><a href="#">ops v0.2.0 documentation</a> &raquo;</li> 
+        <li><a href="#">ops v0.2.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2010-2011, OpsDojo Inc.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.6.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>
 </html>
