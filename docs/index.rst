@@ -12,21 +12,21 @@ running system applications a little easier.
 Settings
 --------
 
-Lets say we create a ``hello.py`` file with the following code::
+Lets say we create ``hello.py`` with the following code::
 
    from ops import exceptions, settings, utils
 
    class Settings(settings.Settings):
 
        class General(settings.Section):
-           debug = settings.Boolean(default=False)
+           debug = settings.Boolean(default=False, help='enable debugging')
 
        class Http(settings.Section):
-           cookie_secret = settings.String(min_length=8, max_length=32)
+           cookie_secret = settings.String(min_length=8, max_length=32, help='key to encrypt HTTP cookies')
 
        class Database(settings.Section):
-           host = settings.String(default='localhost')
-           port = settings.Integer(default=3306, min_value=0)
+           host = settings.String(default='localhost', help='MySQL database host')
+           port = settings.Integer(default=3306, min_value=0, help='MySQL database port')
 
    try:
        settings = Settings('TestServer').parse()
@@ -38,7 +38,7 @@ Lets say we create a ``hello.py`` file with the following code::
    print 'Database host: %s' % settings.database.host
    print 'Database port: %s' % settings.database.port
 
-If we run ``hello.py --help`` we'll get the following::
+If we run ``python hello.py --help`` we'll get the following::
 
    Usage: hello.py [options]
 
@@ -54,17 +54,17 @@ If we run ``hello.py --help`` we'll get the following::
 
      http:
        --http-cookie-secret=HTTP_COOKIE_SECRET
-                           Key to encrypt HTTP cookies
+                           key to encrypt HTTP cookies
 
      general:
-       --general-debug
+       --general-debug     enable debugging
 
-If we create ``hello.cfg`` as::
+If we then create ``hello.cfg`` with the following content::
 
    [http]
    cookie_secret = not.a.good.pass
 
-And run ``hello.py -c hello.cfg`` we should get::
+And run ``python hello.py -c hello.cfg`` we should see::
 
    Debug: False
    Cookie secret: not.a.good.pass
@@ -72,7 +72,7 @@ And run ``hello.py -c hello.cfg`` we should get::
    Database port: 3306
 
 If we run ``export TESTSERVER_GENERAL_DEBUG=true`` then
-``hello.py -c hello.cfg --database-host=mysql`` we should get::
+``python hello.py -c hello.cfg --database-host=mysql`` we should get::
 
    Debug: True
    Cookie secret: not.a.good.pass
