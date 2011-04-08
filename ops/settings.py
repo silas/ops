@@ -4,8 +4,9 @@
 # This file is subject to the MIT License (see the LICENSE file).
 
 import ConfigParser
-import optparse
+import collections
 import numbers
+import optparse
 import ops.exceptions
 import ops.utils
 
@@ -13,7 +14,7 @@ class Type(object):
     """An abstract configuration option, override for custom types."""
 
     def __init__(self, default=None, required=True, type=None, help=None, optparse_opts=None, optparse_metavar=None):
-        self.default = default
+        self.default = default() if isinstance(default, collections.Callable) else default
         self.required = required
         self.type = type
         self.help = help

@@ -14,6 +14,12 @@ class Settings(ops.settings.Settings):
         number_float = ops.settings.Number(default=2.0, min_value=-20, max_value=20)
         number_integer = ops.settings.Number(default=3, min_value=-20, max_value=20)
 
+class TypeTestCase(unittest.TestCase):
+
+    def test_callable_default(self):
+        t = ops.settings.Type(default=lambda: 'ok')
+        self.assertEqual(t.default, 'ok')
+
 class SettingsTestCase(unittest.TestCase):
 
     _env = {
