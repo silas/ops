@@ -177,7 +177,7 @@ htmlhelp_basename = 'opsdoc'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'ops.tex', u'ops Documentation',
-   u'OpsDojo Inc', 'manual'),
+   u'Silas Sewell', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
