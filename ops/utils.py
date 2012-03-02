@@ -8,7 +8,6 @@ import fnmatch
 import grp
 import logging
 import numbers
-import ops
 import os
 import pipes
 import pwd
@@ -19,6 +18,7 @@ import string
 import subprocess
 import sys
 import tempfile
+from ops import exceptions
 
 log = logging.getLogger('ops')
 type_ = type
@@ -565,7 +565,7 @@ def normalize(value, default=None, type=None, raise_exception=False):
             return value
         if default is None:
             if raise_exception:
-                raise ops.exceptions.ValidationError('invalid string')
+                raise exceptions.ValidationError('invalid string')
             else:
                 return ''
     elif type in (str, 'str', 'string'):
@@ -573,7 +573,7 @@ def normalize(value, default=None, type=None, raise_exception=False):
             return value if isinstance(value, str) else str(value)
         if default is None:
             if raise_exception:
-                raise ops.exceptions.ValidationError('invalid string')
+                raise exceptions.ValidationError('invalid string')
             else:
                 return ''
     elif type in (unicode, 'unicode'):
@@ -581,7 +581,7 @@ def normalize(value, default=None, type=None, raise_exception=False):
             return value if isinstance(value, unicode) else unicode(value)
         if default is None:
             if raise_exception:
-                raise ops.exceptions.ValidationError('invalid string')
+                raise exceptions.ValidationError('invalid string')
             else:
                 return u''
     elif type in (bool, 'bool', 'boolean'):
@@ -593,7 +593,7 @@ def normalize(value, default=None, type=None, raise_exception=False):
                 return False
         if default is None:
             if raise_exception:
-                raise ops.exceptions.ValidationError('invalid boolean')
+                raise exceptions.ValidationError('invalid boolean')
             else:
                 return False
     elif type in (numbers.Number, 'number'):
@@ -604,7 +604,7 @@ def normalize(value, default=None, type=None, raise_exception=False):
                 return eval(value)
         if default is None:
             if raise_exception:
-                raise ops.exceptions.ValidationError('invalid number')
+                raise exceptions.ValidationError('invalid number')
             else:
                 return 0
     elif type in (int, 'int', 'integer'):
@@ -615,7 +615,7 @@ def normalize(value, default=None, type=None, raise_exception=False):
                 return int(eval(value))
             if default is None:
                 if raise_exception:
-                    raise ops.exceptions.ValidationError('invalid number')
+                    raise exceptions.ValidationError('invalid number')
                 else:
                     return 0
     elif type in (float, 'float'):
@@ -623,7 +623,7 @@ def normalize(value, default=None, type=None, raise_exception=False):
             return float(value)
         if default is None:
             if raise_exception:
-                raise ops.exceptions.ValidationError('invalid number')
+                raise exceptions.ValidationError('invalid number')
             else:
                 return 0.0
     return default
