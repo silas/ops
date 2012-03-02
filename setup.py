@@ -14,9 +14,9 @@ setup(
     description='Modules and tools for system applications',
     long_description=long_description.strip(),
     author='Silas Sewell',
-    author_email='silas@opsdojo.com',
+    author_email='silas@sewell.org',
     license='MIT',
-    url='https://github.com/opsdojo/ops',
+    url='https://github.com/silas/ops',
     packages=[
         'ops',
     ],
