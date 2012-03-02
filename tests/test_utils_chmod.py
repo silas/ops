@@ -51,7 +51,6 @@ class ChmodTestCase(unittest.TestCase):
         ops.utils.chmod(self.path, 0000)
         self.assertEqual(os.stat(self.path).st_mode, 32768)
 
-
     def test_recursive(self):
         self.setup_directory()
 

@@ -24,8 +24,6 @@ log = logging.getLogger('ops')
 type_ = type
 
 def _chmod(path, value=None):
-    if isinstance(value, int):
-        value = mode(value)
     try:
         os.chmod(path, value.numeric)
         return True
