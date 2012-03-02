@@ -20,7 +20,7 @@ import subprocess
 import sys
 import tempfile
 
-logging = logging.getLogger('ops')
+log = logging.getLogger('ops')
 type_ = type
 
 def _chmod(path, value=None):
@@ -30,9 +30,9 @@ def _chmod(path, value=None):
         os.chmod(path, value.numeric)
         return True
     except OSError, error:
-        logging.error('chmod: %s' % error)
+        log.error('chmod: %s' % error)
     except TypeError:
-        logging.error('invalid mode value: %s' % value)
+        log.error('invalid mode value: %s' % value)
     return False
 
 def chmod(path, mode=None, user=None, group=None, other=None, recursive=False):
@@ -65,7 +65,7 @@ def _chown(path, uid=-1, gid=-1):
         os.chown(path, uid, gid)
         return True
     except OSError, error:
-        logging.error('chown: execute failed: %s (%s)' % (path, error))
+        log.error('chown: execute failed: %s (%s)' % (path, error))
     return False
 
 def chown(path, user=None, group=None, recursive=False):
@@ -87,7 +87,7 @@ def chown(path, user=None, group=None, recursive=False):
             if user:
                 uid = user.id
             else:
-                logging.error('chown: unable to get uid')
+                log.error('chown: unable to get uid')
                 successful = False
         else:
             successful = False
@@ -100,7 +100,7 @@ def chown(path, user=None, group=None, recursive=False):
             if group:
                 gid = group.id
             else:
-                logging.error('chown: unable to get gid')
+                log.error('chown: unable to get gid')
                 successful = False
         else:
             successful = False
@@ -138,9 +138,9 @@ def cp(src_path, dst_path, follow_links=False, recursive=True):
             shutil.copy2(src_path, dst_path)
             successful = True
         else:
-            logging.error('cp: source not found: %s' % src_path)
+            log.error('cp: source not found: %s' % src_path)
     except OSError, error:
-        logging.error('cp: execute failed: %s => %s (%s)' % (src_path, dst_path, error))
+        log.error('cp: execute failed: %s => %s (%s)' % (src_path, dst_path, error))
     return successful
 
 def env_get(name, default=None, type=None, raise_exception=False):
@@ -353,7 +353,7 @@ class find(object):
             elif n in ('atime', 'ctime', 'mtime'):
                 self.rules.append(_FindTimeRule(n, op, value, exclude=exclude))
             else:
-                logging.error('unknown find rule %s=%s' % (name, value))
+                log.error('unknown find rule %s=%s' % (name, value))
 
     def _match(self, path):
         for rule in self.rules:
@@ -450,7 +450,7 @@ def mkdir(path, recursive=True):
         else:
             os.mkdir(path)
     except OSError, error:
-        logging.error('mkdir: execute failed: %s (%s)' % (path, error))
+        log.error('mkdir: execute failed: %s (%s)' % (path, error))
         return False
     return True
 
@@ -498,7 +498,7 @@ class mode(object):
         elif isinstance(value, _ModeBits):
             setattr(self, name, value)
         elif value is not None:
-            logging.warning('mode: unknown bit: %s' % value)
+            log.warning('mode: unknown bit: %s' % value)
         if not hasattr(self, name):
             setattr(self, name, _ModeBits())
 
@@ -747,7 +747,7 @@ def rm(path, recursive=False):
             else:
                 os.rmdir(path)
     except OSError, error:
-        logging.error('rm: execute failed: %s (%s)' % (path, error))
+        log.error('rm: execute failed: %s (%s)' % (path, error))
         return False
     return True
 _ops_rm = rm
@@ -788,7 +788,7 @@ def run(command, **kwargs):
             else:
                 args[name] = pipes.quote(unicode(value))
         command = string.Template(command).safe_substitute(args)
-    logging.debug('run: %s' % command)
+    log.debug('run: %s' % command)
     ref = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
