@@ -61,6 +61,7 @@ class SettingsTestCase(unittest.TestCase):
         return self.parse(config_file=path)
 
     def parse(self, *args, **kwargs):
+        args = args or [[]]
         return Settings(name=self.name).parse(*args, **kwargs)
 
     def test_args(self):
