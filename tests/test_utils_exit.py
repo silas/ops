@@ -3,7 +3,7 @@ import helper
 import StringIO
 import sys
 import unittest
-import ops.utils
+import ops
 
 class ExitTestCase(unittest.TestCase):
 
@@ -18,16 +18,16 @@ class ExitTestCase(unittest.TestCase):
         sys.stderr = self.real_stderr
 
     def test_code(self):
-        self.assertRaises(SystemExit, ops.utils.exit, code=0)
-        self.assertRaises(SystemExit, ops.utils.exit, code=1)
+        self.assertRaises(SystemExit, ops.exit, code=0)
+        self.assertRaises(SystemExit, ops.exit, code=1)
         try:
-            ops.utils.exit(code=1)
+            ops.exit(code=1)
         except SystemExit, exit:
             self.assertEqual(exit.code, 1)
 
     def test_stdout(self):
         try:
-            ops.utils.exit(text='Successfuly')
+            ops.exit(text='Successfuly')
         except SystemExit:
             pass
         result = sys.stdout.getvalue().rstrip()
@@ -35,7 +35,7 @@ class ExitTestCase(unittest.TestCase):
 
     def test_stderr(self):
         try:
-            ops.utils.exit(code=1, text='Failure')
+            ops.exit(code=1, text='Failure')
         except SystemExit:
             pass
         result = sys.stderr.getvalue().rstrip()

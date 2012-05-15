@@ -2,7 +2,7 @@ import helper
 
 import os
 import unittest
-import ops.utils
+import ops
 
 class ChmodTestCase(unittest.TestCase):
 
@@ -27,52 +27,52 @@ class ChmodTestCase(unittest.TestCase):
     def test_file(self):
         self.setup_file()
 
-        ops.utils.chmod(self.path, 0777)
+        ops.chmod(self.path, 0777)
         self.assertEqual(os.stat(self.path).st_mode, 33279)
 
-        ops.utils.chmod(self.path, 0666)
+        ops.chmod(self.path, 0666)
         self.assertEqual(os.stat(self.path).st_mode, 33206)
 
-        ops.utils.chmod(self.path, 0555)
+        ops.chmod(self.path, 0555)
         self.assertEqual(os.stat(self.path).st_mode, 33133)
 
-        ops.utils.chmod(self.path, 0444)
+        ops.chmod(self.path, 0444)
         self.assertEqual(os.stat(self.path).st_mode, 33060)
 
-        ops.utils.chmod(self.path, 0333)
+        ops.chmod(self.path, 0333)
         self.assertEqual(os.stat(self.path).st_mode, 32987)
 
-        ops.utils.chmod(self.path, 0222)
+        ops.chmod(self.path, 0222)
         self.assertEqual(os.stat(self.path).st_mode, 32914)
 
-        ops.utils.chmod(self.path, 0111)
+        ops.chmod(self.path, 0111)
         self.assertEqual(os.stat(self.path).st_mode, 32841)
 
-        ops.utils.chmod(self.path, 0000)
+        ops.chmod(self.path, 0000)
         self.assertEqual(os.stat(self.path).st_mode, 32768)
 
     def test_recursive(self):
         self.setup_directory()
 
-        ops.utils.chmod(self.dir_path, 0755)
+        ops.chmod(self.dir_path, 0755)
         self.assertEqual(os.stat(self.dir_path).st_mode, 16877)
 
-        ops.utils.chmod(self.file_path, 0644)
+        ops.chmod(self.file_path, 0644)
         self.assertEqual(os.stat(self.file_path).st_mode, 33188)
 
-        ops.utils.chmod(self.dir_path, 0777)
+        ops.chmod(self.dir_path, 0777)
         self.assertEqual(os.stat(self.dir_path).st_mode, 16895)
         self.assertEqual(os.stat(self.file_path).st_mode, 33188)
 
-        ops.utils.chmod(self.dir_path, 0777, recursive=True)
+        ops.chmod(self.dir_path, 0777, recursive=True)
         self.assertEqual(os.stat(self.dir_path).st_mode, 16895)
         self.assertEqual(os.stat(self.file_path).st_mode, 33279)
 
-        ops.utils.chmod(self.dir_path, 0555, recursive=True)
+        ops.chmod(self.dir_path, 0555, recursive=True)
         self.assertEqual(os.stat(self.dir_path).st_mode, 16749)
         self.assertEqual(os.stat(self.file_path).st_mode, 33133)
 
-        ops.utils.chmod(self.dir_path, 0777, recursive=True)
+        ops.chmod(self.dir_path, 0777, recursive=True)
 
 if __name__ == '__main__':
     unittest.main()

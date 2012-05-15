@@ -3,7 +3,7 @@ import helper
 import os
 import unittest
 import uuid
-import ops.utils
+import ops
 
 class RunTestCase(unittest.TestCase):
 
@@ -12,7 +12,7 @@ class RunTestCase(unittest.TestCase):
         self.run_path = os.path.join(self.root_path, 'assets', 'run.py')
 
     def do(self, text='', code=0):
-        r = ops.utils.run('python ${run} ${code} ${text}',
+        r = ops.run('python ${run} ${code} ${text}',
             run=self.run_path,
             code=code,
             text=text,
@@ -38,14 +38,14 @@ class RunTestCase(unittest.TestCase):
 
     def test_dict(self):
         args = {'-f': self.run_path}
-        results = ops.utils.run('test ${args}', args=args)
+        results = ops.run('test ${args}', args=args)
         self.assertTrue(results)
         self.assertEqual(results.code, 0)
         print results.command
 
     def test_list(self):
         args = ['?!*', '=', '?!*']
-        results = ops.utils.run('test ${args}', args=args)
+        results = ops.run('test ${args}', args=args)
         self.assertTrue(results)
         self.assertEqual(results.code, 0)
 

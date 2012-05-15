@@ -3,7 +3,7 @@ import helper
 import os
 import unittest
 import uuid
-import ops.utils
+import ops
 
 class CpTestCase(unittest.TestCase):
 
@@ -64,20 +64,20 @@ class CpTestCase(unittest.TestCase):
 
     def test_file_to_file(self):
         self.setup_file()
-        ops.utils.cp(self.path1, self.path2)
+        ops.cp(self.path1, self.path2)
         self.check_same_file(self.path1, self.path2)
 
     def test_file_to_directory(self):
         self.setup_file()
         dir_path = self.workspace.join('dst')
         os.makedirs(dir_path)
-        ops.utils.cp(self.path1, dir_path)
+        ops.cp(self.path1, dir_path)
         path2 = os.path.join(dir_path, self.name1)
         self.check_same_file(self.path1, path2)
 
     def test_directory(self):
         self.setup_directory()
-        ops.utils.cp(self.path1, self.path2)
+        ops.cp(self.path1, self.path2)
         self.check_same_file(self.src_file_path1, self.dst_file_path1)
         self.check_same_file(self.src_file_path2, self.dst_file_path2)
         self.check_stat(self.path1, self.path2)
@@ -85,9 +85,9 @@ class CpTestCase(unittest.TestCase):
     def test_recursive(self):
         self.setup_directory()
         path = self.workspace.join('dst')
-        ops.utils.cp(self.path1, path, recursive=False)
+        ops.cp(self.path1, path, recursive=False)
         self.assertFalse(os.path.exists(path))
-        ops.utils.cp(self.path1, path, recursive=True)
+        ops.cp(self.path1, path, recursive=True)
         self.assertTrue(os.path.isdir(path))
 
 if __name__ == '__main__':

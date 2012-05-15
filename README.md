@@ -1,8 +1,8 @@
 ops
 ===
 
-ops is a collection of Python modules and tools that makes building and
-running system applications a little easier.
+ops is a Python module that makes writing systems administration tasks in
+Python a littl easier.
 
 ### Requirements
 
@@ -10,7 +10,7 @@ running system applications a little easier.
 
 ### Example
 
-    from ops.utils import *
+    from ops import *
 
     for path in find('/tmp').filter(name='*.py', file=True).exclude(mtime__day=13):
         result = run('python ${path}', path=path)

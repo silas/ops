@@ -2,10 +2,10 @@ import logging
 import shutil
 import os
 
-if os.environ.get('OPSUTILS_TEST_LOGGING'):
-    opsutils_logger = logging.getLogger('opsutils')
-    opsutils_logger.setLevel(logging.DEBUG)
-    opsutils_logger.addHandler(logging.StreamHandler())
+if os.environ.get('OPS_TEST_LOGGING'):
+    ops_logger = logging.getLogger('ops')
+    ops_logger.setLevel(logging.DEBUG)
+    ops_logger.addHandler(logging.StreamHandler())
 
 PATH = os.path.join(os.path.realpath(os.path.dirname(__file__)), '.tmp')
 

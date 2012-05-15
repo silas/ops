@@ -1,18 +1,17 @@
 import numbers
 import os
 import unittest
-import ops.exceptions
-import ops.utils
+import ops
 
 class NormalizeTestCase(unittest.TestCase):
 
     def assertNormalizes(self, src, dst, ntype):
-        value = ops.utils.normalize(src, type=ntype)
+        value = ops.normalize(src, type=ntype)
         self.assertTrue(isinstance(value, type(dst)))
         self.assertEqual(value, dst)
 
     def assertNormalizesRaises(self, value, ntype):
-        self.assertRaises(ops.exceptions.ValidationError, ops.utils.normalize, value, type=ntype, raise_exception=True)
+        self.assertRaises(ops.ValidationError, ops.normalize, value, type=ntype, raise_exception=True)
 
     def test_string(self):
         TYPE = 'string'

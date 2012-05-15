@@ -2,12 +2,12 @@ import helper
 
 import copy
 import unittest
-import ops.utils
+import ops
 
 class ObjectifyTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.o = ops.utils.objectify()
+        self.o = ops.objectify()
 
     def test_bool_empty(self):
         self.assertFalse(self.o)
@@ -31,12 +31,12 @@ class ObjectifyTestCase(unittest.TestCase):
             raise Exception("Accessor didn't raise AttributeError.")
         except AttributeError:
             pass
-        o = ops.utils.objectify(default='test')
+        o = ops.objectify(default='test')
         self.assertEqual(o.fail, 'test')
 
     def test_dict(self):
         d = {'hello': 'world', 'thanks': 'mom'}
-        o = ops.utils.objectify(copy.deepcopy(d))
+        o = ops.objectify(copy.deepcopy(d))
         self.assertEqual(len(o), len(d))
         for key, value in d.items():
             self.assertEqual(o[key], value)

@@ -1,7 +1,10 @@
-# Copyright (c) 2010-2011, Silas Sewell
+# Copyright (c) 2010-2012, Silas Sewell
 # All rights reserved.
 #
 # This file is subject to the MIT License (see the LICENSE file).
+
+__copyright__ = '2010-2012, Silas Sewell'
+__version__ = '0.2.1'
 
 import datetime
 import fnmatch
@@ -18,10 +21,12 @@ import string
 import subprocess
 import sys
 import tempfile
-from ops import exceptions
 
 log = logging.getLogger('ops')
 type_ = type
+
+class Error(Exception): pass
+class ValidationError(Error): pass
 
 def _chmod(path, value=None):
     try:
@@ -56,7 +61,6 @@ def chmod(path, mode=None, user=None, group=None, other=None, recursive=False):
     else:
         successful = _chmod(path, mode)
     return successful
-_ops_chmod = chmod
 
 def _chown(path, uid=-1, gid=-1):
     try:
@@ -104,7 +108,7 @@ def chown(path, user=None, group=None, recursive=False):
             successful = False
     if not (uid == -1  and gid == -1):
         if recursive:
-            for p in _ops_find(path, no_peek=True):
+            for p in find(path, no_peek=True):
                 successful = _chown(p, uid=uid, gid=gid) and successful
         else:
             successful = _chown(path, uid=uid, gid=gid)
@@ -366,7 +370,6 @@ class find(object):
     def exclude(self, **kwargs):
         self._add_rule(kwargs, exclude=True)
         return self
-_ops_find = find
 
 class group(object):
     """Get information about a group.
@@ -429,7 +432,7 @@ class group(object):
 
     @property
     def members(self):
-        return [_ops_user(name=name) for name in self.gr_mem]
+        return [user(name=name) for name in self.gr_mem]
 _ops_group = group
 
 def mkdir(path, recursive=True):
@@ -563,7 +566,7 @@ def normalize(value, default=None, type=None, raise_exception=False):
             return value
         if default is None:
             if raise_exception:
-                raise exceptions.ValidationError('invalid string')
+                raise ValidationError('invalid string')
             else:
                 return ''
     elif type in (str, 'str', 'string'):
@@ -571,7 +574,7 @@ def normalize(value, default=None, type=None, raise_exception=False):
             return value if isinstance(value, str) else str(value)
         if default is None:
             if raise_exception:
-                raise exceptions.ValidationError('invalid string')
+                raise ValidationError('invalid string')
             else:
                 return ''
     elif type in (unicode, 'unicode'):
@@ -579,7 +582,7 @@ def normalize(value, default=None, type=None, raise_exception=False):
             return value if isinstance(value, unicode) else unicode(value)
         if default is None:
             if raise_exception:
-                raise exceptions.ValidationError('invalid string')
+                raise ValidationError('invalid string')
             else:
                 return u''
     elif type in (bool, 'bool', 'boolean'):
@@ -591,7 +594,7 @@ def normalize(value, default=None, type=None, raise_exception=False):
                 return False
         if default is None:
             if raise_exception:
-                raise exceptions.ValidationError('invalid boolean')
+                raise ValidationError('invalid boolean')
             else:
                 return False
     elif type in (numbers.Number, 'number'):
@@ -602,7 +605,7 @@ def normalize(value, default=None, type=None, raise_exception=False):
                 return eval(value)
         if default is None:
             if raise_exception:
-                raise exceptions.ValidationError('invalid number')
+                raise ValidationError('invalid number')
             else:
                 return 0
     elif type in (int, 'int', 'integer'):
@@ -613,7 +616,7 @@ def normalize(value, default=None, type=None, raise_exception=False):
                 return int(eval(value))
             if default is None:
                 if raise_exception:
-                    raise exceptions.ValidationError('invalid number')
+                    raise ValidationError('invalid number')
                 else:
                     return 0
     elif type in (float, 'float'):
@@ -621,7 +624,7 @@ def normalize(value, default=None, type=None, raise_exception=False):
             return float(value)
         if default is None:
             if raise_exception:
-                raise exceptions.ValidationError('invalid number')
+                raise ValidationError('invalid number')
             else:
                 return 0.0
     return default
@@ -748,7 +751,6 @@ def rm(path, recursive=False):
         log.error('rm: execute failed: %s (%s)' % (path, error))
         return False
     return True
-_ops_rm = rm
 
 def run(command, **kwargs):
     """Run a shell command and wait for the response. The result object will
@@ -866,7 +868,7 @@ class stat(object):
 
     @property
     def user(self):
-        return _ops_user(id=self.data[4])
+        return user(id=self.data[4])
 
     @property
     def st_gid(self):
@@ -1038,8 +1040,8 @@ class workspace(object):
 
     def __exit__(self, type, value, traceback):
         if self.path and os.path.exists(self.path):
-            _ops_chmod(self.path, 0700, recursive=True)
-            _ops_rm(self.path, recursive=True)
+            chmod(self.path, 0700, recursive=True)
+            rm(self.path, recursive=True)
 
     @property
     def path(self):
