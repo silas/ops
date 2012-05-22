@@ -167,38 +167,40 @@ class _Env(collections.MutableMapping):
       '/bin:/sbin'
     """
 
-    def __init__(self, data):
-        self.data = data
-        self.raise_exception = False
+    def __init__(self, data, raise_exception=False):
+        self._data = data
+        self._raise_exception = raise_exception
 
     def __call__(self, *args, **kwargs):
-        if len(args) == 1:
+        if len(args) == 0:
+            return self._data
+        elif len(args) == 1:
             return self.get(*args, **kwargs)
         else:
             return self.set(*args, **kwargs)
 
     def __contains__(self, *args, **kwargs):
-        return self.data.__contains__(*args, **kwargs)
+        return self._data.__contains__(*args, **kwargs)
 
     def __delitem__(self, *args, **kwargs):
-        return self.data.__delitem__(*args, **kwargs)
+        return self._data.__delitem__(*args, **kwargs)
 
     def __getitem__(self, *args, **kwargs):
-        return self.data.__getitem__(*args, **kwargs)
+        return self._data.__getitem__(*args, **kwargs)
 
     def __iter__(self, *args, **kwargs):
-        return self.data.__iter__(*args, **kwargs)
+        return self._data.__iter__(*args, **kwargs)
 
     def __len__(self, *args, **kwargs):
-        return self.data.__len__(*args, **kwargs)
+        return self._data.__len__(*args, **kwargs)
 
     def __setitem__(self, *args, **kwargs):
-        return self.data.__setitem__(*args, **kwargs)
+        return self._data.__setitem__(*args, **kwargs)
 
     def get(self, name, default=None, type=None, raise_exception=None):
-        value = os.environ.get(name)
+        value = self._data.get(name)
         if raise_exception is None:
-            raise_exception = self.raise_exception
+            raise_exception = self._raise_exception
         return normalize(value, default, type, raise_exception=raise_exception)
 
     def set(self, name, value, add=False, append=False, prepend=False, sep=':', unique=False):
@@ -214,14 +216,14 @@ class _Env(collections.MutableMapping):
                 if unique and sep and value in current_value.split(sep):
                     return False
                 if append:
-                    os.environ[name] = env.get(name, default='') + sep + value
+                    self._data[name] = env.get(name, default='') + sep + value
                 # Don't prepend if we asked for append and unique
                 if prepend and not (append and unique):
-                    os.environ[name] = value + sep + env.get(name, default='')
+                    self._data[name] = value + sep + env.get(name, default='')
             else:
-                os.environ[name] = value
+                self._data[name] = value
         else:
-            os.environ[name] = value
+            self._data[name] = value
         return True
 
 env = _Env(os.environ)
