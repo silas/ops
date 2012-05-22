@@ -682,15 +682,11 @@ class obj(collections.MutableMapping):
             self._value = kwargs['default']
 
     def __getattr__(self, name):
-        if name in self._data:
-            return self._data[name]
-        elif self._grow:
-            value = obj()
-            self._data[name] = value
-            return value
-        elif self._default:
-            return self._value
-        else:
+        try:
+            return self.__getitem__(name)
+        except KeyError:
+            if self._default:
+                return self._value
             raise AttributeError(name)
 
     def __contains__(self, *args, **kwargs):
@@ -699,8 +695,10 @@ class obj(collections.MutableMapping):
     def __delitem__(self, *args, **kwargs):
         return self._data.__delitem__(*args, **kwargs)
 
-    def __getitem__(self, *args, **kwargs):
-        return self._data.__getitem__(*args, **kwargs)
+    def __getitem__(self, name, *args, **kwargs):
+        if name not in self._data and self._grow:
+            self._data[name] = obj()
+        return self._data.__getitem__(name, *args, **kwargs)
 
     def __iter__(self, *args, **kwargs):
         return self._data.__iter__(*args, **kwargs)

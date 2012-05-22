@@ -47,9 +47,13 @@ class ObjTestCase(unittest.TestCase):
         self.assertEqual(str(o), str(d))
 
     def test_grow(self):
-        self.o.one.two.three.four = 123
-        self.assertEqual(self.o.one.two.three.four, 123)
-        self.assertEqual(str(self.o), "{'one': {'two': {'three': {'four': 123}}}}")
+        self.o.one.two.three.four = 1234
+        self.assertEqual(self.o['one']['two']['three']['four'], 1234)
+        self.assertEqual(str(self.o), "{'one': {'two': {'three': {'four': 1234}}}}")
+        del self.o['one']
+        self.o['four']['three']['two']['one'] = 4321
+        self.assertEqual(self.o.four.three.two.one, 4321)
+        self.assertEqual(str(self.o), "{'four': {'three': {'two': {'one': 4321}}}}")
 
 if __name__ == '__main__':
     unittest.main()
