@@ -15,73 +15,73 @@ class EnvGetTestCase(unittest.TestCase):
         os.environ['ops-boolean-false'] = 'false'
 
     def test_default(self):
-        self.assertEqual(ops.env_get('ops-empty'), '')
-        self.assertEqual(ops.env_get('ops-empty', default='test'), 'test')
+        self.assertEqual(ops.env.get('ops-empty'), '')
+        self.assertEqual(ops.env.get('ops-empty', default='test'), 'test')
 
-        self.assertEqual(ops.env_get('ops-string'), 'string')
-        self.assertEqual(ops.env_get('ops-string', default='test'), 'string')
+        self.assertEqual(ops.env.get('ops-string'), 'string')
+        self.assertEqual(ops.env.get('ops-string', default='test'), 'string')
 
-        self.assertTrue(isinstance(ops.env_get('ops-integer'), str))
-        self.assertTrue(isinstance(ops.env_get('ops-string'), str))
-        self.assertTrue(isinstance(ops.env_get('ops-unicode'), unicode))
+        self.assertTrue(isinstance(ops.env.get('ops-integer'), str))
+        self.assertTrue(isinstance(ops.env.get('ops-string'), str))
+        self.assertTrue(isinstance(ops.env.get('ops-unicode'), unicode))
 
     def test_string(self):
         TYPE='string'
 
-        self.assertEqual(ops.env_get('ops-empty', type=TYPE), '')
-        self.assertEqual(ops.env_get('ops-empty', default='test', type=TYPE), 'test')
+        self.assertEqual(ops.env.get('ops-empty', type=TYPE), '')
+        self.assertEqual(ops.env.get('ops-empty', default='test', type=TYPE), 'test')
 
-        self.assertEqual(ops.env_get('ops-string', type=TYPE), 'string')
-        self.assertRaises(ops.ValidationError, ops.env_get, 'ops-empty', type=TYPE, raise_exception=True)
+        self.assertEqual(ops.env.get('ops-string', type=TYPE), 'string')
+        self.assertRaises(ops.ValidationError, ops.env.get, 'ops-empty', type=TYPE, raise_exception=True)
 
     def test_unicode(self):
         TYPE='unicode'
 
-        self.assertEqual(ops.env_get('ops-empty', type=TYPE), '')
-        self.assertEqual(ops.env_get('ops-empty', default=u'test', type=TYPE), u'test')
+        self.assertEqual(ops.env.get('ops-empty', type=TYPE), '')
+        self.assertEqual(ops.env.get('ops-empty', default=u'test', type=TYPE), u'test')
 
-        self.assertEqual(ops.env_get('ops-unicode', type=TYPE), 'unicode')
-        self.assertRaises(ops.ValidationError, ops.env_get, 'ops-empty', type=TYPE, raise_exception=True)
+        self.assertEqual(ops.env.get('ops-unicode', type=TYPE), 'unicode')
+        self.assertRaises(ops.ValidationError, ops.env.get, 'ops-empty', type=TYPE, raise_exception=True)
 
     def test_boolean(self):
         TYPE='boolean'
 
-        self.assertEqual(ops.env_get('ops-empty', type=TYPE), False)
-        self.assertEqual(ops.env_get('ops-empty', default=True, type=TYPE), True)
+        self.assertEqual(ops.env.get('ops-empty', type=TYPE), False)
+        self.assertEqual(ops.env.get('ops-empty', default=True, type=TYPE), True)
 
-        self.assertEqual(ops.env_get('ops-boolean-true', type=TYPE), True)
-        self.assertEqual(ops.env_get('ops-boolean-false', type=TYPE), False)
-        self.assertRaises(ops.ValidationError, ops.env_get, 'ops-string', type=TYPE, raise_exception=True)
+        self.assertEqual(ops.env.get('ops-boolean-true', type=TYPE), True)
+        self.assertEqual(ops.env.get('ops-boolean-false', type=TYPE), False)
+        self.assertRaises(ops.ValidationError, ops.env.get, 'ops-string', type=TYPE, raise_exception=True)
 
     def test_number(self):
         TYPE='number'
 
-        self.assertEqual(ops.env_get('ops-empty', type=TYPE), 0)
-        self.assertEqual(ops.env_get('ops-empty', default=5, type=TYPE), 5)
+        self.assertEqual(ops.env.get('ops-empty', type=TYPE), 0)
+        self.assertEqual(ops.env.get('ops-empty', default=5, type=TYPE), 5)
 
-        self.assertEqual(ops.env_get('ops-integer', type=TYPE), 10)
-        self.assertEqual(ops.env_get('ops-float', type=TYPE), -10.5)
-        self.assertRaises(ops.ValidationError, ops.env_get, 'ops-string', type=TYPE, raise_exception=True)
+        self.assertEqual(ops.env.get('ops-integer', type=TYPE), 10)
+        self.assertEqual(ops.env.get('ops-float', type=TYPE), -10.5)
+        self.assertRaises(ops.ValidationError, ops.env.get, 'ops-string', type=TYPE, raise_exception=True)
 
     def test_integer(self):
         TYPE='integer'
 
-        self.assertEqual(ops.env_get('ops-empty', type=TYPE), 0)
-        self.assertEqual(ops.env_get('ops-empty', default=5, type=TYPE), 5)
-        self.assertEqual(ops.env_get('ops-integer', type=TYPE), 10)
-        self.assertEqual(ops.env_get('ops-float', type=TYPE), -10)
+        self.assertEqual(ops.env.get('ops-empty', type=TYPE), 0)
+        self.assertEqual(ops.env.get('ops-empty', default=5, type=TYPE), 5)
+        self.assertEqual(ops.env.get('ops-integer', type=TYPE), 10)
+        self.assertEqual(ops.env.get('ops-float', type=TYPE), -10)
 
-        self.assertRaises(ops.ValidationError, ops.env_get, 'ops-string', type=TYPE, raise_exception=True)
+        self.assertRaises(ops.ValidationError, ops.env.get, 'ops-string', type=TYPE, raise_exception=True)
 
     def test_float(self):
         TYPE='float'
 
-        self.assertEqual(ops.env_get('ops-empty', type=TYPE), 0.0)
-        self.assertEqual(ops.env_get('ops-empty', default=5.0, type=TYPE), 5.0)
-        self.assertEqual(ops.env_get('ops-integer', type=TYPE), 10.0)
-        self.assertEqual(ops.env_get('ops-float', type=TYPE), -10.5)
+        self.assertEqual(ops.env.get('ops-empty', type=TYPE), 0.0)
+        self.assertEqual(ops.env.get('ops-empty', default=5.0, type=TYPE), 5.0)
+        self.assertEqual(ops.env.get('ops-integer', type=TYPE), 10.0)
+        self.assertEqual(ops.env.get('ops-float', type=TYPE), -10.5)
 
-        self.assertRaises(ops.ValidationError, ops.env_get, 'ops-string', type=TYPE, raise_exception=True)
+        self.assertRaises(ops.ValidationError, ops.env.get, 'ops-string', type=TYPE, raise_exception=True)
 
 class EnvSetTestCase(unittest.TestCase):
 
@@ -90,45 +90,45 @@ class EnvSetTestCase(unittest.TestCase):
         os.environ['ops'] = 'one'
 
     def test_add(self):
-        ops.env_set('ops', 'two', add=True)
-        self.assertEqual(ops.env_get('ops'), 'one')
+        ops.env.set('ops', 'two', add=True)
+        self.assertEqual(ops.env.get('ops'), 'one')
 
-        ops.env_set('ops-two', 'two', add=True)
-        self.assertEqual(ops.env_get('ops-two'), 'two')
+        ops.env.set('ops-two', 'two', add=True)
+        self.assertEqual(ops.env.get('ops-two'), 'two')
 
     def test_append(self):
-        ops.env_set('ops', 'two', append=True, sep='')
-        self.assertEqual(ops.env_get('ops'), 'onetwo')
+        ops.env.set('ops', 'two', append=True, sep='')
+        self.assertEqual(ops.env.get('ops'), 'onetwo')
 
-        ops.env_set('ops', 'three', append=True)
-        self.assertEqual(ops.env_get('ops'), 'onetwo:three')
+        ops.env.set('ops', 'three', append=True)
+        self.assertEqual(ops.env.get('ops'), 'onetwo:three')
 
-        self.assertFalse(ops.env_set('ops', 'onetwo', append=True, unique=True))
-        self.assertFalse(ops.env_set('ops', 'three', append=True, unique=True))
-        self.assertTrue(ops.env_set('ops', 'four', append=True, unique=True))
-        self.assertEqual(ops.env_get('ops'), 'onetwo:three:four')
+        self.assertFalse(ops.env.set('ops', 'onetwo', append=True, unique=True))
+        self.assertFalse(ops.env.set('ops', 'three', append=True, unique=True))
+        self.assertTrue(ops.env.set('ops', 'four', append=True, unique=True))
+        self.assertEqual(ops.env.get('ops'), 'onetwo:three:four')
 
-        self.assertTrue(ops.env_set('ops-two', 'one', prepend=True, unique=True))
-        self.assertEqual(ops.env_get('ops-two'), 'one')
+        self.assertTrue(ops.env.set('ops-two', 'one', prepend=True, unique=True))
+        self.assertEqual(ops.env.get('ops-two'), 'one')
 
     def test_prepend(self):
-        ops.env_set('ops', 'two', prepend=True, sep='')
-        self.assertEqual(ops.env_get('ops'), 'twoone')
+        ops.env.set('ops', 'two', prepend=True, sep='')
+        self.assertEqual(ops.env.get('ops'), 'twoone')
 
-        ops.env_set('ops', 'three', prepend=True)
-        self.assertEqual(ops.env_get('ops'), 'three:twoone')
+        ops.env.set('ops', 'three', prepend=True)
+        self.assertEqual(ops.env.get('ops'), 'three:twoone')
 
-        self.assertFalse(ops.env_set('ops', 'twoone', prepend=True, unique=True))
-        self.assertFalse(ops.env_set('ops', 'three', prepend=True, unique=True))
-        self.assertTrue(ops.env_set('ops', 'four', prepend=True, unique=True))
-        self.assertEqual(ops.env_get('ops'), 'four:three:twoone')
+        self.assertFalse(ops.env.set('ops', 'twoone', prepend=True, unique=True))
+        self.assertFalse(ops.env.set('ops', 'three', prepend=True, unique=True))
+        self.assertTrue(ops.env.set('ops', 'four', prepend=True, unique=True))
+        self.assertEqual(ops.env.get('ops'), 'four:three:twoone')
 
-        self.assertTrue(ops.env_set('ops-two', 'one', prepend=True, unique=True))
-        self.assertEqual(ops.env_get('ops-two'), 'one')
+        self.assertTrue(ops.env.set('ops-two', 'one', prepend=True, unique=True))
+        self.assertEqual(ops.env.get('ops-two'), 'one')
 
     def test_set(self):
-        ops.env_set('ops', 'two')
-        self.assertEqual(ops.env_get('ops'), 'two')
+        ops.env.set('ops', 'two')
+        self.assertEqual(ops.env.get('ops'), 'two')
 
 if __name__ == '__main__':
     unittest.main()

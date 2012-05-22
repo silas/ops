@@ -6,6 +6,7 @@
 __copyright__ = '2010-2012, Silas Sewell'
 __version__ = '0.3.0'
 
+import collections
 import datetime
 import fnmatch
 import grp
@@ -145,63 +146,82 @@ def cp(src_path, dst_path, follow_links=False, recursive=True):
         log.error('cp: execute failed: %s => %s (%s)' % (src_path, dst_path, error))
     return successful
 
-def env_get(name, default=None, type=None, raise_exception=False):
-    """Get environment variable.
+class _Env(collections.MutableMapping):
 
-      >>> env_get('PATH')
-      '/bin'
-      >>> env_get('TEST', type='number')
-      10.0
-      >>> env_get('TEST', type=int)
-      10
-    """
-    exists = env_has(name)
-    value = os.environ.get(name)
-    return normalize(value, default, type, raise_exception=raise_exception)
+    def __init__(self, data):
+        self.data = data
+        self.raise_exception = False
 
-def env_has(name):
-    """Check if environment variable exists.
+    def __contains__(self, *args, **kwargs):
+        return self.data.__contains__(*args, **kwargs)
 
-      >>> env_has('PATH')
-      True
-    """
-    return name in os.environ
+    def __delitem__(self, *args, **kwargs):
+        return self.data.__delitem__(*args, **kwargs)
 
-def env_set(name, value, add=False, append=False, prepend=False, sep=':', unique=False):
-    """Set environment variable.
+    def __getitem__(self, *args, **kwargs):
+        return self.data.__getitem__(*args, **kwargs)
 
-      >>> env_set('PATH', '/bin')
-      True
-      >>> env_set('PATH', '/sbin', append=True)
-      True
-      >>> env_get('PATH')
-      '/bin:/sbin'
-      >>> env_set('PATH', '/sbin', prepend=True, sep=':', unique=True)
-      False
-      >>> env_get('PATH')
-      '/bin:/sbin'
-    """
-    if add and env_has(name):
-        return False
-    if not isinstance(value, basestring):
-        value = unicode(value)
-    if not isinstance(sep, basestring):
-        sep = unicode(sep)
-    if append or prepend:
-        current_value = env_get(name, default='')
-        if current_value:
-            if unique and sep and value in current_value.split(sep):
-                return False
-            if append:
-                os.environ[name] = env_get(name, default='') + sep + value
-            # Don't prepend if we asked for append and unique
-            if prepend and not (append and unique):
-                os.environ[name] = value + sep + env_get(name, default='')
+    def __iter__(self, *args, **kwargs):
+        return self.data.__iter__(*args, **kwargs)
+
+    def __len__(self, *args, **kwargs):
+        return self.data.__len__(*args, **kwargs)
+
+    def __setitem__(self, *args, **kwargs):
+        return self.data.__setitem__(*args, **kwargs)
+
+    def get(self, name, default=None, type=None, raise_exception=None):
+        """Get environment variable.
+
+          >>> env.get('PATH')
+          '/bin'
+          >>> env.get('TEST', type='number')
+          10.0
+          >>> env.get('TEST', type=int)
+          10
+        """
+        value = os.environ.get(name)
+        if raise_exception is None:
+            raise_exception = self.raise_exception
+        return normalize(value, default, type, raise_exception=raise_exception)
+
+    def set(self, name, value, add=False, append=False, prepend=False, sep=':', unique=False):
+        """Set environment variable.
+
+          >>> env.set('PATH', '/bin')
+          True
+          >>> env.set('PATH', '/sbin', append=True)
+          True
+          >>> env.get('PATH')
+          '/bin:/sbin'
+          >>> env.set('PATH', '/sbin', prepend=True, sep=':', unique=True)
+          False
+          >>> env.get('PATH')
+          '/bin:/sbin'
+        """
+        if add and name in self:
+            return False
+        if not isinstance(value, basestring):
+            value = unicode(value)
+        if not isinstance(sep, basestring):
+            sep = unicode(sep)
+        if append or prepend:
+            current_value = env.get(name, default='')
+            if current_value:
+                if unique and sep and value in current_value.split(sep):
+                    return False
+                if append:
+                    os.environ[name] = env.get(name, default='') + sep + value
+                # Don't prepend if we asked for append and unique
+                if prepend and not (append and unique):
+                    os.environ[name] = value + sep + env.get(name, default='')
+            else:
+                os.environ[name] = value
         else:
             os.environ[name] = value
-    else:
-        os.environ[name] = value
-    return True
+        return True
+
+env = _Env(os.environ)
 
 def exit(code=0, text=''):
     """Exit and print text (if defined) to stderr if code > 0 or stdout
@@ -1055,9 +1075,7 @@ __all__ = [
     'chown',
     'cp',
     'dirs',
-    'env_get',
-    'env_has',
-    'env_set',
+    'env',
     'exit',
     'find',
     'group',
