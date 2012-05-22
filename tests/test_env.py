@@ -96,6 +96,10 @@ class EnvSetTestCase(unittest.TestCase):
         ops.env.set('ops-two', 'two', add=True)
         self.assertEqual(ops.env.get('ops-two'), 'two')
 
+    def test_call(self):
+        ops.env('ops', 'call')
+        self.assertEqual(ops.env('ops'), 'call')
+
     def test_append(self):
         ops.env.set('ops', 'two', append=True, sep='')
         self.assertEqual(ops.env.get('ops'), 'onetwo')

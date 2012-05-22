@@ -12,9 +12,7 @@ ops is a library for scripting systems administration tasks in Python.
 .. autofunction:: chmod
 .. autofunction:: chown
 .. autofunction:: cp
-.. autofunction:: env_get
-.. autofunction:: env_has
-.. autofunction:: env_set
+.. autofunction:: env
 .. autofunction:: exit
 .. autofunction:: find
 .. autofunction:: group

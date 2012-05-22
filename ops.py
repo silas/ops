@@ -147,10 +147,35 @@ def cp(src_path, dst_path, follow_links=False, recursive=True):
     return successful
 
 class _Env(collections.MutableMapping):
+    """Get and set environment variables.
+
+      >>> env('PATH')
+      '/bin'
+      >>> env('TEST', type='number')
+      10.0
+      >>> env('TEST', type=int)
+      10
+      >>> env('PATH', '/bin')
+      True
+      >>> env('PATH', '/sbin', append=True)
+      True
+      >>> env('PATH')
+      '/bin:/sbin'
+      >>> env('PATH', '/sbin', prepend=True, sep=':', unique=True)
+      False
+      >>> env('PATH')
+      '/bin:/sbin'
+    """
 
     def __init__(self, data):
         self.data = data
         self.raise_exception = False
+
+    def __call__(self, *args, **kwargs):
+        if len(args) == 1:
+            return self.get(*args, **kwargs)
+        else:
+            return self.set(*args, **kwargs)
 
     def __contains__(self, *args, **kwargs):
         return self.data.__contains__(*args, **kwargs)
@@ -171,34 +196,12 @@ class _Env(collections.MutableMapping):
         return self.data.__setitem__(*args, **kwargs)
 
     def get(self, name, default=None, type=None, raise_exception=None):
-        """Get environment variable.
-
-          >>> env.get('PATH')
-          '/bin'
-          >>> env.get('TEST', type='number')
-          10.0
-          >>> env.get('TEST', type=int)
-          10
-        """
         value = os.environ.get(name)
         if raise_exception is None:
             raise_exception = self.raise_exception
         return normalize(value, default, type, raise_exception=raise_exception)
 
     def set(self, name, value, add=False, append=False, prepend=False, sep=':', unique=False):
-        """Set environment variable.
-
-          >>> env.set('PATH', '/bin')
-          True
-          >>> env.set('PATH', '/sbin', append=True)
-          True
-          >>> env.get('PATH')
-          '/bin:/sbin'
-          >>> env.set('PATH', '/sbin', prepend=True, sep=':', unique=True)
-          False
-          >>> env.get('PATH')
-          '/bin:/sbin'
-        """
         if add and name in self:
             return False
         if not isinstance(value, basestring):
