@@ -183,7 +183,7 @@ class FindTestCase(unittest.TestCase):
     def test_filter(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
         count = 0
-        for path in ops.find(dir_path).filter(name='test_utils_find.py'):
+        for path in ops.find(dir_path).filter(name='test_find.py'):
             count += 1
         self.assertEqual(count, 1)
 
@@ -193,7 +193,7 @@ class FindTestCase(unittest.TestCase):
         exclude_count = 0
         for path in ops.find(dir_path):
             total_count += 1
-        for path in ops.find(dir_path).exclude(name='test_utils_find.py'):
+        for path in ops.find(dir_path).exclude(name='test_find.py'):
             exclude_count += 1
         self.assertEqual(exclude_count+1, total_count)
 
