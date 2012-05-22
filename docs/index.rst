@@ -19,7 +19,7 @@ ops is a library for scripting systems administration tasks in Python.
 .. autofunction:: mkdir
 .. autofunction:: mode
 .. autofunction:: normalize
-.. autofunction:: objectify
+.. autofunction:: obj
 .. autofunction:: path
 .. autofunction:: rm
 .. autofunction:: run

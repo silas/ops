@@ -4,7 +4,7 @@
 # This file is subject to the MIT License (see the LICENSE file).
 
 __copyright__ = '2010-2012, Silas Sewell'
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 
 import collections
 import datetime
