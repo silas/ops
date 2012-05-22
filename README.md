@@ -1,4 +1,4 @@
-ops
+ops [![Build Status](https://secure.travis-ci.org/silas/ops.png)](http://travis-ci.org/silas/ops)
 ===
 
 ops is a library for scripting systems administration tasks in Python.
