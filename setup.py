@@ -10,7 +10,7 @@ You can find the latest docs at http://silas.sewell.org/ops/.
 setup(
     name='ops',
     version=version,
-    description='A library for scripting systems administration tasks',
+    description='Library for scripting systems administration tasks',
     long_description=long_description.strip(),
     author='Silas Sewell',
     author_email='silas@sewell.org',
