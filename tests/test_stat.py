@@ -3,6 +3,7 @@ import helper
 import datetime
 import grp
 import pwd
+import numbers
 import os
 import unittest
 import uuid
@@ -24,17 +25,15 @@ class StatTestCase(unittest.TestCase):
         path = self.workspace.path
         stat = ops.stat(path)
 
-        self.assertTrue(isinstance(stat.st_mode, int))
+        self.assertTrue(isinstance(stat.st_mode, numbers.Number))
 
-        print type(stat.st_ino)
-
-        self.assertTrue(isinstance(stat.st_ino, int))
+        self.assertTrue(isinstance(stat.st_ino, numbers.Number))
         self.assertEqual(stat.inode, stat.st_ino)
 
         self.assertFalse(stat.st_dev is None)
         self.assertEqual(stat.device, stat.st_dev)
 
-        self.assertTrue(isinstance(stat.st_nlink, int))
+        self.assertTrue(isinstance(stat.st_nlink, numbers.Number))
         self.assertEqual(stat.nlink, stat.st_nlink)
 
         self.assertEqual(stat.st_uid, self.uid)
