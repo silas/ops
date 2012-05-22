@@ -41,7 +41,6 @@ class RunTestCase(unittest.TestCase):
         results = ops.run('test ${args}', args=args)
         self.assertTrue(results)
         self.assertEqual(results.code, 0)
-        print results.command
 
     def test_list(self):
         args = ['?!*', '=', '?!*']
