@@ -1,5 +1,6 @@
+*.bz2
 *.pyc
 *.swp
 .coverage
-build
 _tmp
+build
