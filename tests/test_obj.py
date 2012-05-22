@@ -1,7 +1,6 @@
 import helper
 
 import copy
-import json
 import unittest
 import ops
 
@@ -27,12 +26,6 @@ class ObjTestCase(unittest.TestCase):
         self.assertTrue(self.o)
 
     def test_default(self):
-        o = ops.obj(grow=False)
-        try:
-            o.fail
-            raise Exception("Accessor didn't raise AttributeError.")
-        except AttributeError:
-            pass
         o = ops.obj(default='test')
         self.assertEqual(o.fail, 'test')
 
@@ -54,6 +47,13 @@ class ObjTestCase(unittest.TestCase):
         self.o['four']['three']['two']['one'] = 4321
         self.assertEqual(self.o.four.three.two.one, 4321)
         self.assertEqual(str(self.o), "{'four': {'three': {'two': {'one': 4321}}}}")
+
+    def test_grow_false(self):
+        try:
+            ops.obj(grow=False).fail
+            raise Exception("Accessor didn't raise AttributeError.")
+        except AttributeError:
+            pass
 
 if __name__ == '__main__':
     unittest.main()
