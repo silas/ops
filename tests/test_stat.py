@@ -26,6 +26,8 @@ class StatTestCase(unittest.TestCase):
 
         self.assertTrue(isinstance(stat.st_mode, int))
 
+        print type(stat.st_ino)
+
         self.assertTrue(isinstance(stat.st_ino, int))
         self.assertEqual(stat.inode, stat.st_ino)
 
