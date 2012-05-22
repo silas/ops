@@ -2,8 +2,7 @@ from distutils.core import setup
 from ops import __version__ as version
 
 long_description = """
-ops is a Python module that makes writing systems administration tasks in
-Python a littl easier.
+ops is a library for scripting systems administration tasks in Python.
 
 You can find the latest docs at http://silas.sewell.org/ops/.
 """
@@ -11,7 +10,7 @@ You can find the latest docs at http://silas.sewell.org/ops/.
 setup(
     name='ops',
     version=version,
-    description='Library for writing systems administration tasks',
+    description='A library for scripting systems administration tasks',
     long_description=long_description.strip(),
     author='Silas Sewell',
     author_email='silas@sewell.org',
