@@ -652,15 +652,18 @@ def normalize(value, default=None, type=None, raise_exception=False):
                 return 0.0
     return default
 
-class objectify(dict):
+class obj(collections.MutableMapping):
     """Use property access syntax to retrieve values from a dict-like object.
 
-      >>> o = objectify({'name': 'hello', 'value': 'world'})
+      >>> o = obj({'name': 'hello', 'value': 'world'})
       >>> o.name
       'hello'
       >>> o.value
       'world'
-      >>> o = objectify({'name': 'hello'}, default=None)
+      >>> o.one.two = 3
+      >>> o
+      {'name': 'hello', 'value': 'world', 'one': {'two': 3}}
+      >>> o = obj({'name': 'hello'}, default=None)
       >>> o.name
       'test'
       >>> o.value
@@ -668,52 +671,64 @@ class objectify(dict):
     """
 
     def __init__(self, data=None, **kwargs):
-        dict.__init__(self, data or {})
-        if 'default' in kwargs:
-            self['_default'] = kwargs['default']
+        self._data = data or {}
+        self._bool = kwargs.get('bool')
+        self._default = 'default' in kwargs
+        self._grow = kwargs.get('grow', True)
+        if self._default:
+            self._grow = False
+            self._value = kwargs['default']
 
     def __getattr__(self, name):
-        try:
-            return self[name]
-        except KeyError:
-            try:
-                return self['_default']
-            except KeyError:
-                raise AttributeError(name)
+        if name in self._data:
+            return self._data[name]
+        elif self._grow:
+            value = obj()
+            self._data[name] = value
+            return value
+        elif self._default:
+            return self._value
+        else:
+            raise AttributeError(name)
 
-    def __nonzero__(self):
-        try:
-            return self['_bool']
-        except KeyError:
-            if len(self) == 0:
-                return False
-            for key in self:
-                if not key.startswith('_'):
-                    return True
-            return False
+    def __contains__(self, *args, **kwargs):
+        return self._data.__contains__(*args, **kwargs)
 
-    def __len__(self):
-        count = 0
-        for key in self:
-            if not key.startswith('_'):
-                count += 1
-        return count
+    def __delitem__(self, *args, **kwargs):
+        return self._data.__delitem__(*args, **kwargs)
+
+    def __getitem__(self, *args, **kwargs):
+        return self._data.__getitem__(*args, **kwargs)
+
+    def __iter__(self, *args, **kwargs):
+        return self._data.__iter__(*args, **kwargs)
+
+    def __len__(self, *args, **kwargs):
+        return self._data.__len__(*args, **kwargs)
+
+    def __nonzero__(self, *args, **kwargs):
+        if self._bool is not None:
+            return self._bool
+        else:
+            return bool(self._data)
+
+    def __setattr__(self, name, value):
+        if name.startswith('_'):
+            super(obj, self).__setattr__(name, value)
+        else:
+            self._data[name] = value
+
+    def __setitem__(self, *args, **kwargs):
+        return self._data.__setitem__(*args, **kwargs)
 
     def __repr__(self):
-        return repr(self.dict())
+        return repr(self._data)
 
     def __str__(self):
-        return str(self.dict())
+        return str(self._data)
 
     def __unicode__(self):
-        return unicode(self.dict())
-
-    def dict(self):
-        values = {}
-        for name, value in self.items():
-            if not name.startswith('_'):
-                values[name] = value
-        return values
+        return unicode(self._data)
 
 def _path_stat_get(self):
     if not hasattr(self, '_stat'):
@@ -822,13 +837,12 @@ def run(command, **kwargs):
         cwd=kwargs.get('cwd', tempfile.gettempdir()),
     )
     data = ref.communicate()
-    return objectify({
-        '_bool': ref.returncode == 0,
+    return obj({
         'code': ref.returncode,
         'command': command,
         'stdout': data[0],
         'stderr': data[1],
-    })
+    }, bool=ref.returncode == 0, grow=False)
 
 class stat(object):
     """Display stat info for files and directories.
@@ -1077,7 +1091,6 @@ __all__ = [
     'chmod',
     'chown',
     'cp',
-    'dirs',
     'env',
     'exit',
     'find',
@@ -1085,10 +1098,8 @@ __all__ = [
     'mode',
     'mkdir',
     'normalize',
-    'objectify',
+    'obj',
     'path',
-    'popd',
-    'pushd',
     'rm',
     'run',
     'stat',

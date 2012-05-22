@@ -1,13 +1,14 @@
 import helper
 
 import copy
+import json
 import unittest
 import ops
 
-class ObjectifyTestCase(unittest.TestCase):
+class ObjTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.o = ops.objectify()
+        self.o = ops.obj()
 
     def test_bool_empty(self):
         self.assertFalse(self.o)
@@ -18,31 +19,37 @@ class ObjectifyTestCase(unittest.TestCase):
 
     def test_bool_false(self):
         self.o['hello'] = 'world'
-        self.o['_bool'] = False
+        self.o._bool = False
         self.assertFalse(self.o)
 
     def test_bool_true(self):
-        self.o['_bool'] = True
+        self.o._bool = True
         self.assertTrue(self.o)
 
     def test_default(self):
+        o = ops.obj(grow=False)
         try:
-            self.o.fail
+            o.fail
             raise Exception("Accessor didn't raise AttributeError.")
         except AttributeError:
             pass
-        o = ops.objectify(default='test')
+        o = ops.obj(default='test')
         self.assertEqual(o.fail, 'test')
 
     def test_dict(self):
         d = {'hello': 'world', 'thanks': 'mom'}
-        o = ops.objectify(copy.deepcopy(d))
+        o = ops.obj(copy.deepcopy(d))
         self.assertEqual(len(o), len(d))
         for key, value in d.items():
             self.assertEqual(o[key], value)
             self.assertEqual(getattr(o, key), value)
         self.assertEqual(unicode(o), unicode(d))
         self.assertEqual(str(o), str(d))
+
+    def test_grow(self):
+        self.o.one.two.three.four = 123
+        self.assertEqual(self.o.one.two.three.four, 123)
+        self.assertEqual(str(self.o), "{'one': {'two': {'three': {'four': 123}}}}")
 
 if __name__ == '__main__':
     unittest.main()
