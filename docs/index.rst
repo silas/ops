@@ -6,8 +6,7 @@
 ops
 ===
 
-ops is a Python module that makes writing systems administration tasks in
-Python a littl easier.
+ops is a library for scripting systems administration tasks in Python.
 
 .. currentmodule:: ops
 .. autofunction:: chmod
