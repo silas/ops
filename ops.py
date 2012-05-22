@@ -84,7 +84,7 @@ def chown(path, user=None, group=None, recursive=False):
     if user is not None:
         if isinstance(user, basestring):
             user = _ops_user(name=user)
-        elif isinstance(user, int):
+        elif isinstance(user, numbers.Number):
             user = _ops_user(id=user)
         if isinstance(user, _ops_user):
             if user:
@@ -97,7 +97,7 @@ def chown(path, user=None, group=None, recursive=False):
     if group is not None:
         if isinstance(group, basestring):
             group = _ops_group(name=group)
-        elif isinstance(group, int):
+        elif isinstance(group, numbers.Number):
             group = _ops_user(id=group)
         if isinstance(group, _ops_group):
             if group:
