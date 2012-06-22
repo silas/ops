@@ -16,9 +16,7 @@ setup(
     author_email='silas@sewell.org',
     license='MIT',
     url='https://github.com/silas/ops',
-    packages=[
-        'ops',
-    ],
+    py_modules=['ops'],
     classifiers=[
           'Intended Audience :: Developers',
           'Intended Audience :: System Administrators',
@@ -27,6 +25,7 @@ setup(
           'Operating System :: POSIX',
           'Programming Language :: Python',
           'Programming Language :: Python :: 2.6',
+          'Programming Language :: Python :: 2.7',
           'Topic :: Software Development',
           'Topic :: Software Development :: Libraries',
           'Topic :: Software Development :: Libraries :: Python Modules',
