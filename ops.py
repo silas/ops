@@ -805,7 +805,7 @@ def run(command, **kwargs):
       ...     print 'Stderr: %s' % result.stderr
       Stdout: Some $%^$## "" + ' content
       >>> print result.command
-      echo "Some \$%^\$## \"\" + ' content"
+      echo 'Some $%^$## "" + '"'"' content'
     """
     env = None
     if 'env' in kwargs:
