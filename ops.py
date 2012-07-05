@@ -16,6 +16,7 @@ import os
 import pipes
 import pwd
 import re
+import select
 import shutil
 import stat as stat_
 import string
@@ -813,6 +814,13 @@ def run(command, **kwargs):
         else:
             env = copy.deepcopy(os.environ)
         env.update(kwargs['env'])
+    combine = kwargs.get('combine', False)
+    stdout = kwargs.get('stdout', False)
+    stderr = kwargs.get('stderr', False)
+    if stdout is True:
+        stdout = sys.stdout.write
+    if stderr is True:
+        stderr = sys.stderr.write
     if kwargs:
         args = {}
         q = pipes.quote
@@ -830,18 +838,38 @@ def run(command, **kwargs):
     ref = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        stderr=subprocess.STDOUT if combine is True else subprocess.PIPE,
         shell=kwargs.get('shell', True),
         close_fds=kwargs.get('close_fds', True),
         env=env,
         cwd=kwargs.get('cwd', tempfile.gettempdir()),
     )
-    data = ref.communicate()
+    fds = [ref.stdout]
+    if combine is not True:
+        fds.append(ref.stderr)
+    stdout_result = ''
+    stderr_result = ''
+    while fds:
+        for fd in select.select(fds, tuple(), tuple())[0]:
+            line = fd.readline()
+            if line:
+                if fd == ref.stdout:
+                    if stdout:
+                        stdout(line)
+                    stdout_result += line
+                elif fd == ref.stderr:
+                    if stderr:
+                        stderr(line)
+                    stderr_result += line
+            else:
+                fds.remove(fd)
+        if ref.poll():
+            break
     return obj({
         'code': ref.returncode,
         'command': command,
-        'stdout': data[0],
-        'stderr': data[1],
+        'stdout': stdout_result,
+        'stderr': stderr_result,
     }, bool=ref.returncode == 0, grow=False)
 
 class stat(object):
