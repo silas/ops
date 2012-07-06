@@ -863,8 +863,6 @@ def run(command, **kwargs):
                     stderr_result += line
             else:
                 fds.remove(fd)
-        if ref.poll():
-            break
     ref.wait()
     return obj({
         'code': ref.returncode,
