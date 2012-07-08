@@ -35,5 +35,18 @@ class ChownTestCase(unittest.TestCase):
     def test_recursive(self):
         ops.chown(self.workspace.path, user=self.user, group=self.group, recursive=True)
 
+    def test_error(self):
+        path = '/tmp/ops-chown-error'
+        self.assertFalse(ops._chown(path, uid=-2))
+        self.assertFalse(ops._chown(path, gid=-2))
+
+        self.assertFalse(ops.chown(path, user=lambda x: x))
+        self.assertFalse(ops.chown(path, user='ops-chown'))
+        self.assertFalse(ops.chown(path, user=ops.user('ops-chown')))
+
+        self.assertFalse(ops.chown(path, group=lambda x: x))
+        self.assertFalse(ops.chown(path, group='ops-chown'))
+        self.assertFalse(ops.chown(path, group=ops.user('ops-chown')))
+
 if __name__ == '__main__':
     unittest.main()

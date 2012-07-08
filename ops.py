@@ -7,6 +7,7 @@ __copyright__ = '2010-2012, Silas Sewell'
 __version__ = '0.4.4'
 
 import collections
+import copy
 import datetime
 import fnmatch
 import grp
@@ -41,7 +42,7 @@ def _chmod(path, value=None):
     return False
 
 def chmod(path, mode=None, user=None, group=None, other=None, recursive=False):
-    """Changes file mode bits.
+    """Changes file mode permissions.
 
       >>> if chmod('/tmp/one', 0755):
       ...     print 'OK'
@@ -108,7 +109,7 @@ def chown(path, user=None, group=None, recursive=False):
                 successful = False
         else:
             successful = False
-    if not (uid == -1  and gid == -1):
+    if not (uid == -1 and gid == -1):
         if recursive:
             for p in find(path, no_peek=True):
                 successful = _chown(p, uid=uid, gid=gid) and successful
@@ -143,11 +144,11 @@ def cp(src_path, dst_path, follow_links=False, recursive=True):
             successful = True
         else:
             log.error('cp: source not found: %s' % src_path)
-    except OSError, error:
+    except (OSError, TypeError), error:
         log.error('cp: execute failed: %s => %s (%s)' % (src_path, dst_path, error))
     return successful
 
-class _Env(collections.MutableMapping):
+class Env(collections.MutableMapping):
     """Get and set environment variables.
 
       >>> env('PATH')
@@ -168,8 +169,8 @@ class _Env(collections.MutableMapping):
       '/bin:/sbin'
     """
 
-    def __init__(self, data, raise_exception=False):
-        self._data = data
+    def __init__(self, data=None, raise_exception=False):
+        self._data = copy.deepcopy(os.environ) if data is None else data
         self._raise_exception = raise_exception
 
     def __call__(self, *args, **kwargs):
@@ -212,22 +213,22 @@ class _Env(collections.MutableMapping):
         if not isinstance(sep, basestring):
             sep = unicode(sep)
         if append or prepend:
-            current_value = env.get(name, default='')
+            current_value = self.get(name, default='')
             if current_value:
                 if unique and sep and value in current_value.split(sep):
                     return False
                 if append:
-                    self._data[name] = env.get(name, default='') + sep + value
+                    self._data[name] = self.get(name, default='') + sep + value
                 # Don't prepend if we asked for append and unique
                 if prepend and not (append and unique):
-                    self._data[name] = value + sep + env.get(name, default='')
+                    self._data[name] = value + sep + self.get(name, default='')
             else:
                 self._data[name] = value
         else:
             self._data[name] = value
         return True
 
-env = _Env(os.environ)
+env = Env()
 
 def exit(code=0, text=''):
     """Exit and print text (if defined) to stderr if code > 0 or stdout
@@ -481,7 +482,7 @@ def mkdir(path, recursive=True):
         return False
     return True
 
-class _ModeBits(object):
+class perm(object):
 
     def __init__(self, value=None, read=None, write=None, execute=None):
         self.read = read
@@ -496,7 +497,7 @@ class _ModeBits(object):
         self.write = value & 2
 
 class mode(object):
-    """An object for representing file mode bits.
+    """An object for representing file mode permissions.
 
       >>> m = mode(0755)
       >>> m.user.read
@@ -508,9 +509,7 @@ class mode(object):
     """
 
     _TYPES = (('user', 'USR'), ('group', 'GRP'), ('other', 'OTH'))
-    _BITS = (('read', 'R'), ('write', 'W'), ('execute', 'X'))
-
-    bits = _ModeBits
+    _PERMS = (('read', 'R'), ('write', 'W'), ('execute', 'X'))
 
     def __init__(self, value=None, user=None, group=None, other=None):
         self.user = user
@@ -519,33 +518,33 @@ class mode(object):
         if isinstance(value, int):
             self.numeric = value
 
-    def _set_bits(self, name, value):
+    def _set_perm(self, name, value):
         if isinstance(value, int):
-            setattr(self, name, _ModeBits(value=value))
-        elif isinstance(value, _ModeBits):
+            setattr(self, name, perm(value=value))
+        elif isinstance(value, perm):
             setattr(self, name, value)
         elif value is not None:
-            log.warning('mode: unknown bit: %s' % value)
+            log.warning('mode: unknown permission: %s' % value)
         if not hasattr(self, name):
-            setattr(self, name, _ModeBits())
+            setattr(self, name, perm())
 
     @property
     def numeric(self):
         mode = 0
         for type_name, type_abbr in self._TYPES:
             type_value = getattr(self, type_name)
-            for bits_name, bits_abbr in self._BITS:
-                if getattr(type_value, bits_name):
-                    mode |= getattr(stat_, 'S_I%s%s' % (bits_abbr, type_abbr))
+            for perm_name, perm_abbr in self._PERMS:
+                if getattr(type_value, perm_name):
+                    mode |= getattr(stat_, 'S_I%s%s' % (perm_abbr, type_abbr))
         return mode
 
     @numeric.setter
     def numeric(self, mode):
         for type_name, type_abbr in self._TYPES:
             type_value = getattr(self, type_name)
-            for bits_name, bits_abbr in self._BITS:
-                value = bool(mode & getattr(stat_, 'S_I%s%s' % (bits_abbr, type_abbr)))
-                setattr(type_value, bits_name, value)
+            for perm_name, perm_abbr in self._PERMS:
+                value = bool(mode & getattr(stat_, 'S_I%s%s' % (perm_abbr, type_abbr)))
+                setattr(type_value, perm_name, value)
 
     @property
     def user(self):
@@ -553,7 +552,7 @@ class mode(object):
 
     @user.setter
     def user(self, value=None):
-        self._set_bits('_user', value)
+        self._set_perm('_user', value)
 
     @property
     def group(self):
@@ -561,7 +560,7 @@ class mode(object):
 
     @group.setter
     def group(self, value=None):
-        self._set_bits('_group', value)
+        self._set_perm('_group', value)
 
     @property
     def other(self):
@@ -569,7 +568,7 @@ class mode(object):
 
     @other.setter
     def other(self, value=None):
-        self._set_bits('_other', value)
+        self._set_perm('_other', value)
 _ops_mode = mode
 
 def normalize(value, default=None, type=None, raise_exception=False):
@@ -1115,6 +1114,7 @@ class workspace(object):
         return os.path.join(self.path, *args)
 
 __all__ = [
+    'Env',
     'chmod',
     'chown',
     'cp',
@@ -1127,6 +1127,7 @@ __all__ = [
     'normalize',
     'obj',
     'path',
+    'perm',
     'rm',
     'run',
     'stat',

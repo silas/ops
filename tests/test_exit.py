@@ -35,11 +35,11 @@ class ExitTestCase(unittest.TestCase):
 
     def test_stderr(self):
         try:
-            ops.exit(code=1, text='Failure')
+            ops.exit(code=1, text=False)
         except SystemExit:
             pass
         result = sys.stderr.getvalue().rstrip()
-        self.assertEqual(result, 'Failure')
+        self.assertEqual(result, 'False')
 
 if __name__ == '__main__':
     unittest.main()

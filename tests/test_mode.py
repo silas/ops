@@ -4,61 +4,61 @@ import sys
 import unittest
 import ops
 
-class ModeBitsTestCase(unittest.TestCase):
+class PermTestCase(unittest.TestCase):
 
     def test_default(self):
-        b = ops._ModeBits()
-        self.assertEqual(b.read, None)
-        self.assertEqual(b.write, None)
-        self.assertEqual(b.execute, None)
+        p = ops.perm()
+        self.assertEqual(p.read, None)
+        self.assertEqual(p.write, None)
+        self.assertEqual(p.execute, None)
 
     def test_seven(self):
-        b = ops._ModeBits(7)
-        self.assertTrue(b.read)
-        self.assertTrue(b.write)
-        self.assertTrue(b.execute)
+        p = ops.perm(7)
+        self.assertTrue(p.read)
+        self.assertTrue(p.write)
+        self.assertTrue(p.execute)
 
     def test_six(self):
-        b = ops._ModeBits(6)
-        self.assertTrue(b.read)
-        self.assertTrue(b.write)
-        self.assertFalse(b.execute)
+        p = ops.perm(6)
+        self.assertTrue(p.read)
+        self.assertTrue(p.write)
+        self.assertFalse(p.execute)
 
     def test_five(self):
-        b = ops._ModeBits(5)
-        self.assertTrue(b.read)
-        self.assertFalse(b.write)
-        self.assertTrue(b.execute)
+        p = ops.perm(5)
+        self.assertTrue(p.read)
+        self.assertFalse(p.write)
+        self.assertTrue(p.execute)
 
     def test_four(self):
-        b = ops._ModeBits(4)
-        self.assertTrue(b.read)
-        self.assertFalse(b.write)
-        self.assertFalse(b.execute)
+        p = ops.perm(4)
+        self.assertTrue(p.read)
+        self.assertFalse(p.write)
+        self.assertFalse(p.execute)
 
     def test_three(self):
-        b = ops._ModeBits(3)
-        self.assertFalse(b.read)
-        self.assertTrue(b.write)
-        self.assertTrue(b.execute)
+        p = ops.perm(3)
+        self.assertFalse(p.read)
+        self.assertTrue(p.write)
+        self.assertTrue(p.execute)
 
     def test_two(self):
-        b = ops._ModeBits(2)
-        self.assertFalse(b.read)
-        self.assertTrue(b.write)
-        self.assertFalse(b.execute)
+        p = ops.perm(2)
+        self.assertFalse(p.read)
+        self.assertTrue(p.write)
+        self.assertFalse(p.execute)
 
     def test_one(self):
-        b = ops._ModeBits(1)
-        self.assertFalse(b.read)
-        self.assertFalse(b.write)
-        self.assertTrue(b.execute)
+        p = ops.perm(1)
+        self.assertFalse(p.read)
+        self.assertFalse(p.write)
+        self.assertTrue(p.execute)
 
     def test_zero(self):
-        b = ops._ModeBits(0)
-        self.assertFalse(b.read)
-        self.assertFalse(b.write)
-        self.assertFalse(b.execute)
+        p = ops.perm(0)
+        self.assertFalse(p.read)
+        self.assertFalse(p.write)
+        self.assertFalse(p.execute)
 
 class ModeTestCase(unittest.TestCase):
 

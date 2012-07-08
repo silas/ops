@@ -24,6 +24,12 @@ class ChmodTestCase(unittest.TestCase):
         with open(self.file_path, 'w') as f:
             f.write('hello world')
 
+    def test_error(self):
+        # OSError
+        self.assertFalse(ops.chmod('/tmp/ops-chmod-missing', 0777))
+        # TypeError
+        self.assertFalse(ops.chmod(0, 0777))
+
     def test_file(self):
         self.setup_file()
 
@@ -50,6 +56,13 @@ class ChmodTestCase(unittest.TestCase):
 
         ops.chmod(self.path, 0000)
         self.assertEqual(os.stat(self.path).st_mode, 32768)
+
+        u = ops.perm(read=True, write=True, execute=True)
+        g = ops.perm(read=True, write=True, execute=False)
+        o = ops.perm(read=False, write=False, execute=False)
+
+        ops.chmod(self.path, user=u, group=g, other=o)
+        self.assertEqual(os.stat(self.path).st_mode, 33264)
 
     def test_recursive(self):
         self.setup_directory()

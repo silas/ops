@@ -67,6 +67,17 @@ class CpTestCase(unittest.TestCase):
         ops.cp(self.path1, self.path2)
         self.check_same_file(self.path1, self.path2)
 
+    def test_file_follow_links(self):
+        self.setup_file()
+        self.name3 = 'file3'
+        self.name4 = 'file4'
+        self.path3 = self.workspace.join(self.name3)
+        self.path4 = self.workspace.join(self.name4)
+        os.symlink(self.path1, self.path3)
+        os.symlink(self.path2, self.path4)
+        ops.cp(self.path3, self.path4, follow_links=True)
+        self.check_same_file(self.path1, self.path2)
+
     def test_file_to_directory(self):
         self.setup_file()
         dir_path = self.workspace.join('dst')
@@ -74,6 +85,13 @@ class CpTestCase(unittest.TestCase):
         ops.cp(self.path1, dir_path)
         path2 = os.path.join(dir_path, self.name1)
         self.check_same_file(self.path1, path2)
+
+    def test_error(self):
+        # src path doesn't exist
+        self.assertFalse(ops.cp('/tmp/ops-cp-error', '/tmp/ops-cp'))
+
+        # invalid src or dst path
+        ops.cp(True, False)
 
     def test_directory(self):
         self.setup_directory()
