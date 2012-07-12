@@ -4,7 +4,7 @@
 # This file is subject to the MIT License (see the LICENSE file).
 
 __copyright__ = '2010-2012, Silas Sewell'
-__version__ = '0.4.5'
+__version__ = '0.4.6'
 
 import collections
 import copy
@@ -813,9 +813,10 @@ def run(command, **kwargs):
         else:
             env = copy.deepcopy(os.environ)
         env.update(kwargs['env'])
-    combine = kwargs.get('combine', False)
+    stdin = kwargs.get('stdin')
     stdout = kwargs.get('stdout', False)
     stderr = kwargs.get('stderr', False)
+    combine = kwargs.get('combine', False)
     if stdout is True:
         stdout = sys.stdout.write
     if stderr is True:
@@ -836,6 +837,7 @@ def run(command, **kwargs):
     log.debug('run: %s' % command)
     ref = subprocess.Popen(
         command,
+        stdin=None if stdin is None else subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT if combine is True else subprocess.PIPE,
         shell=kwargs.get('shell', True),
@@ -843,6 +845,10 @@ def run(command, **kwargs):
         env=env,
         cwd=kwargs.get('cwd', tempfile.gettempdir()),
     )
+    if stdin is not None:
+        ref.stdin.write(stdin)
+        ref.stdin.flush()
+        ref.stdin.close()
     fds = [ref.stdout]
     if combine is not True:
         fds.append(ref.stderr)

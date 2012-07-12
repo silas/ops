@@ -48,5 +48,9 @@ class RunTestCase(unittest.TestCase):
         self.assertTrue(results)
         self.assertEqual(results.code, 0)
 
+    def test_stdin(self):
+        results = ops.run('bash', stdin='echo -n ok')
+        self.assertEqual('ok', results.stdout)
+
 if __name__ == '__main__':
     unittest.main()
