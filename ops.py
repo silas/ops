@@ -747,6 +747,8 @@ class path(unicode):
       True
       >>> p
       /tmp
+      >>> p.join('foo')
+      /tmp/foo
       >>> p.stat.user.name
       root
     """
@@ -765,6 +767,9 @@ class path(unicode):
         if isinstance(stat, _ops_stat):
             obj._stat = stat
         return obj
+
+    def join(self, *args, **kwargs):
+        return path(os.path.join(self, *args, **kwargs))
 
 def rm(path, recursive=False):
     """Delete a specified file or directory. This function does not recursively
