@@ -27,9 +27,19 @@ import tempfile
 
 log = logging.getLogger('ops')
 type_ = type
+darwin = sys.platform == 'darwin'
 
 class Error(Exception): pass
 class ValidationError(Error): pass
+
+def _uid_gid(path, uid, gid):
+    if uid == -1 or gid == -1:
+        st = stat(path)
+        if uid == -1:
+            uid = st.st_uid
+        if gid == -1:
+            gid = st.st_uid
+    return uid, gid
 
 def _chmod(path, value=None):
     try:
@@ -66,6 +76,12 @@ def chmod(path, mode=None, user=None, group=None, other=None, recursive=False):
     return successful
 
 def _chown(path, uid=-1, gid=-1):
+    if uid < -1 or gid < -1:
+        log.error('chown: invalid uid or gid: %s' % path)
+        return False
+    # hack around Apple's broken patch (http://bugs.python.org/issue13315)
+    if darwin:
+        uid, gid = _uid_gid(path, uid, gid)
     try:
         os.chown(path, uid, gid)
         return True
@@ -425,10 +441,12 @@ class group(object):
             try:
                 if self._name:
                     self._data = grp.getgrnam(self._name)
-                else:
+                elif self._id >= 0:
                     self._data = grp.getgrgid(self._id)
+                else:
+                    raise Error('invalid')
                 self._bool = True
-            except KeyError:
+            except (Error, KeyError):
                 self._bool = False
                 self._data = [None] * 7
         return self._data
