@@ -70,7 +70,7 @@ def _chown(path, uid=-1, gid=-1):
         log.error('chown: invalid uid or gid: %s' % path)
         return False
     # hack around Apple's broken patch (http://bugs.python.org/issue13315)
-    if sys.platform == 'darwin' and uid == -1 or gid == -1:
+    if sys.platform == 'darwin' and (uid == -1 or gid == -1):
         st = stat(path)
         if uid == -1:
             uid = st.st_uid
