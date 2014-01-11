@@ -5,6 +5,8 @@ import os
 import unittest
 import ops
 
+from mock import patch
+
 class ChownTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -20,8 +22,20 @@ class ChownTestCase(unittest.TestCase):
     def test_uid(self):
         ops.chown(self.workspace.path, user=self.uid)
 
+    @patch('sys.platform', 'darwin')
+    @patch('os.chown', return_value=True)
+    def test_uid_darwin(self, chown):
+        ops.chown(self.workspace.path, user=self.uid)
+        chown.assert_called_with(self.workspace.path, self.uid, self.gid)
+
     def test_gid(self):
         ops.chown(self.workspace.path, group=self.gid)
+
+    @patch('sys.platform', 'darwin')
+    @patch('os.chown', return_value=True)
+    def test_gid_darwin(self, chown):
+        ops.chown(self.workspace.path, group=self.gid)
+        chown.assert_called_with(self.workspace.path, self.uid, self.gid)
 
     def test_user(self):
         ops.chown(self.workspace.path, user=self.user)
