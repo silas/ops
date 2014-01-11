@@ -38,7 +38,7 @@ def _uid_gid(path, uid, gid):
         if uid == -1:
             uid = st.st_uid
         if gid == -1:
-            gid = st.st_uid
+            gid = st.st_gid
     return uid, gid
 
 def _chmod(path, value=None):
