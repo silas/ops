@@ -28,8 +28,14 @@ import tempfile
 log = logging.getLogger('ops')
 type_ = type
 
-class Error(Exception): pass
-class ValidationError(Error): pass
+
+class Error(Exception):
+    pass
+
+
+class ValidationError(Error):
+    pass
+
 
 def _chmod(path, value=None):
     try:
@@ -40,6 +46,7 @@ def _chmod(path, value=None):
     except TypeError:
         log.error('invalid mode value: %s' % value)
     return False
+
 
 def chmod(path, mode=None, user=None, group=None, other=None, recursive=False):
     """Changes file mode permissions.
@@ -65,6 +72,7 @@ def chmod(path, mode=None, user=None, group=None, other=None, recursive=False):
         successful = _chmod(path, mode)
     return successful
 
+
 def _chown(path, uid=-1, gid=-1):
     if uid < -1 or gid < -1:
         log.error('chown: invalid uid or gid: %s' % path)
@@ -82,6 +90,7 @@ def _chown(path, uid=-1, gid=-1):
     except OSError, error:
         log.error('chown: execute failed: %s (%s)' % (path, error))
     return False
+
 
 def chown(path, user=None, group=None, recursive=False):
     """Change file owner and group.
@@ -129,6 +138,7 @@ def chown(path, user=None, group=None, recursive=False):
         successful = False
     return successful
 
+
 def cp(src_path, dst_path, follow_links=False, recursive=True):
     """Copy source to destination.
 
@@ -157,6 +167,7 @@ def cp(src_path, dst_path, follow_links=False, recursive=True):
     except (OSError, TypeError), error:
         log.error('cp: execute failed: %s => %s (%s)' % (src_path, dst_path, error))
     return successful
+
 
 class Env(collections.MutableMapping):
     """Get and set environment variables.
@@ -240,6 +251,7 @@ class Env(collections.MutableMapping):
 
 env = Env()
 
+
 def exit(code=0, text=''):
     """Exit and print text (if defined) to stderr if code > 0 or stdout
     otherwise.
@@ -257,6 +269,7 @@ def exit(code=0, text=''):
             print text
         sys.exit(0)
 
+
 class _FindRule(object):
 
     def __init__(self, exclude=False):
@@ -270,6 +283,7 @@ class _FindRule(object):
             return not value
         return value
 
+
 class _FindDirectoryRule(_FindRule):
 
     def __init__(self, value, **kwargs):
@@ -278,6 +292,7 @@ class _FindDirectoryRule(_FindRule):
 
     def __call__(self, path):
         return self.render(path.stat.directory == self.value)
+
 
 class _FindFileRule(_FindRule):
 
@@ -288,6 +303,7 @@ class _FindFileRule(_FindRule):
     def __call__(self, path):
         return self.render(path.stat.file == self.value)
 
+
 class _FindNameRule(_FindRule):
 
     def __init__(self, pattern, **kwargs):
@@ -297,6 +313,7 @@ class _FindNameRule(_FindRule):
     def __call__(self, path):
         name = os.path.basename(path)
         return self.render(fnmatch.fnmatch(name, self.pattern))
+
 
 class _FindTimeRule(_FindRule):
 
@@ -310,9 +327,11 @@ class _FindTimeRule(_FindRule):
         dt = getattr(path.stat, self.type)
         if not self.op or self.op == 'exact':
             if isinstance(self.time, datetime.date):
-                return self.render(dt.year == self.time.year and
-                        dt.month == self.time.month and
-                        dt.day == self.time.day)
+                return self.render(
+                    dt.year == self.time.year and
+                    dt.month == self.time.month and
+                    dt.day == self.time.day
+                )
             return self.render(dt == self.time)
         if isinstance(self.time, datetime.date) and not isinstance(self.time, datetime.datetime):
             time = datetime.datetime(year=self.time.year, month=self.time.month, day=self.time.day)
@@ -339,6 +358,7 @@ class _FindTimeRule(_FindRule):
         elif self.op == 'second':
             return self.render(dt.second == self.time)
         return self.render()
+
 
 class find(object):
     """Find directories and files in the specified path.
@@ -408,6 +428,7 @@ class find(object):
         self._add_rule(kwargs, exclude=True)
         return self
 
+
 class group(object):
     """Get information about a group.
 
@@ -472,7 +493,9 @@ class group(object):
     @property
     def members(self):
         return [user(name=name) for name in self.gr_mem]
+
 _ops_group = group
+
 
 def mkdir(path, recursive=True):
     """Create a directory at the specified path. By default this function
@@ -494,6 +517,7 @@ def mkdir(path, recursive=True):
         return False
     return True
 
+
 class perm(object):
 
     def __init__(self, value=None, read=None, write=None, execute=None):
@@ -507,6 +531,7 @@ class perm(object):
         self.execute = value & 1
         self.read = value & 4
         self.write = value & 2
+
 
 class mode(object):
     """An object for representing file mode permissions.
@@ -582,6 +607,7 @@ class mode(object):
     def other(self, value=None):
         self._set_perm('_other', value)
 _ops_mode = mode
+
 
 def normalize(value, default=None, type=None, raise_exception=False):
     """Convert string variables to a specified type.
@@ -666,6 +692,7 @@ def normalize(value, default=None, type=None, raise_exception=False):
                 return 0.0
     return default
 
+
 class obj(collections.MutableMapping):
     """Use property access syntax to retrieve values from a dict-like object.
 
@@ -742,14 +769,17 @@ class obj(collections.MutableMapping):
     def __unicode__(self):
         return unicode(self._data)
 
+
 def _path_stat_get(self):
     if not hasattr(self, '_stat'):
         self._stat = _ops_stat(self)
     return self._stat
 
+
 def _path_stat_set(self, value=None):
     if isinstance(value, _ops_stat):
         self._stat = stat
+
 
 class path(unicode):
     """An object for representing paths.
@@ -783,6 +813,7 @@ class path(unicode):
     def join(self, *args, **kwargs):
         return path(os.path.join(self, *args, **kwargs))
 
+
 def rm(path, recursive=False):
     """Delete a specified file or directory. This function does not recursively
     delete by default.
@@ -806,6 +837,7 @@ def rm(path, recursive=False):
         log.error('rm: execute failed: %s (%s)' % (path, error))
         return False
     return True
+
 
 def run(command, **kwargs):
     """Run a shell command and wait for the response. The result object will
@@ -892,6 +924,7 @@ def run(command, **kwargs):
         'stdout': stdout_result,
         'stderr': stderr_result,
     }, bool=ref.returncode == 0, grow=False)
+
 
 class stat(object):
     """Display stat info for files and directories.
@@ -1009,6 +1042,7 @@ class stat(object):
         return self._directory
 _ops_stat = stat
 
+
 class user(object):
     """Get information about a user.
 
@@ -1101,6 +1135,7 @@ class user(object):
     def shell(self):
         return self.pw_shell
 _ops_user = user
+
 
 class workspace(object):
     """Create a secure and temporary workspace that will be automatically
