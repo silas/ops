@@ -10,7 +10,7 @@ You can find the latest docs at http://silas.sewell.org/ops/.
 setup(
     name='ops',
     version=version,
-    description='Automation library for system tasks',
+    description='Automation library for systems administration tasks',
     long_description=long_description.strip(),
     author='Silas Sewell',
     author_email='silas@sewell.org',
@@ -26,6 +26,7 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.3',
         'Topic :: Software Development',
         'Topic :: Software Development :: Libraries',
         'Topic :: Software Development :: Libraries :: Python Modules',
