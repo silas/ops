@@ -31,8 +31,8 @@ log = logging.getLogger('ops')
 type_ = type
 py3 = sys.version_info[0] > 2
 
-if sys.version_info[1] < 3:
-    raise Exception('Python %s.%s not supported' % (sys.version_info.major, sys.version_info.minor))
+if py3 and sys.version_info[1] < 3:
+    raise Exception('Python %s.%s not supported' % sys.version_info[0:2])
 
 str_types = (str, 'str', 'string', 'unicode')
 
