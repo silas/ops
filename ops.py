@@ -40,15 +40,11 @@ if py3:
     bytes_type = bytes
     unicode_type = str
     basestring_type = str
-    u = lambda t: u
-    b = lambda t: t.encode('utf-8') if isinstance(t, str) else t
 else:
     bytes_type = str
     unicode_type = unicode
     basestring_type = basestring
     str_types += (unicode,)
-    u = lambda t: t if isinstance(t, unicode) else unicode(t)
-    b = lambda t: t.encode('utf-8') if isinstance(t, unicode) else t
 
 
 class Error(Exception):
