@@ -29,9 +29,9 @@ import tempfile
 
 log = logging.getLogger('ops')
 type_ = type
-py3 = sys.version_info.major > 2
+py3 = sys.version_info[0] > 2
 
-if sys.version_info.minor < 3:
+if sys.version_info[1] < 3:
     raise Exception('Python %s.%s not supported' % (sys.version_info.major, sys.version_info.minor))
 
 str_types = (str, 'str', 'string', 'unicode')
@@ -74,7 +74,7 @@ def chmod(path, mode=None, user=None, group=None, other=None, recursive=False):
     """Changes file mode permissions.
 
       >>> if chmod('/tmp/one', 0755):
-      ...     print 'OK'
+      ...     print('OK')
       OK
 
     NOTE: The precending ``0`` is required when using a numerical mode.
@@ -118,7 +118,7 @@ def chown(path, user=None, group=None, recursive=False):
     """Change file owner and group.
 
       >>> if chown('/tmp/one', user='root', group='wheel'):
-      ...     print 'OK'
+      ...     print('OK')
       OK
     """
     successful = True
@@ -165,7 +165,7 @@ def cp(src_path, dst_path, follow_links=False, recursive=True):
     """Copy source to destination.
 
       >>> if cp('/tmp/one', '/tmp/two'):
-      ...     print 'OK'
+      ...     print('OK')
       OK
     """
     successful = False
@@ -388,7 +388,7 @@ class find(object):
     """Find directories and files in the specified path.
 
       >>> for path in find('/tmp').filter(name='*.py', file=True).exclude(mtime__year=2010):
-      ...     print '%s is owned by %s' % (path, path.stat.user.name)
+      ...     print('%s is owned by %s' % (path, path.stat.user.name))
       /tmp/test1.py is owned by silas
       /tmp/test2.py is owned by root
     """
@@ -529,7 +529,7 @@ def mkdir(path, recursive=True):
     recursively creates the path.
 
       >>> if mkdir('/tmp/one/two'):
-      ...     print 'OK'
+      ...     print('OK')
       OK
     """
     if os.path.exists(path):
@@ -838,7 +838,7 @@ def rm(path, recursive=False):
     delete by default.
 
       >>> if rm('/tmp/build', recursive=True):
-      ...     print 'OK'
+      ...     print('OK')
       OK
     """
     try:
@@ -867,11 +867,11 @@ def run(command, **kwargs):
       >>> result.code
       0
       >>> if result:
-      ...     print 'Stdout: %s' % result.stdout
+      ...     print('Stdout: %s' % result.stdout)
       ... else:
-      ...     print 'Stderr: %s' % result.stderr
+      ...     print('Stderr: %s' % result.stderr)
       Stdout: Some $%^$## "" + ' content
-      >>> print result.command
+      >>> print(result.command)
       echo 'Some $%^$## "" + '"'"' content'
     """
     env = None
@@ -1172,7 +1172,7 @@ class workspace(object):
       >>> path = None
       >>> with workspace() as w:
       ...     path = w.path
-      ...     print w.join('dir1', 'file1')
+      ...     print(w.join('dir1', 'file1'))
       /tmp/tmp8IVxyA/dir1/file1
       >>> os.path.exists(path)
       False

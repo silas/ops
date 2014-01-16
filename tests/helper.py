@@ -7,7 +7,7 @@ import sys
 import uuid as uuid_
 
 
-py3 = sys.version_info.major > 2
+py3 = sys.version_info[0] > 2
 
 if py3:
     bytes_type = bytes

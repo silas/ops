@@ -13,12 +13,12 @@ ops is a library for scripting systems administration tasks in Python.
 
     for path in find('/tmp').filter(name='*.py', file=True).exclude(mtime__day=13):
         result = run('python ${path}', path=path)
-        print 'Command: %s' % result.command
-        print 'Code: %s' % result.code
+        print('Command: %s' % result.command)
+        print('Code: %s' % result.code)
         if result:
-            print 'Stdout: %s' % result.stdout
+            print('Stdout: %s' % result.stdout)
         else:
-            print 'Stderr: %s' % result.stderr
+            print('Stderr: %s' % result.stderr)
 
 Which might produce something like:
 
