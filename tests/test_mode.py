@@ -1,8 +1,12 @@
+from __future__ import unicode_literals
+
 import helper
 
 import sys
 import unittest
+
 import ops
+
 
 class PermTestCase(unittest.TestCase):
 
@@ -60,6 +64,7 @@ class PermTestCase(unittest.TestCase):
         self.assertFalse(p.write)
         self.assertFalse(p.execute)
 
+
 class ModeTestCase(unittest.TestCase):
 
     def test_default(self):
@@ -70,7 +75,7 @@ class ModeTestCase(unittest.TestCase):
         self.assertEqual(m.other.execute, None)
 
     def test_get(self):
-        m = ops.mode(0740)
+        m = ops.mode(0o740)
 
         self.assertTrue(m.user.read)
         self.assertTrue(m.user.write)
@@ -85,11 +90,11 @@ class ModeTestCase(unittest.TestCase):
         self.assertFalse(m.other.execute)
 
     def test_set(self):
-        m = ops.mode(0640)
+        m = ops.mode(0o640)
 
         m.group.write = True
         m.other.read = True
-        self.assertEqual(m.numeric, 0664)
+        self.assertEqual(m.numeric, 0o664)
 
     def test_set_type(self):
         m = ops.mode()

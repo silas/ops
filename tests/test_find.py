@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import helper
 
 import datetime
@@ -5,7 +7,9 @@ import copy
 import os
 import time
 import unittest
+
 import ops
+
 
 class FindRuleTestCase(unittest.TestCase):
 
@@ -25,6 +29,7 @@ class FindRuleTestCase(unittest.TestCase):
         self.assertFalse(rule.render())
         self.assertTrue(rule.render(False))
 
+
 class FindDirectoryRuleTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -37,6 +42,7 @@ class FindDirectoryRuleTestCase(unittest.TestCase):
     def test_directory(self):
         path = ops.path(os.path.dirname(self.file_path))
         self.assertTrue(self.rule(path))
+
 
 class FindFileRuleTestCase(unittest.TestCase):
 
@@ -51,6 +57,7 @@ class FindFileRuleTestCase(unittest.TestCase):
         path = ops.path(os.path.dirname(self.file_path))
         self.assertFalse(self.rule(path))
 
+
 class FindNameRuleTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -62,6 +69,7 @@ class FindNameRuleTestCase(unittest.TestCase):
 
     def test_no_match(self):
         self.assertFalse(self.rule(ops.path('world.py')))
+
 
 class FindTimeRuleTestCase(unittest.TestCase):
 
@@ -136,6 +144,7 @@ class FindTimeRuleTestCase(unittest.TestCase):
         self.assertTrue(self.rule('second', 15))
         self.assertFalse(self.rule('second', 1))
 
+
 class FindTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -145,8 +154,8 @@ class FindTestCase(unittest.TestCase):
         self.workspace.destroy()
 
     def setup_directory(self):
-        for n1 in xrange(0, 3):
-            for n2 in xrange(0, 3):
+        for n1 in range(0, 3):
+            for n2 in range(0, 3):
                 p = self.workspace.join('dir%s' % n1, 'dir%s' % n2)
                 os.makedirs(p)
                 with open(os.path.join(p, 'file'), 'w') as f:
@@ -195,7 +204,7 @@ class FindTestCase(unittest.TestCase):
             total_count += 1
         for path in ops.find(dir_path).exclude(name='test_find.py'):
             exclude_count += 1
-        self.assertEqual(exclude_count+1, total_count)
+        self.assertEqual(exclude_count + 1, total_count)
 
     def test_top_down(self):
         self.setup_directory()

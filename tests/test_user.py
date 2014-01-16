@@ -1,10 +1,13 @@
+from __future__ import unicode_literals
+
 import helper
 
 import pwd
 import os
 import unittest
-import uuid
+
 import ops
+
 
 class UserTestCase(unittest.TestCase):
 
@@ -34,7 +37,7 @@ class UserTestCase(unittest.TestCase):
         self.assertTrue(user)
 
     def test_get_by_invalid_name(self):
-        user = ops.user(name=uuid.uuid4().get_hex())
+        user = ops.user(name=helper.uuid())
         self.assertTrue(user.id is None)
         self.assertTrue(user.name is None)
         self.assertFalse(user)

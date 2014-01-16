@@ -1,9 +1,11 @@
-# Copyright (c) 2010-2012, Silas Sewell
+# Copyright (c) 2010-2014, Silas Sewell
 # All rights reserved.
 #
 # This file is subject to the MIT License (see the LICENSE file).
 
-__copyright__ = '2010-2012, Silas Sewell'
+from __future__ import unicode_literals
+
+__copyright__ = '2010-2014, Silas Sewell'
 __version__ = '0.4.6'
 
 import collections
@@ -27,6 +29,26 @@ import tempfile
 
 log = logging.getLogger('ops')
 type_ = type
+py3 = sys.version_info.major > 2
+
+if sys.version_info.minor < 3:
+    raise Exception('Python %s.%s not supported' % (sys.version_info.major, sys.version_info.minor))
+
+str_types = (str, 'str', 'string', 'unicode')
+
+if py3:
+    bytes_type = bytes
+    unicode_type = str
+    basestring_type = str
+    u = lambda t: u
+    b = lambda t: t.encode('utf-8') if isinstance(t, str) else t
+else:
+    bytes_type = str
+    unicode_type = unicode
+    basestring_type = basestring
+    str_types += (unicode,)
+    u = lambda t: t if isinstance(t, unicode) else unicode(t)
+    b = lambda t: t.encode('utf-8') if isinstance(t, unicode) else t
 
 
 class Error(Exception):
@@ -39,12 +61,12 @@ class ValidationError(Error):
 
 def _chmod(path, value=None):
     try:
-        os.chmod(path, value.numeric)
+        os.chmod('' + path, value.numeric)
         return True
-    except OSError, error:
+    except OSError as error:
         log.error('chmod: %s' % error)
     except TypeError:
-        log.error('invalid mode value: %s' % value)
+        log.error('chmod: invalid mode value: %s' % value)
     return False
 
 
@@ -87,7 +109,7 @@ def _chown(path, uid=-1, gid=-1):
     try:
         os.chown(path, uid, gid)
         return True
-    except OSError, error:
+    except OSError as error:
         log.error('chown: execute failed: %s (%s)' % (path, error))
     return False
 
@@ -103,7 +125,7 @@ def chown(path, user=None, group=None, recursive=False):
     uid = -1
     gid = -1
     if user is not None:
-        if isinstance(user, basestring):
+        if isinstance(user, basestring_type):
             user = _ops_user(name=user)
         elif isinstance(user, numbers.Number):
             user = _ops_user(id=user)
@@ -116,7 +138,7 @@ def chown(path, user=None, group=None, recursive=False):
         else:
             successful = False
     if group is not None:
-        if isinstance(group, basestring):
+        if isinstance(group, basestring_type):
             group = _ops_group(name=group)
         elif isinstance(group, numbers.Number):
             group = _ops_group(id=group)
@@ -164,7 +186,7 @@ def cp(src_path, dst_path, follow_links=False, recursive=True):
             successful = True
         else:
             log.error('cp: source not found: %s' % src_path)
-    except (OSError, TypeError), error:
+    except (OSError, TypeError) as error:
         log.error('cp: execute failed: %s => %s (%s)' % (src_path, dst_path, error))
     return successful
 
@@ -229,10 +251,10 @@ class Env(collections.MutableMapping):
     def set(self, name, value, add=False, append=False, prepend=False, sep=':', unique=False):
         if add and name in self:
             return False
-        if not isinstance(value, basestring):
-            value = unicode(value)
-        if not isinstance(sep, basestring):
-            sep = unicode(sep)
+        if not isinstance(value, basestring_type):
+            value = unicode_type(value)
+        if not isinstance(sep, basestring_type):
+            sep = unicode_type(sep)
         if append or prepend:
             current_value = self.get(name, default='')
             if current_value:
@@ -258,15 +280,17 @@ def exit(code=0, text=''):
 
       >>> exit(code=1, text='Invalid directory path')
     """
-    if not isinstance(text, basestring):
-        text = unicode(text)
+    if not isinstance(text, basestring_type):
+        text = unicode_type(text)
     if code > 0:
         if text:
-            print >> sys.stderr, text
+            if not isinstance(text, basestring_type):
+                text = unicode_type(text)
+            sys.stderr.write(text)
         sys.exit(code)
     else:
         if text:
-            print text
+            print(text)
         sys.exit(0)
 
 
@@ -445,10 +469,13 @@ class group(object):
         if id is None and name is None:
             self._id = os.getegid()
 
-    def __nonzero__(self):
+    def __bool__(self):
         if self._bool is None:
             self.data
         return self._bool
+
+    def __nonzero__(self):
+        return self.__bool__()
 
     @property
     def data(self):
@@ -512,7 +539,7 @@ def mkdir(path, recursive=True):
             os.makedirs(path)
         else:
             os.mkdir(path)
-    except OSError, error:
+    except OSError as error:
         log.error('mkdir: execute failed: %s (%s)' % (path, error))
         return False
     return True
@@ -606,6 +633,7 @@ class mode(object):
     @other.setter
     def other(self, value=None):
         self._set_perm('_other', value)
+
 _ops_mode = mode
 
 
@@ -621,33 +649,21 @@ def normalize(value, default=None, type=None, raise_exception=False):
     """
     NUMBER_RE = re.compile('^[-+]?(([0-9]+\.?[0-9]*)|([0-9]*\.?[0-9]+))$')
     if type is None and default is None:
-        type = basestring
+        type = unicode_type
     elif type is None:
         type = type_(default)
-    if type in (basestring, 'basestring'):
+    if type in str_types:
         if value is not None:
-            return value
+            if isinstance(value, unicode_type):
+                return value
+            elif py3 and isinstance(value, bytes_type):
+                return value.decode('utf-8')
+            return unicode_type(value)
         if default is None:
             if raise_exception:
                 raise ValidationError('invalid string')
             else:
-                return ''
-    elif type in (str, 'str', 'string'):
-        if value is not None:
-            return value if isinstance(value, str) else str(value)
-        if default is None:
-            if raise_exception:
-                raise ValidationError('invalid string')
-            else:
-                return ''
-    elif type in (unicode, 'unicode'):
-        if value is not None:
-            return value if isinstance(value, unicode) else unicode(value)
-        if default is None:
-            if raise_exception:
-                raise ValidationError('invalid string')
-            else:
-                return u''
+                return unicode_type()
     elif type in (bool, 'bool', 'boolean'):
         if value is not None:
             value = value.lower().strip()
@@ -675,7 +691,7 @@ def normalize(value, default=None, type=None, raise_exception=False):
         try:
             return int(value)
         except Exception:
-            if isinstance(value, basestring) and NUMBER_RE.match(value):
+            if isinstance(value, basestring_type) and NUMBER_RE.match(value):
                 return int(eval(value))
             if default is None:
                 if raise_exception:
@@ -745,11 +761,14 @@ class obj(collections.MutableMapping):
     def __len__(self, *args, **kwargs):
         return self._data.__len__(*args, **kwargs)
 
-    def __nonzero__(self, *args, **kwargs):
+    def __bool__(self, *args, **kwargs):
         if self._bool is not None:
             return self._bool
         else:
             return bool(self._data)
+
+    def __nonzero__(self, *args, **kwargs):
+        return self.__bool__(*args, **kwargs)
 
     def __setattr__(self, name, value):
         if name.startswith('_'):
@@ -767,7 +786,7 @@ class obj(collections.MutableMapping):
         return str(self._data)
 
     def __unicode__(self):
-        return unicode(self._data)
+        return unicode_type(self._data)
 
 
 def _path_stat_get(self):
@@ -781,7 +800,7 @@ def _path_stat_set(self, value=None):
         self._stat = stat
 
 
-class path(unicode):
+class path(unicode_type):
     """An object for representing paths.
 
       >>> p = path('/tmp')
@@ -805,7 +824,7 @@ class path(unicode):
             value = os.path.realpath(value)
         except OSError:
             value = ''
-        obj = unicode.__new__(cls, value)
+        obj = unicode_type.__new__(cls, value)
         if isinstance(stat, _ops_stat):
             obj._stat = stat
         return obj
@@ -833,7 +852,7 @@ def rm(path, recursive=False):
                 os.remove(path)
             else:
                 os.rmdir(path)
-    except OSError, error:
+    except OSError as error:
         log.error('rm: execute failed: %s (%s)' % (path, error))
         return False
     return True
@@ -874,14 +893,14 @@ def run(command, **kwargs):
         args = {}
         q = pipes.quote
         for name, value in kwargs.items():
-            if isinstance(value, basestring):
+            if isinstance(value, basestring_type):
                 args[name] = q(value)
             elif isinstance(value, (list, tuple)):
-                args[name] = u' '.join([q(unicode(v)) for v in value])
+                args[name] = u' '.join([q(unicode_type(v)) for v in value])
             elif isinstance(value, dict):
                 args[name] = u' '.join([u'%s %s' % (q(n), q(v)) for n, v in value.items()])
             else:
-                args[name] = pipes.quote(unicode(value))
+                args[name] = pipes.quote(unicode_type(value))
         command = string.Template(command).safe_substitute(args)
     log.debug('run: %s' % command)
     ref = subprocess.Popen(
@@ -895,14 +914,18 @@ def run(command, **kwargs):
         cwd=kwargs.get('cwd', tempfile.gettempdir()),
     )
     if stdin is not None:
+        if not isinstance(stdin, basestring_type):
+            stdin = unicode_type(stdin)
+        if not isinstance(stdin, bytes_type):
+            stdin = stdin.encode('utf-8')
         ref.stdin.write(stdin)
         ref.stdin.flush()
         ref.stdin.close()
     fds = [ref.stdout]
     if combine is not True:
         fds.append(ref.stderr)
-    stdout_result = ''
-    stderr_result = ''
+    stdout_result = b''
+    stderr_result = b''
     while fds:
         for fd in select.select(fds, tuple(), tuple())[0]:
             line = fd.readline()
@@ -1040,6 +1063,7 @@ class stat(object):
         if not hasattr(self, '_directory'):
             self._directory = os.path.isdir(self.path)
         return self._directory
+
 _ops_stat = stat
 
 
@@ -1064,10 +1088,13 @@ class user(object):
         if id is None and name is None:
             self._id = os.geteuid()
 
-    def __nonzero__(self):
+    def __bool__(self):
         if self._bool is None:
             self.data
         return self._bool
+
+    def __nonzero__(self):
+        return self.__bool__()
 
     @property
     def data(self):
@@ -1134,6 +1161,7 @@ class user(object):
     @property
     def shell(self):
         return self.pw_shell
+
 _ops_user = user
 
 
@@ -1161,7 +1189,7 @@ class workspace(object):
 
     def __exit__(self, type, value, traceback):
         if self.path and os.path.exists(self.path):
-            chmod(self.path, 0700, recursive=True)
+            chmod(self.path, 0o700, recursive=True)
             rm(self.path, recursive=True)
 
     @property

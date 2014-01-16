@@ -1,13 +1,20 @@
+from __future__ import unicode_literals
+
+import helper
+
 import numbers
 import os
 import unittest
+
 import ops
+
 
 class NormalizeTestCase(unittest.TestCase):
 
     def assertNormalizes(self, src, dst, ntype):
         value = ops.normalize(src, type=ntype)
-        self.assertTrue(isinstance(value, type(dst)))
+        message = '%s != %s' % (type(value).__name__, type(dst).__name__)
+        self.assertTrue(isinstance(value, type(dst)), message)
         self.assertEqual(value, dst)
 
     def assertNormalizesRaises(self, value, ntype):
@@ -16,25 +23,14 @@ class NormalizeTestCase(unittest.TestCase):
     def test_string(self):
         TYPE = 'string'
 
-        self.assertNormalizes(u'abc', 'abc', str)
-        self.assertNormalizes(u'abc', 'abc', 'str')
-        self.assertNormalizes(u'abc', 'abc', 'string')
+        self.assertNormalizes(b'abc', 'abc', helper.unicode_type)
+        self.assertNormalizes(b'abc', 'abc', 'str')
+        self.assertNormalizes(b'abc', 'abc', 'string')
 
-        self.assertNormalizes(u'', '', TYPE)
+        self.assertNormalizes(b'', '', TYPE)
 
         self.assertNormalizes(123, '123', TYPE)
         self.assertNormalizes(1.0, '1.0', TYPE)
-
-    def test_unicode(self):
-        TYPE = 'unicode'
-
-        self.assertNormalizes('abc', u'abc', unicode)
-        self.assertNormalizes('abc', u'abc', 'unicode')
-
-        self.assertNormalizes('', u'', TYPE)
-
-        self.assertNormalizes(123, u'123', TYPE)
-        self.assertNormalizes(1.0, u'1.0', TYPE)
 
     def test_boolean(self):
         TYPE = 'boolean'

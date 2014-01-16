@@ -1,10 +1,13 @@
+from __future__ import unicode_literals
+
 import helper
 
 import grp
 import os
 import unittest
-import uuid
+
 import ops
+
 
 class GroupTestCase(unittest.TestCase):
 
@@ -34,7 +37,7 @@ class GroupTestCase(unittest.TestCase):
         self.assertTrue(group)
 
     def test_get_by_invalid_name(self):
-        group = ops.group(name=uuid.uuid4().get_hex())
+        group = ops.group(name=helper.uuid())
         self.assertTrue(group.id is None)
         self.assertTrue(group.name is None)
         self.assertFalse(group)

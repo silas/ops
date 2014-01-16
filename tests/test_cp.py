@@ -1,9 +1,12 @@
+from __future__ import unicode_literals
+
 import helper
 
 import os
 import unittest
-import uuid
+
 import ops
+
 
 class CpTestCase(unittest.TestCase):
 
@@ -42,19 +45,19 @@ class CpTestCase(unittest.TestCase):
     def check_stat(self, path1, path2):
         stat1 = os.stat(path1)
         stat2 = os.stat(path2)
-        self.assertEqual(stat1[0], stat2[0]) # st_mode
-        self.assertNotEqual(stat1[1], stat2[1]) # st_ino
-        self.assertEqual(stat1[2], stat2[2]) # st_dev
-        self.assertEqual(stat1[3], stat2[3]) # st_nlink
-        self.assertEqual(stat1[4], stat2[4]) # st_uid
-        self.assertEqual(stat1[5], stat2[5]) # st_gid
-        self.assertEqual(stat1[6], stat2[6]) # st_size
-        self.assertEqual(stat1[7], stat2[7]) # st_atime
-        self.assertEqual(stat1[8], stat2[8]) # st_ctime
+        self.assertEqual(stat1[0], stat2[0])  # st_mode
+        self.assertNotEqual(stat1[1], stat2[1])  # st_ino
+        self.assertEqual(stat1[2], stat2[2])  # st_dev
+        self.assertEqual(stat1[3], stat2[3])  # st_nlink
+        self.assertEqual(stat1[4], stat2[4])  # st_uid
+        self.assertEqual(stat1[5], stat2[5])  # st_gid
+        self.assertEqual(stat1[6], stat2[6])  # st_size
+        self.assertEqual(stat1[7], stat2[7])  # st_atime
+        self.assertEqual(stat1[8], stat2[8])  # st_ctime
 
     def check_same_file(self, path1, path2):
-        content1 = uuid.uuid4().get_hex()
-        content2 = uuid.uuid4().get_hex()
+        content1 = helper.uuid()
+        content2 = helper.uuid()
         with open(path1, 'r') as f:
             content1 = f.read()
         with open(path2, 'r') as f:

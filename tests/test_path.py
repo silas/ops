@@ -1,8 +1,14 @@
+from __future__ import unicode_literals
+
+import helper
+
 import os
 import unittest
+
 import ops
 
 PATH = os.path.dirname(os.path.realpath(os.path.dirname(__file__)))
+
 
 class PathTestCase(unittest.TestCase):
 
@@ -16,7 +22,8 @@ class PathTestCase(unittest.TestCase):
         self.assertTrue(isinstance(self.path.stat, ops.stat))
 
     def test_type(self):
-        self.assertTrue(isinstance(self.path, unicode))
+        self.assertTrue(isinstance(self.path, helper.unicode_type))
+
 
 if __name__ == '__main__':
     unittest.main()

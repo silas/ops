@@ -1,8 +1,12 @@
+from __future__ import unicode_literals
+
 import helper
 
 import os
 import unittest
+
 import ops
+
 
 class WorkspaceTestCase(unittest.TestCase):
 

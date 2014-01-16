@@ -1,17 +1,25 @@
+from __future__ import unicode_literals
+
 import helper
 
-import StringIO
 import sys
 import unittest
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
 import ops
+
 
 class ExitTestCase(unittest.TestCase):
 
     def setUp(self):
         self.real_stdout = sys.stdout
         self.real_stderr = sys.stderr
-        sys.stdout = StringIO.StringIO()
-        sys.stderr = StringIO.StringIO()
+        sys.stdout = StringIO()
+        sys.stderr = StringIO()
 
     def tearDown(self):
         sys.stdout = self.real_stdout
@@ -22,7 +30,7 @@ class ExitTestCase(unittest.TestCase):
         self.assertRaises(SystemExit, ops.exit, code=1)
         try:
             ops.exit(code=1)
-        except SystemExit, exit:
+        except SystemExit as exit:
             self.assertEqual(exit.code, 1)
 
     def test_stdout(self):

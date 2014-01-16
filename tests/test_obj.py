@@ -1,8 +1,13 @@
+from __future__ import unicode_literals
+
 import helper
 
 import copy
+import json
 import unittest
+
 import ops
+
 
 class ObjTestCase(unittest.TestCase):
 
@@ -36,17 +41,15 @@ class ObjTestCase(unittest.TestCase):
         for key, value in d.items():
             self.assertEqual(o[key], value)
             self.assertEqual(getattr(o, key), value)
-        self.assertEqual(unicode(o), unicode(d))
-        self.assertEqual(str(o), str(d))
 
     def test_grow(self):
         self.o.one.two.three.four = 1234
         self.assertEqual(self.o['one']['two']['three']['four'], 1234)
-        self.assertEqual(str(self.o), "{'one': {'two': {'three': {'four': 1234}}}}")
+        self.assertEqual(str(self.o).replace("u'", "'"), "{'one': {'two': {'three': {'four': 1234}}}}")
         del self.o['one']
         self.o['four']['three']['two']['one'] = 4321
         self.assertEqual(self.o.four.three.two.one, 4321)
-        self.assertEqual(str(self.o), "{'four': {'three': {'two': {'one': 4321}}}}")
+        self.assertEqual(str(self.o).replace("u'", "'"), "{'four': {'three': {'two': {'one': 4321}}}}")
 
     def test_grow_false(self):
         try:

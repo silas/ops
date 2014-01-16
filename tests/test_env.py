@@ -1,7 +1,13 @@
+from __future__ import unicode_literals
+
+import helper
+
 import numbers
 import os
 import unittest
+
 import ops
+
 
 class EnvGetTestCase(unittest.TestCase):
 
@@ -22,12 +28,12 @@ class EnvGetTestCase(unittest.TestCase):
         self.assertEqual(self.env.get('ops-string'), 'string')
         self.assertEqual(self.env.get('ops-string', default='test'), 'string')
 
-        self.assertTrue(isinstance(self.env.get('ops-integer'), str))
-        self.assertTrue(isinstance(self.env.get('ops-string'), str))
-        self.assertTrue(isinstance(self.env.get('ops-unicode'), unicode))
+        self.assertTrue(isinstance(self.env.get('ops-integer'), helper.basestring_type))
+        self.assertTrue(isinstance(self.env.get('ops-string'), helper.basestring_type))
+        self.assertTrue(isinstance(self.env.get('ops-unicode'), helper.basestring_type))
 
     def test_string(self):
-        TYPE='string'
+        TYPE = 'string'
 
         self.assertEqual(self.env.get('ops-empty', type=TYPE), '')
         self.assertEqual(self.env.get('ops-empty', default='test', type=TYPE), 'test')
@@ -36,7 +42,7 @@ class EnvGetTestCase(unittest.TestCase):
         self.assertRaises(ops.ValidationError, self.env.get, 'ops-empty', type=TYPE, raise_exception=True)
 
     def test_unicode(self):
-        TYPE='unicode'
+        TYPE = 'unicode'
 
         self.assertEqual(self.env.get('ops-empty', type=TYPE), '')
         self.assertEqual(self.env.get('ops-empty', default=u'test', type=TYPE), u'test')
@@ -45,7 +51,7 @@ class EnvGetTestCase(unittest.TestCase):
         self.assertRaises(ops.ValidationError, self.env.get, 'ops-empty', type=TYPE, raise_exception=True)
 
     def test_boolean(self):
-        TYPE='boolean'
+        TYPE = 'boolean'
 
         self.assertEqual(self.env.get('ops-empty', type=TYPE), False)
         self.assertEqual(self.env.get('ops-empty', default=True, type=TYPE), True)
@@ -55,7 +61,7 @@ class EnvGetTestCase(unittest.TestCase):
         self.assertRaises(ops.ValidationError, self.env.get, 'ops-string', type=TYPE, raise_exception=True)
 
     def test_number(self):
-        TYPE='number'
+        TYPE = 'number'
 
         self.assertEqual(self.env.get('ops-empty', type=TYPE), 0)
         self.assertEqual(self.env.get('ops-empty', default=5, type=TYPE), 5)
@@ -65,7 +71,7 @@ class EnvGetTestCase(unittest.TestCase):
         self.assertRaises(ops.ValidationError, self.env.get, 'ops-string', type=TYPE, raise_exception=True)
 
     def test_integer(self):
-        TYPE='integer'
+        TYPE = 'integer'
 
         self.assertEqual(self.env.get('ops-empty', type=TYPE), 0)
         self.assertEqual(self.env.get('ops-empty', default=5, type=TYPE), 5)
@@ -75,7 +81,7 @@ class EnvGetTestCase(unittest.TestCase):
         self.assertRaises(ops.ValidationError, self.env.get, 'ops-string', type=TYPE, raise_exception=True)
 
     def test_float(self):
-        TYPE='float'
+        TYPE = 'float'
 
         self.assertEqual(self.env.get('ops-empty', type=TYPE), 0.0)
         self.assertEqual(self.env.get('ops-empty', default=5.0, type=TYPE), 5.0)
@@ -83,6 +89,7 @@ class EnvGetTestCase(unittest.TestCase):
         self.assertEqual(self.env.get('ops-float', type=TYPE), -10.5)
 
         self.assertRaises(ops.ValidationError, self.env.get, 'ops-string', type=TYPE, raise_exception=True)
+
 
 class EnvSetTestCase(unittest.TestCase):
 

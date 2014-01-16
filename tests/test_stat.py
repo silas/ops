@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import helper
 
 import datetime
@@ -6,8 +8,9 @@ import pwd
 import numbers
 import os
 import unittest
-import uuid
+
 import ops
+
 
 class StatTestCase(unittest.TestCase):
 

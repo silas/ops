@@ -1,6 +1,23 @@
+from __future__ import unicode_literals
+
 import logging
-import shutil
 import os
+import shutil
+import sys
+import uuid as uuid_
+
+
+py3 = sys.version_info.major > 2
+
+if py3:
+    bytes_type = bytes
+    unicode_type = str
+    basestring_type = str
+else:
+    bytes_type = str
+    unicode_type = unicode
+    basestring_type = basestring
+
 
 if os.environ.get('OPS_TEST_LOGGING'):
     ops_logger = logging.getLogger('ops')
@@ -8,6 +25,11 @@ if os.environ.get('OPS_TEST_LOGGING'):
     ops_logger.addHandler(logging.StreamHandler())
 
 PATH = os.path.join(os.path.realpath(os.path.dirname(__file__)), '.tmp')
+
+
+def uuid():
+    return uuid_.uuid4().hex
+
 
 class Workspace(object):
 

@@ -1,11 +1,14 @@
+from __future__ import unicode_literals
+
 import helper
 
 import grp
 import os
 import unittest
-import ops
 
+import ops
 from mock import patch
+
 
 class ChownTestCase(unittest.TestCase):
 
